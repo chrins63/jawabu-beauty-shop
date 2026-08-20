@@ -1,0 +1,405 @@
+/* =========================================================
+   JAWABU BEAUTY ADMIN — PRODUCTS
+   ========================================================= */
+
+.products-page {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ---------------------------------------------------------
+   PAGE HEADER
+   --------------------------------------------------------- */
+
+.products-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.products-header h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.products-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 16px;
+}
+
+/* ---------------------------------------------------------
+   TOOLBAR
+   --------------------------------------------------------- */
+
+.products-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.products-toolbar input {
+  width: min(420px, 100%);
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid #d8dee7;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.products-toolbar input::placeholder {
+  color: #94a3b8;
+}
+
+.products-toolbar input:focus {
+  border-color: #ed1761;
+  box-shadow: 0 0 0 3px rgba(237, 23, 97, 0.08);
+}
+
+/* ---------------------------------------------------------
+   ERROR
+   --------------------------------------------------------- */
+
+.products-error {
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+  color: #991b1b;
+}
+
+.products-error strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.products-error p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* ---------------------------------------------------------
+   PRODUCTS CARD
+   --------------------------------------------------------- */
+
+.products-card {
+  background: #ffffff;
+  border: 1px solid #e8ebef;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+}
+
+.products-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 22px 24px;
+  border-bottom: 1px solid #edf0f3;
+}
+
+.products-card-header h2 {
+  margin: 0 0 5px;
+  font-size: 20px;
+  color: #111827;
+}
+
+.products-card-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* ---------------------------------------------------------
+   ADD PRODUCT BUTTON
+   --------------------------------------------------------- */
+
+.add-product-button {
+  border: none;
+  background: #ed1761;
+  color: #ffffff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+  white-space: nowrap;
+}
+
+.add-product-button:hover {
+  background: #d91457;
+  transform: translateY(-1px);
+}
+
+.add-product-button:active {
+  transform: translateY(0);
+}
+
+/* ---------------------------------------------------------
+   TABLE
+   --------------------------------------------------------- */
+
+.products-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.products-table {
+  width: 100%;
+  min-width: 1050px;
+  border-collapse: collapse;
+}
+
+.products-table th {
+  background: #fafafa;
+  color: #475569;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 14px 18px;
+  border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+
+.products-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid #eef0f2;
+  color: #334155;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.products-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.products-table tbody tr:hover {
+  background: #fff8fb;
+}
+
+.products-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ---------------------------------------------------------
+   PRODUCT CELL
+   --------------------------------------------------------- */
+
+.product-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 260px;
+}
+
+.product-cell > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.product-cell strong {
+  color: #111827;
+  font-size: 14px;
+}
+
+.product-cell small {
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.4;
+  max-width: 280px;
+}
+
+/* ---------------------------------------------------------
+   PRODUCT IMAGE
+   --------------------------------------------------------- */
+
+.product-image {
+  width: 52px;
+  height: 52px;
+  object-fit: cover;
+  border-radius: 9px;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  flex-shrink: 0;
+}
+
+.product-image-placeholder {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+/* ---------------------------------------------------------
+   PRICE
+   --------------------------------------------------------- */
+
+.products-table td strong {
+  color: #111827;
+}
+
+.products-table td:nth-child(5) strong {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------
+   STOCK
+   --------------------------------------------------------- */
+
+.products-table td:nth-child(6) {
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------
+   STOCK STATUS
+   --------------------------------------------------------- */
+
+.stock-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.stock-status.good {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.stock-status.low {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.stock-status.out {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+/* ---------------------------------------------------------
+   ACTION BUTTONS
+   --------------------------------------------------------- */
+
+.view-button,
+.edit-button,
+.archive-button {
+  border: 1px solid #d8dee7;
+  background: #ffffff;
+  color: #111827;
+  padding: 7px 11px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+  margin-right: 6px;
+  margin-bottom: 4px;
+}
+
+.view-button:hover,
+.edit-button:hover {
+  border-color: #ed1761;
+  color: #ed1761;
+  background: #fdf2f8;
+}
+
+.archive-button {
+  color: #b91c1c;
+}
+
+.archive-button:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+/* ---------------------------------------------------------
+   EMPTY STATE
+   --------------------------------------------------------- */
+
+.products-empty {
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px 20px;
+  color: #64748b;
+}
+
+.products-empty .empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.products-empty h3 {
+  margin: 0 0 7px;
+  color: #334155;
+  font-size: 18px;
+}
+
+.products-empty p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* ---------------------------------------------------------
+   LOADING
+   --------------------------------------------------------- */
+
+.products-empty .loading-spinner {
+  color: #64748b;
+  font-size: 15px;
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE
+   --------------------------------------------------------- */
+
+@media (max-width: 768px) {
+  .products-header {
+    flex-direction: column;
+  }
+
+  .products-toolbar {
+    width: 100%;
+  }
+
+  .products-toolbar input {
+    width: 100%;
+  }
+
+  .products-card-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .add-product-button {
+    width: 100%;
+  }
+}

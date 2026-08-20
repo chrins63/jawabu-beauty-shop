@@ -1,0 +1,692 @@
+.jw-register-root {
+  --cream: #fffbf6;
+  --ink: #1c1714;
+  --ink-soft: rgba(28, 23, 20, 0.58);
+  --rose: #e92063;
+  --rose-deep: #b5134a;
+
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+
+  font-family: "Inter", sans-serif;
+  color: var(--ink);
+  background: var(--ink);
+}
+
+/* =========================
+   BACKGROUND
+========================= */
+
+.jw-register-media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.jw-register-video {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  animation: jw-register-kenburns
+    26s ease-in-out infinite alternate;
+}
+
+@keyframes jw-register-kenburns {
+  0% {
+    transform: scale(1.04);
+  }
+
+  100% {
+    transform: scale(1.14)
+      translate(-1%, -1.5%);
+  }
+}
+
+.jw-register-fallback {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      120deg,
+      #f4dec6,
+      #f7d6dd 45%,
+      #e92063 130%
+    );
+
+  background-size: 240% 240%;
+
+  animation: jw-register-gradient
+    16s ease-in-out infinite;
+}
+
+@keyframes jw-register-gradient {
+  0%,
+  100% {
+    background-position: 0% 40%;
+  }
+
+  50% {
+    background-position: 100% 60%;
+  }
+}
+
+/* =========================
+   OVERLAYS
+========================= */
+
+.jw-register-scrim {
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(20, 14, 13, 0.58) 0%,
+      rgba(20, 14, 13, 0.16) 42%,
+      rgba(20, 14, 13, 0.05) 60%,
+      rgba(28, 20, 20, 0.5) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(20, 14, 13, 0.35) 0%,
+      transparent 22%,
+      transparent 72%,
+      rgba(20, 14, 13, 0.4) 100%
+    );
+}
+
+.jw-register-grain {
+  position: absolute;
+  inset: -20%;
+
+  opacity: 0.05;
+
+  mix-blend-mode: overlay;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  pointer-events: none;
+}
+
+/* =========================
+   CINEMATIC BARS
+========================= */
+
+.jw-register-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+
+  height: 7vh;
+
+  background: #0f0b0a;
+
+  z-index: 5;
+
+  transition:
+    transform 0.9s
+    cubic-bezier(0.65, 0, 0.24, 1);
+}
+
+.jw-register-bar.top {
+  top: 0;
+  transform: translateY(-100%);
+}
+
+.jw-register-bar.bottom {
+  bottom: 0;
+  transform: translateY(100%);
+}
+
+.jw-register-root.-stage1
+  .jw-register-bar.top,
+.jw-register-root.-stage2
+  .jw-register-bar.top,
+.jw-register-root.-stage3
+  .jw-register-bar.top {
+  transform: translateY(0);
+}
+
+.jw-register-root.-stage1
+  .jw-register-bar.bottom,
+.jw-register-root.-stage2
+  .jw-register-bar.bottom,
+.jw-register-root.-stage3
+  .jw-register-bar.bottom {
+  transform: translateY(0);
+}
+
+/* =========================
+   NAVIGATION
+========================= */
+
+.jw-register-nav {
+  position: absolute;
+
+  top: 7vh;
+  left: 0;
+  right: 0;
+
+  z-index: 4;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 30px 48px 0;
+
+  opacity: 0;
+
+  transform: translateY(-10px);
+
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s ease;
+}
+
+.jw-register-root.-stage2
+  .jw-register-nav,
+.jw-register-root.-stage3
+  .jw-register-nav {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.jw-register-wordmark {
+  color: var(--cream);
+
+  font-family: "Fraunces", serif;
+
+  font-size: 22px;
+
+  letter-spacing: 0.18em;
+
+  text-decoration: none;
+}
+
+.jw-register-nav-tag {
+  color: rgba(255, 251, 246, 0.75);
+
+  font-size: 11px;
+
+  letter-spacing: 0.16em;
+
+  text-transform: uppercase;
+
+  text-decoration: none;
+}
+
+/* =========================
+   CAPTION
+========================= */
+
+.jw-register-caption {
+  position: absolute;
+
+  left: 6vw;
+  bottom: 12vh;
+
+  z-index: 3;
+
+  max-width: 380px;
+
+  opacity: 0;
+
+  transform: translateY(14px);
+
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease;
+}
+
+.jw-register-root.-stage2
+  .jw-register-caption,
+.jw-register-root.-stage3
+  .jw-register-caption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.jw-register-eyebrow {
+  color: rgba(255, 251, 246, 0.7);
+
+  font-size: 11px;
+
+  letter-spacing: 0.16em;
+
+  text-transform: uppercase;
+}
+
+.jw-register-caption p {
+  margin: 0;
+
+  color: var(--cream);
+
+  font-family: "Fraunces", serif;
+
+  font-size: 30px;
+
+  line-height: 1.2;
+}
+
+.jw-register-script {
+  color: var(--rose);
+
+  font-family: "Pinyon Script", cursive;
+
+  font-size: 44px;
+
+  line-height: 1;
+}
+
+/* =========================
+   STAGE
+========================= */
+
+.jw-register-stagearea {
+  position: relative;
+
+  z-index: 3;
+
+  min-height: 100vh;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-end;
+
+  padding: 7vh 6vw;
+
+  box-sizing: border-box;
+}
+
+/* =========================
+   CARD
+========================= */
+
+.jw-register-card {
+  position: relative;
+
+  width: 100%;
+
+  max-width: 420px;
+
+  padding: 36px;
+
+  box-sizing: border-box;
+
+  border-radius: 20px;
+
+  border: 1px solid
+    rgba(255, 255, 255, 0.65);
+
+  background: rgba(255, 255, 255, 0.5);
+
+  -webkit-backdrop-filter:
+    blur(22px) saturate(140%);
+
+  backdrop-filter:
+    blur(22px) saturate(140%);
+
+  box-shadow:
+    0 30px 70px
+    rgba(20, 10, 15, 0.35);
+
+  opacity: 0;
+
+  transform:
+    translateY(26px)
+    scale(0.98);
+
+  transition:
+    opacity 0.8s
+      cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.8s
+      cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.jw-register-root.-stage3
+  .jw-register-card {
+  opacity: 1;
+
+  transform:
+    translateY(0)
+    scale(1);
+}
+
+.jw-register-card-eyebrow {
+  margin-bottom: 10px;
+
+  color: var(--rose-deep);
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.16em;
+
+  text-transform: uppercase;
+}
+
+.jw-register-title {
+  margin: 0 0 6px;
+
+  color: var(--ink);
+
+  font-family: "Fraunces", serif;
+
+  font-size: 32px;
+
+  font-weight: 500;
+
+  line-height: 1.15;
+}
+
+.jw-register-title
+  .jw-register-script {
+  margin-left: 4px;
+
+  font-size: 40px;
+
+  font-weight: 400;
+}
+
+.jw-register-sub {
+  margin: 0 0 22px;
+
+  color: var(--ink-soft);
+
+  font-size: 13.5px;
+}
+
+.jw-register-sub a,
+.jw-register-foot a,
+.jw-register-success-link {
+  color: var(--rose-deep);
+
+  font-weight: 600;
+
+  text-decoration: none;
+}
+
+/* =========================
+   MESSAGES
+========================= */
+
+.jw-register-error {
+  margin-bottom: 16px;
+
+  padding: 12px 14px;
+
+  border:
+    1px solid
+    rgba(181, 19, 74, 0.25);
+
+  border-radius: 10px;
+
+  background:
+    rgba(181, 19, 74, 0.08);
+
+  color: var(--rose-deep);
+
+  font-size: 13px;
+
+  line-height: 1.4;
+}
+
+.jw-register-success {
+  margin-bottom: 16px;
+
+  padding: 12px 14px;
+
+  border:
+    1px solid
+    rgba(40, 130, 80, 0.25);
+
+  border-radius: 10px;
+
+  background:
+    rgba(40, 130, 80, 0.08);
+
+  color: #246b45;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+.jw-register-success-link {
+  display: block;
+
+  margin-top: 6px;
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+.jw-register-field {
+  position: relative;
+
+  margin-bottom: 16px;
+}
+
+.jw-register-field input {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding:
+    19px
+    60px
+    7px
+    16px;
+
+  border:
+    1.5px solid
+    rgba(28, 23, 20, 0.14);
+
+  border-radius: 12px;
+
+  outline: none;
+
+  background:
+    rgba(255, 255, 255, 0.75);
+
+  color: var(--ink);
+
+  font-family: "Inter", sans-serif;
+
+  font-size: 14.5px;
+
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
+}
+
+.jw-register-field input:focus {
+  border-color: var(--rose);
+
+  background: #fff;
+
+  box-shadow:
+    0 0 0 4px
+    rgba(233, 32, 99, 0.1);
+}
+
+.jw-register-field label {
+  position: absolute;
+
+  left: 16px;
+  top: 15px;
+
+  color: var(--ink-soft);
+
+  font-size: 14.5px;
+
+  pointer-events: none;
+
+  transform-origin: left top;
+
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease,
+    top 0.2s ease;
+}
+
+.jw-register-field.-active label,
+.jw-register-field
+  input:focus
+  + label,
+.jw-register-field
+  input:not(:placeholder-shown)
+  + label {
+  top: 8px;
+
+  transform: scale(0.7);
+
+  color: var(--rose-deep);
+}
+
+/* =========================
+   PASSWORD TOGGLE
+========================= */
+
+.jw-register-toggle {
+  position: absolute;
+
+  right: 14px;
+  top: 15px;
+
+  padding: 4px 6px;
+
+  border: none;
+
+  background: none;
+
+  color: var(--ink-soft);
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.03em;
+
+  cursor: pointer;
+}
+
+.jw-register-toggle:hover {
+  color: var(--rose-deep);
+}
+
+/* =========================
+   BUTTON
+========================= */
+
+.jw-register-btn {
+  width: 100%;
+
+  margin-top: 4px;
+
+  padding: 15px 20px;
+
+  border: none;
+
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      120deg,
+      var(--rose-deep),
+      var(--rose)
+    );
+
+  color: #fff;
+
+  font-family: "Inter", sans-serif;
+
+  font-size: 14.5px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.25s ease;
+}
+
+.jw-register-btn:hover {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 14px 28px
+    rgba(233, 32, 99, 0.35);
+}
+
+.jw-register-btn:active {
+  transform: translateY(0);
+}
+
+.jw-register-btn:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.65;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+.jw-register-foot {
+  margin: 20px 0 0;
+
+  color: var(--ink-soft);
+
+  font-size: 11.5px;
+
+  line-height: 1.5;
+
+  text-align: center;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 900px) {
+  .jw-register-stagearea {
+    justify-content: center;
+
+    padding:
+      12vh
+      20px;
+  }
+
+  .jw-register-nav {
+    padding:
+      20px
+      20px
+      0;
+  }
+
+  .jw-register-caption {
+    display: none;
+  }
+
+  .jw-register-card {
+    max-width: 430px;
+
+    padding: 30px 24px;
+  }
+}

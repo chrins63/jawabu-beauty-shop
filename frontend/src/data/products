@@ -1,0 +1,58 @@
+const products = [
+  {
+    id: 1,
+    name: "Deep Hydrating Body Lotion",
+    price: 1200,
+    category: "Skincare",
+    image: "/images/products/body-lotion.jpg",
+    description:
+      "Rich body lotion with shea butter and Vitamin E for deep hydration."
+  },
+  {
+    id: 2,
+    name: "Vitamin C Face Serum",
+    price: 1800,
+    category: "Skincare",
+    image: "/images/products/glow-serum.jpg",
+    description:
+      "Brightening serum that improves skin tone and texture."
+  },
+  {
+    id: 3,
+    name: "Hair Nourishing Oil",
+    price: 950,
+    category: "Hair Care",
+    image: "/images/products/hair-nourishing-oil.jpg",
+    description:
+      "Natural oils that strengthen hair and reduce breakage."
+  },
+  {
+    id: 4,
+    name: "Hydrating Facial Cleanser",
+    price: 1400,
+    category: "Skincare",
+    image: "/images/products/hydrating-facial-cleanser.jpg",
+    description:
+      "Gentle cleanser suitable for daily use."
+  },
+  {
+    id: 5,
+    name: "Signature Fragrance",
+    price: 3500,
+    category: "Fragrance",
+    image: "/images/products/signature-fragrance.jpg",
+    description:
+      "Elegant long-lasting perfume."
+  },
+  {
+    id: 6,
+    name: "Lip Gloss",
+    price: 800,
+    category: "Makeup",
+    image: "/images/products/lip-gloss.jpg",
+    description:
+      "High-shine moisturizing lip gloss."
+  }
+]
+
+export default products

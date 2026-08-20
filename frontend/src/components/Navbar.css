@@ -1,0 +1,829 @@
+/* =========================================================
+   JAWABU BEAUTY — NAVBAR
+   Clean spacing / no overlapping
+   ========================================================= */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  width: 100%;
+
+  background: #fcf8f3;
+
+  border-bottom: 1px solid rgba(43, 29, 34, 0.08);
+
+  transition:
+    background 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+
+
+/* =========================================================
+   SCROLLED
+   ========================================================= */
+
+.navbar--scrolled {
+  background: rgba(252, 248, 243, 0.92);
+
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(150%);
+
+  border-bottom-color: rgba(43, 29, 34, 0.1);
+
+  box-shadow: 0 8px 30px -20px rgba(43, 29, 34, 0.35);
+}
+
+
+/* =========================================================
+   MAIN CONTAINER
+   ========================================================= */
+
+.navbar-container {
+  width: 100%;
+  max-width: 1400px;
+
+  min-height: 68px;
+
+  margin: 0 auto;
+
+  padding: 0 28px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  gap: 0;
+}
+
+
+/* =========================================================
+   LOGO
+   ========================================================= */
+
+.navbar-logo {
+  display: inline-flex;
+  align-items: baseline;
+
+  gap: 7px;
+
+  flex-shrink: 0;
+
+  text-decoration: none;
+
+  line-height: 1;
+}
+
+.navbar-logo-mark {
+  font-family:
+    'Fraunces',
+    Georgia,
+    serif;
+
+  font-size: 24px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.08em;
+
+  color: #2b1d22;
+}
+
+.navbar-logo-script {
+  font-family:
+    'Pinyon Script',
+    cursive;
+
+  font-size: 21px;
+
+  color: #e31c79;
+
+  transform: translateY(2px);
+}
+
+
+/* =========================================================
+   DESKTOP NAVIGATION
+   ========================================================= */
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+
+  gap: 38px;
+
+  margin-left: 75px;
+}
+
+.navbar-link {
+  position: relative;
+
+  display: inline-flex;
+  align-items: center;
+
+  padding: 8px 2px;
+
+  font-family:
+    'Inter',
+    Arial,
+    sans-serif;
+
+  font-size: 14px;
+
+  font-weight: 500;
+
+  color: #2b1d22;
+
+  text-decoration: none;
+
+  white-space: nowrap;
+
+  transition: color 0.2s ease;
+}
+
+.navbar-link:hover {
+  color: #b8115c;
+}
+
+.navbar-link::after {
+  content: '';
+
+  position: absolute;
+
+  left: 0;
+  bottom: 3px;
+
+  width: 100%;
+  height: 1.5px;
+
+  background: #e31c79;
+
+  transform: scaleX(0);
+  transform-origin: right;
+
+  transition: transform 0.25s ease;
+}
+
+.navbar-link:hover::after,
+.navbar-link:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.navbar-actions {
+  margin-left: auto;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  flex-shrink: 0;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   ICON BUTTON
+   ========================================================= */
+
+.navbar-icon-btn {
+  position: relative;
+
+  width: 40px;
+  height: 40px;
+
+  flex: 0 0 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 50%;
+
+  background: transparent;
+
+  color: #2b1d22;
+
+  font-size: 18px;
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.navbar-icon-btn:hover {
+  background: #f6dce0;
+
+  color: #b8115c;
+
+  transform: translateY(-1px);
+}
+
+.navbar-icon-btn:focus-visible {
+  outline: 2px solid #e31c79;
+  outline-offset: 2px;
+}
+
+
+/* =========================================================
+   CART / WISHLIST BADGES
+   ========================================================= */
+
+.navbar-badge {
+  position: absolute;
+
+  top: 2px;
+  right: 2px;
+
+  min-width: 17px;
+  height: 17px;
+
+  padding: 0 4px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+
+  background: #e31c79;
+
+  color: #fff;
+
+  border: 2px solid #fcf8f3;
+
+  font-family: 'Inter', sans-serif;
+
+  font-size: 9px;
+
+  font-weight: 700;
+
+  line-height: 1;
+}
+
+
+/* =========================================================
+   ACCOUNT WRAPPER
+   ========================================================= */
+
+.navbar-account-wrapper {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  flex: 0 0 auto;
+
+  margin-left: 4px;
+}
+
+
+/* =========================================================
+   ACCOUNT BUTTON
+   ========================================================= */
+
+.navbar-account {
+  height: 40px;
+
+  min-width: 88px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 11px;
+
+  box-sizing: border-box;
+
+  border: none;
+  border-radius: 999px;
+
+  background: transparent;
+
+  color: #2b1d22;
+
+  font-family:
+    'Inter',
+    Arial,
+    sans-serif;
+
+  font-size: 13px;
+
+  font-weight: 500;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.navbar-account:hover {
+  background: #f6dce0;
+
+  color: #b8115c;
+}
+
+.navbar-account:focus-visible {
+  outline: 2px solid #e31c79;
+  outline-offset: 2px;
+}
+
+.navbar-account svg {
+  width: 17px;
+  height: 17px;
+
+  flex: 0 0 17px;
+}
+
+
+/* =========================================================
+   ACCOUNT CHEVRON
+   ========================================================= */
+
+.navbar-account-chevron {
+  width: 13px !important;
+  height: 13px !important;
+
+  transition: transform 0.2s ease;
+}
+
+.navbar-account-chevron.is-open {
+  transform: rotate(180deg);
+}
+
+
+/* =========================================================
+   ACCOUNT DROPDOWN
+   ========================================================= */
+
+.navbar-account-dropdown {
+  position: absolute;
+
+  top: calc(100% + 10px);
+
+  right: 0;
+
+  width: 250px;
+
+  padding: 10px;
+
+  box-sizing: border-box;
+
+  background: rgba(255, 250, 247, 0.98);
+
+  border: 1px solid rgba(43, 29, 34, 0.1);
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 20px 45px -20px rgba(43, 29, 34, 0.42);
+
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+
+  z-index: 2000;
+
+  animation: navbar-dropdown-in 0.18s ease-out;
+}
+
+@keyframes navbar-dropdown-in {
+  from {
+    opacity: 0;
+    transform: translateY(-7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* =========================================================
+   ACCOUNT HEADER
+   ========================================================= */
+
+.navbar-account-header {
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+
+  padding: 11px;
+
+  margin-bottom: 3px;
+
+  border-bottom: 1px solid rgba(43, 29, 34, 0.1);
+}
+
+.navbar-account-name {
+  font-family:
+    'Fraunces',
+    Georgia,
+    serif;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  color: #2b1d22;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navbar-account-email {
+  font-family:
+    'Inter',
+    Arial,
+    sans-serif;
+
+  font-size: 11px;
+
+  color: rgba(43, 29, 34, 0.55);
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   ACCOUNT LINKS
+   ========================================================= */
+
+.navbar-account-link,
+.navbar-signout {
+  width: 100%;
+
+  min-height: 40px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 10px 11px;
+
+  box-sizing: border-box;
+
+  border: none;
+  border-radius: 9px;
+
+  background: transparent;
+
+  color: #2b1d22;
+
+  font-family:
+    'Inter',
+    Arial,
+    sans-serif;
+
+  font-size: 13px;
+
+  font-weight: 500;
+
+  text-decoration: none;
+
+  text-align: left;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+.navbar-account-link svg,
+.navbar-signout svg {
+  width: 15px;
+  height: 15px;
+
+  flex: 0 0 15px;
+}
+
+.navbar-account-link:hover,
+.navbar-signout:hover {
+  background: #fff0f4;
+
+  color: #e31c79;
+}
+
+
+/* =========================================================
+   MOBILE MENU
+   ========================================================= */
+
+.navbar-menu-btn {
+  display: none;
+}
+
+
+/* =========================================================
+   MOBILE BACKDROP
+   ========================================================= */
+
+.navbar-mobile-backdrop {
+  position: fixed;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  padding: 0;
+
+  border: none;
+
+  background: rgba(43, 29, 34, 0.35);
+
+  cursor: default;
+
+  z-index: 900;
+}
+
+
+/* =========================================================
+   MOBILE PANEL
+   ========================================================= */
+
+.navbar-mobile-panel {
+  position: fixed;
+
+  top: 0;
+  left: 0;
+
+  width: min(78vw, 320px);
+  height: 100vh;
+
+  box-sizing: border-box;
+
+  padding: 5.5rem 1.75rem 2rem;
+
+  background: #fcf8f3;
+
+  border-right: 1px solid rgba(43, 29, 34, 0.1);
+
+  box-shadow:
+    20px 0 45px -20px rgba(43, 29, 34, 0.4);
+
+  transform: translateX(-100%);
+
+  transition:
+    transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+
+  z-index: 950;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.4rem;
+
+  visibility: hidden;
+}
+
+.navbar-mobile-panel.is-open {
+  transform: translateX(0);
+
+  visibility: visible;
+}
+
+
+/* =========================================================
+   MOBILE LINKS
+   ========================================================= */
+
+.navbar-mobile-links {
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar-mobile-link {
+  font-family:
+    'Fraunces',
+    Georgia,
+    serif;
+
+  font-size: 1.35rem;
+
+  color: #2b1d22;
+
+  text-decoration: none;
+
+  padding: 0.65rem 0;
+
+  transition: color 0.2s ease;
+}
+
+.navbar-mobile-link:hover {
+  color: #e31c79;
+}
+
+
+/* =========================================================
+   MOBILE DIVIDER
+   ========================================================= */
+
+.navbar-mobile-divider {
+  width: 100%;
+
+  height: 1px;
+
+  margin: 0.75rem 0;
+
+  background: rgba(43, 29, 34, 0.1);
+}
+
+
+/* =========================================================
+   MOBILE SIGN OUT
+   ========================================================= */
+
+.navbar-mobile-signout {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 0.5rem 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #b8115c;
+
+  font-family: 'Inter', sans-serif;
+
+  font-size: 0.95rem;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   TABLET / MOBILE
+   ========================================================= */
+
+@media (max-width: 860px) {
+
+  .navbar-container {
+    min-height: 64px;
+
+    padding: 0 16px;
+  }
+
+  .navbar-menu-btn {
+    display: inline-flex;
+  }
+
+  .navbar-links {
+    display: none;
+  }
+
+  .navbar-logo {
+    margin-left: 15px;
+  }
+
+  .navbar-actions {
+    gap: 4px;
+  }
+
+  .navbar-icon-btn {
+    width: 38px;
+    height: 38px;
+
+    flex-basis: 38px;
+  }
+
+  .navbar-account {
+    min-width: 38px;
+
+    width: 38px;
+
+    padding: 0;
+  }
+
+  .navbar-account span {
+    display: none;
+  }
+
+  .navbar-account-chevron {
+    display: none;
+  }
+
+  .navbar-account-wrapper {
+    margin-left: 2px;
+  }
+}
+
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+  .navbar-container {
+    padding: 0 10px;
+  }
+
+  .navbar-logo-script {
+    display: none;
+  }
+
+  .navbar-logo-mark {
+    font-size: 20px;
+  }
+
+  .navbar-actions {
+    gap: 2px;
+  }
+
+  .navbar-icon-btn {
+    width: 36px;
+    height: 36px;
+
+    flex-basis: 36px;
+  }
+
+  .navbar-actions
+  > .navbar-icon-btn:first-child {
+    display: none;
+  }
+
+  .navbar-account {
+    width: 36px;
+    min-width: 36px;
+  }
+
+  .navbar-account-dropdown {
+    position: fixed;
+
+    top: 70px;
+    right: 12px;
+
+    width: min(
+      250px,
+      calc(100vw - 24px)
+    );
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .navbar,
+  .navbar-link::after,
+  .navbar-icon-btn,
+  .navbar-account,
+  .navbar-account-chevron,
+  .navbar-account-dropdown,
+  .navbar-mobile-panel,
+  .navbar-mobile-link {
+    transition: none;
+
+    animation: none;
+  }
+}

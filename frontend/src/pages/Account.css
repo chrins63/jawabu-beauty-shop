@@ -1,0 +1,520 @@
+/* =========================================================
+   JAWABU BEAUTY — ACCOUNT PAGE
+   ========================================================= */
+
+.account-page {
+  min-height: calc(100vh - 66px);
+  background: #fcf8f3;
+  color: #2b1d22;
+}
+
+
+/* =========================================================
+   CONTAINER
+   ========================================================= */
+
+.account-container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+.account-loading {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.account-loader {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: rgba(43, 29, 34, 0.6);
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.account-hero {
+  padding: 5rem 0 4rem;
+  background:
+    radial-gradient(
+      circle at 85% 20%,
+      rgba(246, 220, 224, 0.7),
+      transparent 35%
+    ),
+    #fcf8f3;
+  border-bottom: 1px solid rgba(43, 29, 34, 0.08);
+}
+
+.account-eyebrow {
+  margin-bottom: 1rem;
+
+  font-family: 'Inter', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+
+  color: #e31c79;
+}
+
+.account-title {
+  max-width: 780px;
+  margin: 0;
+
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(2.6rem, 6vw, 5rem);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+}
+
+.account-title span {
+  display: block;
+
+  margin-top: 0.35rem;
+
+  font-family: 'Pinyon Script', cursive;
+  font-size: 1.05em;
+  font-weight: 400;
+
+  color: #e31c79;
+  letter-spacing: 0;
+}
+
+.account-intro {
+  max-width: 570px;
+  margin: 1.6rem 0 0;
+
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.75;
+
+  color: rgba(43, 29, 34, 0.62);
+}
+
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+.account-content {
+  padding: 3rem 0 5rem;
+}
+
+
+/* =========================================================
+   PROFILE
+   ========================================================= */
+
+.account-profile-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  padding: 1.25rem;
+
+  background: #fffaf7;
+
+  border: 1px solid rgba(43, 29, 34, 0.09);
+  border-radius: 18px;
+
+  box-shadow:
+    0 18px 45px -35px rgba(43, 29, 34, 0.35);
+}
+
+.account-avatar {
+  width: 54px;
+  height: 54px;
+
+  flex: 0 0 54px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #f6dce0;
+  color: #b8115c;
+
+  font-size: 1.3rem;
+}
+
+.account-profile-info h2 {
+  margin: 0;
+
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.account-email {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  margin-top: 0.35rem;
+
+  font-family: 'Inter', sans-serif;
+  font-size: 0.78rem;
+
+  color: rgba(43, 29, 34, 0.55);
+}
+
+.account-email svg {
+  width: 14px;
+  height: 14px;
+}
+
+
+/* =========================================================
+   ACTION GRID
+   ========================================================= */
+
+.account-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 1rem;
+
+  margin-top: 1rem;
+}
+
+
+/* =========================================================
+   ACTION CARD
+   ========================================================= */
+
+.account-action-card {
+  position: relative;
+
+  min-height: 145px;
+
+  display: flex;
+  align-items: flex-start;
+
+  gap: 1rem;
+
+  padding: 1.35rem;
+
+  box-sizing: border-box;
+
+  background: #fffaf7;
+
+  border: 1px solid rgba(43, 29, 34, 0.09);
+  border-radius: 18px;
+
+  text-decoration: none;
+  color: #2b1d22;
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.account-action-card:hover {
+  transform: translateY(-3px);
+
+  border-color: rgba(227, 28, 121, 0.3);
+
+  box-shadow:
+    0 20px 45px -30px rgba(43, 29, 34, 0.4);
+}
+
+.account-action-icon {
+  width: 42px;
+  height: 42px;
+
+  flex: 0 0 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #f6dce0;
+  color: #b8115c;
+}
+
+.account-action-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.account-action-content {
+  padding-right: 1.5rem;
+}
+
+.account-action-content h3 {
+  margin: 0;
+
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.account-action-content p {
+  margin: 0.45rem 0 0;
+
+  font-family: 'Inter', sans-serif;
+  font-size: 0.78rem;
+  line-height: 1.6;
+
+  color: rgba(43, 29, 34, 0.58);
+}
+
+.account-action-arrow {
+  position: absolute;
+
+  top: 1.4rem;
+  right: 1.35rem;
+
+  width: 16px;
+  height: 16px;
+
+  color: rgba(43, 29, 34, 0.35);
+
+  transition:
+    transform 0.25s ease,
+    color 0.25s ease;
+}
+
+.account-action-card:hover .account-action-arrow {
+  transform: translateX(3px);
+  color: #e31c79;
+}
+
+.account-action-disabled {
+  cursor: default;
+}
+
+.account-action-disabled:hover {
+  transform: none;
+  border-color: rgba(43, 29, 34, 0.09);
+  box-shadow: none;
+}
+
+
+/* =========================================================
+   DETAILS
+   ========================================================= */
+
+.account-details {
+  margin-top: 4rem;
+}
+
+.account-section-heading {
+  margin-bottom: 1rem;
+}
+
+.account-section-heading span {
+  display: block;
+
+  margin-bottom: 0.35rem;
+
+  font-family: 'Inter', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+
+  color: #e31c79;
+}
+
+.account-section-heading h2 {
+  margin: 0;
+
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.7rem;
+  font-weight: 500;
+}
+
+.account-details-card {
+  background: #fffaf7;
+
+  border: 1px solid rgba(43, 29, 34, 0.09);
+  border-radius: 18px;
+
+  overflow: hidden;
+}
+
+.account-detail-row {
+  display: grid;
+
+  grid-template-columns: 180px 1fr;
+
+  gap: 1rem;
+
+  padding: 1.15rem 1.3rem;
+
+  border-bottom: 1px solid rgba(43, 29, 34, 0.08);
+}
+
+.account-detail-row:last-child {
+  border-bottom: none;
+}
+
+.account-detail-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+
+  color: rgba(43, 29, 34, 0.5);
+}
+
+.account-detail-value {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+
+  color: #2b1d22;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+   SIGN OUT
+   ========================================================= */
+
+.account-signout-area {
+  display: flex;
+  justify-content: flex-end;
+
+  margin-top: 2rem;
+}
+
+.account-signout {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  padding: 0.7rem 1rem;
+
+  border: 1px solid rgba(184, 17, 92, 0.2);
+  border-radius: 999px;
+
+  background: transparent;
+
+  color: #b8115c;
+
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.account-signout:hover {
+  background: #fff0f4;
+  border-color: rgba(184, 17, 92, 0.35);
+}
+
+.account-signout:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .account-container {
+    padding: 0 1rem;
+  }
+
+  .account-hero {
+    padding: 3.5rem 0 3rem;
+  }
+
+  .account-title {
+    font-size: clamp(2.5rem, 13vw, 4rem);
+  }
+
+  .account-content {
+    padding: 2rem 0 4rem;
+  }
+
+  .account-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-detail-row {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .account-signout-area {
+    justify-content: flex-start;
+  }
+}
+
+
+.account-orders-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.account-order-card {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1.1rem 1.25rem;
+  background: #fffaf7;
+  border: 1px solid rgba(43, 29, 34, 0.09);
+  border-radius: 16px;
+}
+
+.account-order-id {
+  display: block;
+  font-family: Inter, sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.account-order-meta,
+.account-order-status {
+  margin: 0.3rem 0 0;
+  font-family: Inter, sans-serif;
+  font-size: 0.78rem;
+  color: rgba(43, 29, 34, 0.55);
+  text-transform: capitalize;
+}
+
+@media (max-width: 700px) {
+  .account-order-card {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .account-action-card,
+  .account-action-arrow,
+  .account-signout {
+    transition: none;
+  }
+}
