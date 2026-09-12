@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
@@ -55,16 +56,14 @@ export default function Login() {
     // Successful login
     setSubmitting(false);
 
-    navigate("/", { replace: true });
+    navigate("/account", { replace: true });
   };
 
   return (
     <div
-      className={`jw-root${
-        stage >= 1 ? " -stage1" : ""
-      }${stage >= 2 ? " -stage2" : ""}${
-        stage >= 3 ? " -stage3" : ""
-      }`}
+      className={`jw-root${stage >= 1 ? " -stage1" : ""}${
+        stage >= 2 ? " -stage2" : ""
+      }${stage >= 3 ? " -stage3" : ""}`}
     >
       {/* Background media */}
       <div className="jw-media">
@@ -92,32 +91,15 @@ export default function Login() {
       <div className="jw-bar top" />
       <div className="jw-bar bottom" />
 
-      {/* Brand navigation */}
-      <div className="jw-nav">
-        <Link
-          to="/"
-          className="jw-wordmark"
-          style={{ textDecoration: "none" }}
-        >
-          JAWABU
-        </Link>
-
-        <Link to="/" className="jw-nav-tag">
-          Back to home
-        </Link>
-      </div>
-
       {/* Left caption */}
       <div className="jw-caption">
-        <span className="eyebrow">
-          The Jawabu Edit
-        </span>
+        <span className="eyebrow">The Sleek Edit</span>
 
         <p>
-          Beauty that
+          Look good.
           <br />
           <span className="jw-script">
-            feels personal.
+            Stay sleek.
           </span>
         </p>
       </div>
@@ -127,7 +109,6 @@ export default function Login() {
         <form
           className="jw-card"
           onSubmit={handleSubmit}
-          noValidate={false}
         >
           <div className="jw-eyebrow">
             Welcome back
@@ -140,9 +121,13 @@ export default function Login() {
             </span>
           </h1>
 
+          {/* Create account */}
           <p className="jw-sub">
             New here?{" "}
-            <Link to="/register">
+            <Link
+              className="jw-create-account"
+              to="/register"
+            >
               Create an account
             </Link>
           </p>
@@ -179,7 +164,9 @@ export default function Login() {
               required
             />
 
-            <label>Email address</label>
+            <label>
+              Email address
+            </label>
           </div>
 
           {/* Password */}
@@ -212,7 +199,9 @@ export default function Login() {
               required
             />
 
-            <label>Password</label>
+            <label>
+              Password
+            </label>
 
             <button
               type="button"
@@ -234,14 +223,6 @@ export default function Login() {
 
           {/* Remember / Forgot */}
           <div className="jw-row">
-            <label className="jw-remember">
-              <input
-                type="checkbox"
-                defaultChecked
-              />
-              Remember me
-            </label>
-
             <Link
               className="jw-forgot"
               to="/forgot-password"
@@ -277,15 +258,20 @@ export default function Login() {
             type="button"
             className="jw-alt"
             onClick={async () => {
-              const { error } = await supabase.auth.signInWithOAuth({
-                provider: "google",
-                options: {
-                  redirectTo: `${window.location.origin}/account`,
-                },
-              });
+              setErrorMessage("");
+
+              const { error } =
+                await supabase.auth.signInWithOAuth({
+                  provider: "google",
+                  options: {
+                    redirectTo: `${window.location.origin}/account`,
+                  },
+                });
 
               if (error) {
-                setErrorMessage(error.message);
+                setErrorMessage(
+                  error.message
+                );
               }
             }}
           >
@@ -294,7 +280,7 @@ export default function Login() {
 
           {/* Terms */}
           <p className="jw-foot">
-            By continuing you agree to Jawabu's{" "}
+            By continuing you agree to Sleek Sisters'{" "}
             <Link to="/terms">
               Terms
             </Link>{" "}

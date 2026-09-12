@@ -105,13 +105,37 @@ export const AuthProvider = ({ children }) => {
     };
   }, []);
 
-  const login = async (email, password) => {
-    const result = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+  const login = async (identifier, pin) => {
+    const trimmed = String(identifier || '').trim();
+    const secret = String(pin || '').trim();
 
-    return result;
+    if (!trimmed.includes('@')) {
+      const { data, error } = await supabase.functions.invoke('staff-login', {
+        body: { identifier: trimmed, pin: secret },
+      });
+
+      if (error || data?.error || !data?.session) {
+        return {
+          data: { user: null, session: null },
+          error: {
+            message:
+              data?.error ||
+              error?.message ||
+              'Invalid login details',
+          },
+        };
+      }
+
+      return supabase.auth.setSession({
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+      });
+    }
+
+    return supabase.auth.signInWithPassword({
+      email: trimmed,
+      password: secret,
+    });
   };
 
   const logout = async () => {

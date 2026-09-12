@@ -134,8 +134,6 @@ export default function Register() {
         return;
       }
 
-      console.log("Registration successful:", data);
-
       // =========================
       // IF USER IS IMMEDIATELY LOGGED IN
       // =========================
@@ -147,7 +145,7 @@ export default function Register() {
 
         // Give the success message a moment to appear
         setTimeout(() => {
-          navigate("/");
+          navigate("/account");
         }, 1200);
 
         return;
@@ -210,7 +208,7 @@ export default function Register() {
             preload="auto"
             onError={() => {
               console.error(
-                "Jawabu registration background video failed to load."
+                "Sleek Sisters registration background video failed to load."
               );
 
               setVideoOk(false);
@@ -244,7 +242,7 @@ export default function Register() {
           to="/"
           className="jw-register-wordmark"
         >
-          JAWABU
+          SLEEK
         </Link>
 
         <Link
@@ -263,7 +261,7 @@ export default function Register() {
       <div className="jw-register-caption">
 
         <span className="jw-register-eyebrow">
-          The Jawabu Edit
+          The Sleek Edit
         </span>
 
         <p>
@@ -294,7 +292,7 @@ export default function Register() {
           ====================================== */}
 
           <div className="jw-register-card-eyebrow">
-            Welcome to Jawabu
+            Welcome to Sleek Sisters
           </div>
 
           <h1 className="jw-register-title">
@@ -550,7 +548,7 @@ export default function Register() {
           <p className="jw-register-foot">
 
             By creating an account you agree to
-            Jawabu's{" "}
+            Sleek Sisters'{" "}
 
             <Link to="/terms">
               Terms

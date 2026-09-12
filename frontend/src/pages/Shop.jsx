@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
 import { supabase } from '../lib/supabase'
+import { categorySlug, slugMatchesCategory } from '../lib/brand'
+import { buildCategoryLookup, normalizeStoreProduct } from '../lib/storeProduct'
 import { useCart } from '../context/useCart'
 import { useWishlist } from '../context/useWishlist'
-
 import {
   FiHeart,
   FiSearch,
@@ -17,43 +18,13 @@ import {
 
 
 // =========================================================
-// SHOP CATEGORIES
-// =========================================================
-
-const categories = [
-  'All',
-  'Skincare',
-  'Hair Care',
-  'Makeup',
-  'Fragrance'
-]
-
-
-// =========================================================
-// NORMALIZE CATEGORY NAME
-// =========================================================
-// Makes database values such as:
-// "Hair care"
-// "Hair Care"
-// "hair care"
-// all behave the same.
-// =========================================================
-
-const normalizeCategory = (value) => {
-  if (!value) return ''
-
-  return String(value)
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, ' ')
-}
-
-
-// =========================================================
 // SHOP
 // =========================================================
 
 const Shop = () => {
+
+  const [searchParams, setSearchParams] = useSearchParams()
+  const navigate = useNavigate()
 
   const { addToCart } = useCart()
 
@@ -69,7 +40,7 @@ const Shop = () => {
 
   const [databaseProducts, setDatabaseProducts] = useState([])
 
-  const [, setDatabaseCategories] = useState([])
+  const [databaseCategories, setDatabaseCategories] = useState([])
 
   const [loading, setLoading] = useState(true)
 
@@ -82,7 +53,9 @@ const Shop = () => {
 
   const [activeCategory, setActiveCategory] = useState('All')
 
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchTerm, setSearchTerm] = useState(
+    () => searchParams.get('search') || ''
+  )
 
   const [sortBy, setSortBy] = useState('featured')
 
@@ -140,7 +113,8 @@ const Shop = () => {
           error: productError
         } = await supabase
           .from('products')
-          .select('*')
+          .select('*, product_variants(*)')
+          .eq('active', true)
           .order('id', {
             ascending: true
           })
@@ -158,134 +132,16 @@ const Shop = () => {
         }
 
 
-        console.log(
-          'SUPABASE CATEGORIES:',
-          categoryData
-        )
-
-
-        console.log(
-          'SUPABASE PRODUCTS:',
-          productData
-        )
-
-
-        // -----------------------------------------------------
-        // SAVE CATEGORIES
-        // -----------------------------------------------------
-
         setDatabaseCategories(
           categoryData || []
         )
 
-
-        // -----------------------------------------------------
-        // CREATE CATEGORY LOOKUP
-        // -----------------------------------------------------
-        //
-        // Example:
-        //
-        // {
-        //   1: "Hair care",
-        //   2: "Skincare",
-        //   3: "Makeup",
-        //   4: "Fragrance"
-        // }
-        //
-        // -----------------------------------------------------
-
-        const categoryLookup = {}
-
-        ;(categoryData || []).forEach(
-          (category) => {
-
-            categoryLookup[category.id] =
-              category.name || ''
-
-          }
-        )
-
-
-        // -----------------------------------------------------
-        // NORMALIZE PRODUCTS
-        // -----------------------------------------------------
-
-        const normalizedProducts =
-          (productData || []).map(
-            (product) => {
-
-              const categoryName =
-                categoryLookup[
-                  product.category_id
-                ] || 'Beauty'
-
-
-              return {
-
-                id: product.id,
-
-
-                name:
-                  product.name ||
-                  product.product_name ||
-                  'Unnamed Product',
-
-
-                // Actual category name
-                category:
-                  categoryName,
-
-
-                // Normalized category used
-                // internally for filtering
-                categoryKey:
-                  normalizeCategory(
-                    categoryName
-                  ),
-
-
-                // Keep category ID available
-                category_id:
-                  product.category_id,
-
-
-                price:
-                  Number(product.price) || 0,
-
-
-                image:
-                  product.image_url ||
-                  product.image ||
-                  '/images/products/placeholder.jpg',
-
-
-                description:
-                  product.description ||
-                  'A beautiful addition to your everyday routine.',
-
-
-                stock_quantity:
-                  Number(
-                    product.stock_quantity ??
-                    product.stock_qty ??
-                    product.stock ??
-                    0
-                  )
-
-              }
-
-            }
-          )
-
-
-        console.log(
-          'NORMALIZED PRODUCTS:',
-          normalizedProducts
-        )
-
+        const categoryLookup = buildCategoryLookup(categoryData)
 
         setDatabaseProducts(
-          normalizedProducts
+          (productData || []).map((product) =>
+            normalizeStoreProduct(product, categoryLookup)
+          )
         )
 
       } catch (error) {
@@ -318,27 +174,62 @@ const Shop = () => {
 
   }, [])
 
+  useEffect(() => {
+    const categoryParam = searchParams.get('category')
+    const searchParam = searchParams.get('search') || ''
+
+    // Keep filters aligned with the shop URL.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSearchTerm(searchParam)
+
+    if (!categoryParam) {
+      setActiveCategory('All')
+      return
+    }
+
+    const matched = (databaseCategories || []).find((category) =>
+      slugMatchesCategory(categoryParam, category.name)
+    )
+
+    if (matched) {
+      setActiveCategory(matched.name)
+    }
+  }, [searchParams, databaseCategories])
+
+  const updateShopParams = (updates) => {
+    const next = new URLSearchParams(searchParams)
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value == null || value === '') {
+        next.delete(key)
+      } else {
+        next.set(key, String(value))
+      }
+    })
+
+    setSearchParams(next, { replace: true })
+  }
+
 
   // =========================================================
   // ADD TO CART
   // =========================================================
 
   const handleAddToCart = (product) => {
+    if (product.hasOptions) {
+      navigate(`/product/${product.id}`)
+      return
+    }
 
     addToCart(product)
-
 
     setAddedProductId(
       product.id
     )
 
-
     setTimeout(() => {
-
       setAddedProductId(null)
-
     }, 1500)
-
   }
 
 
@@ -358,25 +249,14 @@ const Shop = () => {
     // =======================================================
 
     if (activeCategory !== 'All') {
-
-      const selectedCategory =
-        normalizeCategory(
-          activeCategory
-        )
-
-
       result = result.filter(
         (product) => {
-
-          return (
-            normalizeCategory(
-              product.category
-            ) === selectedCategory
+          return slugMatchesCategory(
+            categorySlug(activeCategory),
+            product.category
           )
-
         }
       )
-
     }
 
 
@@ -501,7 +381,7 @@ const Shop = () => {
 
               <p>
                 Please wait while we load the
-                Jawabu Beauty collection.
+                Sleek Sisters collection.
               </p>
 
             </div>
@@ -535,7 +415,7 @@ const Shop = () => {
         <div className="container">
 
           <span className="section-eyebrow">
-            JAWABU BEAUTY SHOP
+            SLEEK SISTERS
           </span>
 
 
@@ -583,9 +463,9 @@ const Shop = () => {
                 type="search"
                 value={searchTerm}
                 onChange={(event) =>
-                  setSearchTerm(
-                    event.target.value
-                  )
+                  updateShopParams({
+                    search: event.target.value
+                  })
                 }
                 placeholder="Search beauty products..."
                 aria-label="Search beauty products"
@@ -598,13 +478,26 @@ const Shop = () => {
 
             <div className="shop-sort">
 
-              <FiSliders />
-
+              <FiSliders aria-hidden="true" />
 
               <span>
                 Sort by
               </span>
 
+              <strong className="shop-sort-value">
+                {sortBy === 'price-low'
+                  ? 'Price: Low to High'
+                  : sortBy === 'price-high'
+                    ? 'Price: High to Low'
+                    : sortBy === 'name'
+                      ? 'Name'
+                      : 'Featured'}
+              </strong>
+
+              <FiChevronDown
+                className="shop-sort-chevron"
+                aria-hidden="true"
+              />
 
               <select
                 value={sortBy}
@@ -637,9 +530,6 @@ const Shop = () => {
 
               </select>
 
-
-              <FiChevronDown />
-
             </div>
 
           </div>
@@ -651,7 +541,7 @@ const Shop = () => {
 
           <div className="shop-categories">
 
-            {categories.map(
+            {['All', ...databaseCategories.map((category) => category.name)].map(
               (category) => (
 
                 <button
@@ -662,11 +552,16 @@ const Shop = () => {
                       ? 'category-filter active'
                       : 'category-filter'
                   }
-                  onClick={() =>
-                    setActiveCategory(
-                      category
-                    )
-                  }
+                  onClick={() => {
+                    setActiveCategory(category)
+
+                    updateShopParams({
+                      category:
+                        category === 'All'
+                          ? ''
+                          : categorySlug(category),
+                    })
+                  }}
                 >
 
                   {category}
@@ -788,11 +683,16 @@ const Shop = () => {
 
                         <div className="shop-product-image">
 
-
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                          />
+                          <Link
+                            to={`/product/${product.id}`}
+                            className="product-image-link"
+                            aria-label={`View ${product.name}`}
+                          >
+                            <img
+                              src={product.image}
+                              alt=""
+                            />
+                          </Link>
 
 
                           {/* WISHLIST */}
@@ -853,9 +753,14 @@ const Shop = () => {
                           </span>
 
 
-                          <h2>
-                            {product.name}
-                          </h2>
+                          <Link
+                            to={`/product/${product.id}`}
+                            className="shop-product-name-link"
+                          >
+                            <h2>
+                              {product.name}
+                            </h2>
+                          </Link>
 
 
                           <p className="shop-product-description">
@@ -890,10 +795,12 @@ const Shop = () => {
                                   : 'add-to-bag'
                               }
                               aria-label={
-                                addedProductId ===
-                                product.id
-                                  ? `${product.name} added to bag`
-                                  : `Add ${product.name} to bag`
+                                product.hasOptions
+                                  ? `Choose ${product.name}`
+                                  : addedProductId ===
+                                    product.id
+                                    ? `${product.name} added to bag`
+                                    : `Add ${product.name} to bag`
                               }
                               onClick={() =>
                                 handleAddToCart(
@@ -902,7 +809,19 @@ const Shop = () => {
                               }
                             >
 
-                              {addedProductId ===
+                              {product.hasOptions ? (
+
+                                <>
+
+                                  <FiArrowRight />
+
+                                  <span>
+                                    Choose
+                                  </span>
+
+                                </>
+
+                              ) : addedProductId ===
                               product.id ? (
 
                                 <>
@@ -971,11 +890,7 @@ const Shop = () => {
                     type="button"
                     className="btn btn-primary"
                     onClick={() => {
-
-                      setSearchTerm('')
-
-                      setActiveCategory('All')
-
+                      setSearchParams({}, { replace: true })
                     }}
                   >
                     View all products
@@ -1008,16 +923,16 @@ const Shop = () => {
             <div>
 
               <span className="section-eyebrow">
-                THE JAWABU STANDARD
+                THE SLEEK STANDARD
               </span>
 
 
               <h2>
 
-                Beauty that feels
+                Look good. Feel beautiful.
 
                 <span>
-                  personal.
+                  Stay sleek.
                 </span>
 
               </h2>
@@ -1032,7 +947,7 @@ const Shop = () => {
 
 
             <div className="shop-cta-mark">
-              JAWABU
+              SLEEK
             </div>
 
 

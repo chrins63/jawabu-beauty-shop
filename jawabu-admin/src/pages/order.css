@@ -1,18 +1,18 @@
 /* =========================================================
-   JAWABU BEAUTY ADMIN — ORDERS
+   SLEEK SISTERS ADMIN — ORDERS
    ========================================================= */
 
 .orders-page {
-  --jw-ink: #2b1a24;
-  --jw-ink-soft: #5c4753;
-  --jw-muted: #8a7480;
-  --jw-cream: #fdf8f5;
-  --jw-blush: #fdf1f4;
-  --jw-rose-line: #f0dde3;
+  --jw-ink: #262220;
+  --jw-ink-soft: #4a4540;
+  --jw-muted: #6b6560;
+  --jw-cream: #fafaf8;
+  --jw-blush: #f4ead8;
+  --jw-rose-line: #e9e1d6;
   --jw-surface: #ffffff;
-  --jw-flame: #ed1761;
-  --jw-flame-dark: #c20e4d;
-  --jw-flame-wash: #fdeef3;
+  --jw-flame: #c9a876;
+  --jw-flame-dark: #a8884e;
+  --jw-flame-wash: #f4ead8;
   --jw-emerald: #0f7a5c;
   --jw-emerald-wash: #eafaf3;
   --jw-amber: #b5590f;
@@ -22,8 +22,8 @@
   --jw-blue: #1d5fa8;
   --jw-blue-wash: #eaf3fc;
 
-  --jw-shadow-sm: 0 2px 10px rgba(178, 44, 90, 0.06);
-  --jw-shadow-md: 0 10px 30px rgba(178, 44, 90, 0.08);
+  --jw-shadow-sm: 0 2px 10px rgba(38, 34, 32, 0.06);
+  --jw-shadow-md: 0 10px 30px rgba(38, 34, 32, 0.08);
   --jw-shadow-lg: 0 25px 60px rgba(43, 18, 32, 0.18);
 
   --jw-font-display: "Fraunces", "Georgia", serif;
@@ -140,7 +140,7 @@
 
 .orders-toolbar input[type='text']:focus {
   border-color: var(--jw-flame);
-  box-shadow: 0 0 0 4px rgba(237, 23, 97, 0.1);
+  box-shadow: 0 0 0 4px rgba(201, 168, 118, 0.1);
 }
 
 .orders-toolbar select {
@@ -159,7 +159,7 @@
 
 .orders-toolbar select:focus {
   border-color: var(--jw-flame);
-  box-shadow: 0 0 0 4px rgba(237, 23, 97, 0.1);
+  box-shadow: 0 0 0 4px rgba(201, 168, 118, 0.1);
 }
 
 /* CARD */
@@ -607,8 +607,8 @@ small.status {
 .status-buttons button.active-status {
   border-color: var(--jw-flame);
   background: linear-gradient(135deg, var(--jw-flame), var(--jw-flame-dark));
-  color: #ffffff;
-  box-shadow: 0 6px 16px rgba(237, 23, 97, 0.28);
+  color: #262220;
+  box-shadow: 0 6px 16px rgba(201, 168, 118, 0.28);
 }
 
 .status-buttons button:disabled {

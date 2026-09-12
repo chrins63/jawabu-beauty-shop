@@ -13,14 +13,52 @@ body,
 
 body {
   font-family:
-    Inter,
-    -apple-system,
-    BlinkMacSystemFont,
+    Calibri,
+    "Source Sans 3",
     "Segoe UI",
     sans-serif;
 
-  background: #f8f5f2;
-  color: #241d20;
+  background: #fafaf8;
+  color: #262220;
+}
+
+/* =========================================================
+   RESPONSIVE UTILITIES (non-breaking)
+   - ensures media scale, touch targets, and container padding
+========================================================= */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+img,
+video,
+iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+a,
+button {
+  -webkit-tap-highlight-color: rgba(0,0,0,0.04);
+  touch-action: manipulation;
+}
+
+@media (max-width: 600px) {
+  .admin-content,
+  .login-card {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  button,
+  .login-button,
+  .logout-button {
+    min-height: 48px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
 }
 
 button,
@@ -82,7 +120,7 @@ input {
 }
 
 .brand-name span {
-  color: #e0205b;
+  color: #c9a876;
 
   font-family: cursive;
 
@@ -156,10 +194,10 @@ input {
 }
 
 .form-group input:focus {
-  border-color: #e0205b;
+  border-color: #c9a876;
 
   box-shadow:
-    0 0 0 3px rgba(224, 32, 91, 0.1);
+    0 0 0 3px rgba(201, 168, 118, 0.18);
 }
 
 .login-error {
@@ -187,9 +225,8 @@ input {
 
   border-radius: 12px;
 
-  background: #e0205b;
-
-  color: white;
+  background: #c9a876;
+  color: #262220;
 
   font-weight: 600;
 
@@ -201,7 +238,7 @@ input {
 }
 
 .login-button:hover {
-  background: #c91850;
+  background: #a8884e;
 
   transform: translateY(-1px);
 }
@@ -237,8 +274,22 @@ input {
 body {
   margin: 0;
   font-family: Inter, Arial, sans-serif;
-  background: #f7f7f8;
-  color: #171717;
+  background: #fafaf8;
+  color: #262220;
+  overflow-x: hidden;
+}
+
+img,
+video,
+canvas {
+  max-width: 100%;
+}
+
+input,
+select,
+textarea {
+  max-width: 100%;
+  font-size: 16px;
 }
 
 button {
@@ -253,19 +304,67 @@ button {
 /* SIDEBAR */
 
 .sidebar {
-  width: 250px;
+  width: 260px;
   min-height: 100vh;
-  background: #ffffff;
-  border-right: 1px solid #e8e8e8;
+  background: #0a0a0a;
+  border-right: 1px solid rgba(201, 168, 118, 0.28);
   position: fixed;
   left: 0;
   top: 0;
   bottom: 0;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .sidebar-logo {
-  padding: 28px 24px;
-  border-bottom: 1px solid #eeeeee;
+  padding: 22px 18px 18px;
+  border-bottom: 1px solid rgba(201, 168, 118, 0.28);
+}
+
+.sidebar .brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.sidebar .brand-logo-mark {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+}
+
+.sidebar .brand-logo-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sidebar .brand-logo-name {
+  font-family: Cambria, Georgia, serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #c9a876;
+  line-height: 1.15;
+}
+
+.sidebar .brand-logo-tagline {
+  font-family: Cambria, Georgia, serif;
+  font-style: italic;
+  font-size: 10px;
+  color: #e8d5a3;
 }
 
 .sidebar-logo h2 {
@@ -276,11 +375,11 @@ button {
 
 .sidebar-logo span {
   display: block;
-  margin-top: 5px;
-  font-size: 11px;
-  color: #ec1b62;
+  margin-top: 8px;
+  font-size: 10px;
+  color: #c9a876;
   font-weight: 700;
-  letter-spacing: 1px;
+  letter-spacing: 0.22em;
 }
 
 .sidebar-nav {
@@ -296,9 +395,9 @@ button {
   margin-bottom: 5px;
 
   text-decoration: none;
-  color: #555;
+  color: #d8c7a3;
 
-  border-radius: 8px;
+  border-radius: 2px;
 
   font-size: 14px;
   font-weight: 500;
@@ -307,14 +406,18 @@ button {
 }
 
 .sidebar-link:hover {
-  background: #f7f7f7;
-  color: #171717;
+  background: rgba(201, 168, 118, 0.12);
+  color: #e8d5a3;
 }
 
 .sidebar-link.active {
-  background: #fff0f5;
-  color: #ec1b62;
+  background: rgba(201, 168, 118, 0.18);
+  color: #c9a876;
   font-weight: 700;
+}
+
+.sidebar-link.pos-link {
+  border: 1px solid rgba(201, 168, 118, 0.35);
 }
 
 .sidebar-icon {
@@ -325,24 +428,112 @@ button {
 /* MAIN */
 
 .admin-main {
-  margin-left: 250px;
-  width: calc(100% - 250px);
+  margin-left: 260px;
+  width: calc(100% - 260px);
   min-height: 100vh;
 }
-
-/* TOPBAR */
 
 .topbar {
   height: 76px;
 
-  background: white;
-  border-bottom: 1px solid #e8e8e8;
+  background: #0a0a0a;
+  border-bottom: 1px solid rgba(201, 168, 118, 0.28);
 
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 24px;
 
   padding: 0 32px;
+}
+
+.topbar-search {
+  position: relative;
+  flex: 1;
+  max-width: 460px;
+}
+
+.topbar-search input {
+  width: 100%;
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid rgba(201, 168, 118, 0.35);
+  border-radius: 2px;
+  background: #111;
+  color: #f5ead0;
+  font: inherit;
+  box-sizing: border-box;
+}
+
+.topbar-search input::placeholder {
+  color: #8a7b5e;
+}
+
+.topbar-search input:focus {
+  outline: none;
+  border-color: #c9a876;
+}
+
+.topbar-search-results {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background: #111;
+  border: 1px solid rgba(201, 168, 118, 0.35);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+}
+
+.topbar-search-item,
+.topbar-search-empty {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 12px 14px;
+  border: 0;
+  background: transparent;
+  color: #f5ead0;
+  font: inherit;
+}
+
+.topbar-search-item {
+  cursor: pointer;
+  border-bottom: 1px solid rgba(201, 168, 118, 0.12);
+}
+
+.topbar-search-item strong {
+  display: block;
+  color: #c9a876;
+  margin-bottom: 4px;
+}
+
+.topbar-search-item span {
+  font-size: 12px;
+  color: #e8d5a3;
+}
+
+.topbar-search-item:hover {
+  background: rgba(201, 168, 118, 0.12);
+}
+
+.topbar-search-empty {
+  color: #8a7b5e;
+  margin: 0;
+}
+
+.topbar-brand h1 {
+  margin: 0;
+  font-size: 18px;
+  color: #c9a876;
+  font-family: Cambria, Georgia, serif;
+}
+
+.topbar-brand p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  font-style: italic;
+  color: #e8d5a3;
 }
 
 .topbar h1 {
@@ -350,10 +541,35 @@ button {
   font-size: 20px;
 }
 
+.user-info strong {
+  font-size: 14px;
+  color: #f5ead0;
+}
+
+.user-info span {
+  font-size: 12px;
+  color: #c9a876;
+}
+
+.logout-button {
+  border: 1px solid #c9a876;
+  background: #c9a876;
+  color: #0a0a0a;
+  padding: 10px 16px;
+  border-radius: 2px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.logout-button:hover {
+  background: #e8d5a3;
+}
+
 .topbar-right {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 18px;
+  flex-shrink: 0;
 }
 
 .user-info {
@@ -362,87 +578,122 @@ button {
   align-items: flex-end;
 }
 
-.user-info strong {
-  font-size: 14px;
-}
-
-.user-info span {
-  font-size: 12px;
-  color: #777;
-}
-
 .user-info small {
   margin-top: 2px;
-  color: #ec1b62;
+  color: #c9a876;
   font-weight: 700;
   text-transform: uppercase;
-}
-
-.logout-button {
-  border: 0;
-  background: #f1f1f2;
-  padding: 10px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.logout-button:hover {
-  background: #e6e6e7;
 }
 
 /* CONTENT */
 
 .admin-content {
   padding: 32px;
+  background: #fafaf8;
+  min-height: calc(100vh - 76px);
 }
 
-/* MOBILE */
+.topbar-menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border: 1px solid rgba(201, 168, 118, 0.35);
+  background: #111;
+  color: #c9a876;
+  cursor: pointer;
+}
 
-@media (max-width: 800px) {
+.admin-nav-backdrop {
+  display: none;
+}
+
+.sidebar-nav {
+  overflow-y: auto;
+  height: calc(100vh - 118px);
+}
+
+@media (max-width: 980px) {
+  .topbar-menu-btn {
+    display: inline-flex;
+  }
+
+  .admin-nav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    border: 0;
+    background: rgba(10, 10, 10, 0.55);
+  }
 
   .sidebar {
-    width: 70px;
+    width: min(280px, 88vw);
+    z-index: 80;
+    transform: translateX(-110%);
+    transition: transform 0.22s ease;
   }
 
-  .sidebar-logo {
-    padding: 20px 10px;
-    text-align: center;
-  }
-
-  .sidebar-logo h2 {
-    font-size: 14px;
-  }
-
-  .sidebar-logo span {
-    display: none;
-  }
-
-  .sidebar-link {
-    justify-content: center;
-    padding: 14px 5px;
-  }
-
-  .sidebar-link span:last-child {
-    display: none;
+  .admin-layout.nav-open .sidebar {
+    transform: translateX(0);
+    box-shadow: 18px 0 40px rgba(0, 0, 0, 0.4);
   }
 
   .admin-main {
-    margin-left: 70px;
-    width: calc(100% - 70px);
+    margin-left: 0;
+    width: 100%;
   }
 
-  .user-info {
+  .topbar {
+    height: auto;
+    min-height: 64px;
+    padding: 10px 16px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .topbar-brand {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .topbar-brand h1 {
+    font-size: 15px;
+  }
+
+  .topbar-brand p {
+    display: none;
+  }
+
+  .topbar-search {
+    order: 4;
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .user-info span {
     display: none;
   }
 
   .admin-content {
-    padding: 20px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .user-info {
+    display: none;
+  }
+
+  .logout-button {
+    padding: 10px 12px;
   }
 }
 
 /* =========================================================
-   JAWABU BEAUTY ADMIN DASHBOARD
+   SLEEK SISTERS ADMIN DASHBOARD
    ========================================================= */
 
 .dashboard {
@@ -520,13 +771,13 @@ button {
 }
 
 .stat-icon.pink {
-  background: #fff0f5;
-  color: #ec1b62;
+  background: #f4ead8;
+  color: #a8884e;
 }
 
 .stat-icon.purple {
-  background: #f3efff;
-  color: #7048d8;
+  background: #f4ead8;
+  color: #a8884e;
   font-size: 18px;
 }
 
@@ -620,7 +871,7 @@ button {
 }
 
 .view-all {
-  color: #ec1b62;
+  color: #c9a876;
   text-decoration: none;
   font-weight: 600;
   font-size: 13px;
@@ -742,7 +993,7 @@ button {
 }
 
 .quick-action:hover {
-  border-color: #ec1b62;
+  border-color: #c9a876;
   transform: translateY(-2px);
 }
 
@@ -774,7 +1025,7 @@ button {
   width: 30px;
   height: 30px;
   border: 3px solid #eeeeee;
-  border-top-color: #ec1b62;
+  border-top-color: #c9a876;
   border-radius: 50%;
   animation: dashboard-spin 0.8s linear infinite;
   margin-bottom: 15px;
@@ -828,5 +1079,20 @@ button {
   .section-header {
     align-items: flex-start;
     gap: 15px;
+  }
+}
+
+.admin-login-page {
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .admin-login-page {
+    padding: 16px !important;
+    align-items: flex-start !important;
+  }
+
+  .admin-login-card {
+    padding: 24px 18px !important;
   }
 }

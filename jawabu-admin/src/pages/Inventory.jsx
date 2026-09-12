@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+import { variantDisplayLabel } from '../lib/productOptions';
 import './inventory.css';
 
 function Inventory() {
@@ -41,6 +42,7 @@ function Inventory() {
 
   const [showAdjustment, setShowAdjustment] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedVariantId, setSelectedVariantId] = useState('');
   const [adjustmentType, setAdjustmentType] = useState('IN');
   const [quantity, setQuantity] = useState('');
   const [notes, setNotes] = useState('');
@@ -77,7 +79,15 @@ function Inventory() {
           stock_quantity,
           low_stock_threshold,
           image_url,
-          updated_at
+          updated_at,
+          product_variants (
+            id,
+            option_type,
+            option_value,
+            sku,
+            stock_quantity,
+            available
+          )
         `)
         .eq('active', true)
         .order('name', { ascending: true });
@@ -235,7 +245,12 @@ function Inventory() {
     return (
       (product.name || '').toLowerCase().includes(text) ||
       (product.sku || '').toLowerCase().includes(text) ||
-      (product.barcode || '').toLowerCase().includes(text)
+      (product.barcode || '').toLowerCase().includes(text) ||
+      (product.product_variants || []).some((row) =>
+        `${row.option_value || ''} ${row.sku || ''}`
+          .toLowerCase()
+          .includes(text)
+      )
     );
   });
 
@@ -270,6 +285,9 @@ function Inventory() {
 
   const openAdjustment = (product) => {
     setSelectedProduct(product);
+    setSelectedVariantId(
+      product.product_variants?.[0] ? String(product.product_variants[0].id) : ''
+    );
     setAdjustmentType('IN');
     setQuantity('');
     setNotes('');
@@ -282,6 +300,7 @@ function Inventory() {
 
     setShowAdjustment(false);
     setSelectedProduct(null);
+    setSelectedVariantId('');
     setQuantity('');
     setNotes('');
     setAdjustmentError('');
@@ -311,11 +330,28 @@ function Inventory() {
       return;
     }
 
-    const currentStock = Number(selectedProduct.stock_quantity || 0);
+    const variants = selectedProduct.product_variants || [];
+    const selectedVariant = variants.find(
+      (row) => String(row.id) === String(selectedVariantId)
+    );
+
+    if (variants.length && !selectedVariant) {
+      setAdjustmentError('Choose which colour or size to adjust.');
+      return;
+    }
+
+    const currentStock = Number(
+      selectedVariant
+        ? selectedVariant.stock_quantity || 0
+        : selectedProduct.stock_quantity || 0
+    );
+    const targetName = selectedVariant
+      ? `${selectedProduct.name} (${variantDisplayLabel(selectedVariant)})`
+      : selectedProduct.name;
 
     if (adjustmentType === 'OUT' && amount > currentStock) {
       setAdjustmentError(
-        `Cannot remove ${amount} units. ${selectedProduct.name} only has ${currentStock} units.`
+        `Cannot remove ${amount} units. ${targetName} only has ${currentStock} units.`
       );
       return;
     }
@@ -327,6 +363,10 @@ function Inventory() {
     setAdjustmentError('');
 
     try {
+      const variantNote = selectedVariant
+        ? `[${variantDisplayLabel(selectedVariant)}] `
+        : '';
+
       // 1. Record movement
       const { error: movementError } = await supabase
         .from('inventory_movements')
@@ -336,7 +376,7 @@ function Inventory() {
           movement_type: 'adjustment',
           reference_type: 'MANUAL_ADJUSTMENT',
           reference_id: null,
-          notes: notes.trim() || null,
+          notes: `${variantNote}${notes.trim()}`.trim() || null,
           created_by: user.id,
         });
 
@@ -347,29 +387,68 @@ function Inventory() {
         );
       }
 
-      // 2. Update product stock
-      const { error: productError } = await supabase
-        .from('products')
-        .update({
-          stock_quantity: newStock,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', selectedProduct.id);
+      if (selectedVariant) {
+        const { error: variantError } = await supabase
+          .from('product_variants')
+          .update({
+            stock_quantity: newStock,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', selectedVariant.id);
 
-      if (productError) {
-        console.error('Product update error:', productError);
-        throw new Error(
-          `Movement was recorded but product stock could not be updated: ${productError.message}`
+        if (variantError) {
+          throw new Error(
+            `Movement was recorded but option stock could not be updated: ${variantError.message}`
+          );
+        }
+
+        const { error: syncError } = await supabase.rpc(
+          'sync_product_variant_stock',
+          { p_product_id: selectedProduct.id }
         );
+
+        if (syncError) {
+          throw new Error(
+            `Option stock saved, but product total could not refresh: ${syncError.message}`
+          );
+        }
+      } else {
+        const { error: productError } = await supabase
+          .from('products')
+          .update({
+            stock_quantity: newStock,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', selectedProduct.id);
+
+        if (productError) {
+          console.error('Product update error:', productError);
+          throw new Error(
+            `Movement was recorded but product stock could not be updated: ${productError.message}`
+          );
+        }
       }
 
-      // 3. Update local product state
+      const nextVariants = selectedVariant
+        ? variants.map((row) =>
+            row.id === selectedVariant.id
+              ? { ...row, stock_quantity: newStock }
+              : row
+          )
+        : variants;
+      const nextProductStock = selectedVariant
+        ? nextVariants
+            .filter((row) => row.available !== false)
+            .reduce((total, row) => total + Number(row.stock_quantity || 0), 0)
+        : newStock;
+
       setProducts((currentProducts) =>
         currentProducts.map((product) =>
           product.id === selectedProduct.id
             ? {
                 ...product,
-                stock_quantity: newStock,
+                stock_quantity: nextProductStock,
+                product_variants: nextVariants,
                 updated_at: new Date().toISOString(),
               }
             : product
@@ -469,7 +548,7 @@ function Inventory() {
       <div className="inventory-header">
         <div>
           <h1>Inventory</h1>
-          <p>Monitor and manage Jawabu Beauty stock.</p>
+          <p>Monitor and manage Sleek Sisters stock.</p>
         </div>
 
         <button
@@ -622,6 +701,16 @@ function Inventory() {
                           <div>
                             <strong>{product.name}</strong>
                             {product.barcode && <small>{product.barcode}</small>}
+                            {(product.product_variants || []).length > 0 ? (
+                              <small className="inventory-option-summary">
+                                {(product.product_variants || [])
+                                  .map(
+                                    (row) =>
+                                      `${row.option_value}${row.available === false ? ' (off)' : ''}: ${row.stock_quantity ?? 0}`
+                                  )
+                                  .join(' · ')}
+                              </small>
+                            ) : null}
                           </div>
                         </div>
                       </td>
@@ -828,9 +917,33 @@ function Inventory() {
             </div>
 
             <form className="inventory-adjustment-form" onSubmit={handleAdjustment}>
+              {(selectedProduct.product_variants || []).length > 0 ? (
+                <div className="inventory-form-group">
+                  <label>Colour / size</label>
+                  <select
+                    value={selectedVariantId}
+                    onChange={(event) => setSelectedVariantId(event.target.value)}
+                    disabled={adjusting}
+                  >
+                    {(selectedProduct.product_variants || []).map((row) => (
+                      <option key={row.id} value={row.id}>
+                        {variantDisplayLabel(row)}
+                        {row.available === false ? ' (not for sale)' : ''} — {row.stock_quantity ?? 0} in stock
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : null}
+
               <div className="inventory-current-stock">
                 <span>Current Stock</span>
-                <strong>{selectedProduct.stock_quantity ?? 0}</strong>
+                <strong>
+                  {(selectedProduct.product_variants || []).length
+                    ? (selectedProduct.product_variants || []).find(
+                        (row) => String(row.id) === String(selectedVariantId)
+                      )?.stock_quantity ?? 0
+                    : selectedProduct.stock_quantity ?? 0}
+                </strong>
               </div>
 
               <div className="inventory-form-group">

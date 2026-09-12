@@ -194,7 +194,7 @@ const { data, error } = await supabase
           <h1>Products</h1>
 
           <p>
-            Manage the Jawabu Beauty product catalogue.
+            Manage the Sleek Sisters product catalogue.
           </p>
         </div>
 

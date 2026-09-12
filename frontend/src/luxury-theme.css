@@ -1,0 +1,1001 @@
+/* =========================================================
+   SLEEK SISTERS — BLACK & GOLD LUXURY STOREFRONT
+   Loaded last. Keeps layout; restyles chrome to match admin.
+========================================================= */
+
+html,
+body,
+#root {
+  background: #070707;
+  color: #f5ead0;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 12% -10%, rgba(232, 195, 106, 0.16), transparent 42%),
+    radial-gradient(ellipse at 92% 8%, rgba(212, 175, 55, 0.1), transparent 36%),
+    #070707;
+}
+
+main {
+  background: transparent;
+  color: #f5ead0;
+}
+
+.home-page,
+.shop-page,
+.product-details-page,
+.cart-page,
+.checkout-page,
+.wishlist-page,
+.account-page {
+  background: transparent;
+  color: #f5ead0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #fff8e7;
+}
+
+p,
+li,
+small,
+label,
+.cart-empty p,
+.shop-hero p,
+.hero-content p,
+.checkout-section p,
+.product-details-description {
+  color: #c9b896;
+}
+
+a:hover {
+  color: #f3d98a;
+}
+
+/* ---------- Luxury gold buttons ---------- */
+.btn-primary,
+.btn.btn-primary,
+.add-to-bag,
+.product-add-btn,
+.newsletter-submit,
+.checkout-submit,
+.place-order-btn {
+  background: linear-gradient(180deg, #f3d98a 0%, #e8c36a 48%, #c9a227 100%);
+  color: #0a0a0a;
+  border: 1px solid #f3d98a;
+  box-shadow: 0 12px 28px rgba(232, 195, 106, 0.32);
+}
+
+.btn-primary:hover,
+.add-to-bag:hover,
+.product-add-btn:hover,
+.newsletter-submit:hover {
+  background: linear-gradient(180deg, #f7e4a6 0%, #e8c36a 55%, #b8921e 100%);
+  color: #000;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #f3d98a;
+  border: 1px solid #e8c36a;
+}
+
+.btn-secondary:hover {
+  background: rgba(232, 195, 106, 0.12);
+  color: #f7e4a6;
+  border-color: #f3d98a;
+}
+
+/* ---------- Cards / panels ---------- */
+.product-card,
+.shop-product-card,
+.category-card,
+.benefit-card,
+.cart-item,
+.cart-summary,
+.checkout-summary,
+.wishlist-card,
+.newsletter-card,
+.hero-image-frame,
+.brand-story-image,
+.shop-search,
+.shop-sort,
+.account-card,
+.track-card,
+.checkout-form-section,
+.product-details-image,
+.product-meta-row,
+.quantity-control,
+.checkout-lipa,
+.checkout-success-icon {
+  background: #12100c;
+  border-color: rgba(232, 195, 106, 0.32);
+  color: #f5ead0;
+}
+
+.product-card,
+.shop-product-card,
+.cart-item,
+.cart-summary,
+.checkout-summary,
+.wishlist-card,
+.newsletter-card,
+.account-card {
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+.product-info h3,
+.shop-product-info h2,
+.shop-products-section .product-info h3,
+.cart-item-info h2,
+.wishlist-info h2,
+.product-details-info h1,
+.cart-heading h1,
+.checkout-heading h1,
+.shop-hero h1 {
+  color: #fff8e7;
+}
+
+.product-info p,
+.shop-product-info strong,
+.cart-item-info > strong,
+.wishlist-price,
+.product-details-info .price,
+.cart-summary strong,
+.checkout-summary strong {
+  color: #f3d98a;
+}
+
+.product-category,
+.shop-product-category,
+.section-eyebrow,
+.hero-eyebrow,
+.shop-hero .section-eyebrow {
+  color: #e8c36a;
+}
+
+.featured-section,
+.bestsellers-section,
+.why-jawabu-section,
+.brand-story-section,
+.newsletter-section,
+.shop-hero,
+.shop-products-section,
+.cart-section,
+.checkout-section,
+.product-details-section,
+.wishlist-section {
+  background: transparent;
+}
+
+.featured-section {
+  background:
+    linear-gradient(180deg, rgba(232, 195, 106, 0.08), transparent 70%);
+}
+
+/* ---------- Forms ---------- */
+input,
+select,
+textarea,
+.shop-search input,
+.checkout-field input,
+.checkout-field textarea,
+.checkout-field select,
+.newsletter-input-wrapper input,
+.track-form input {
+  background: #0c0b09;
+  color: #f5ead0;
+  border: 1px solid rgba(232, 195, 106, 0.35);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(201, 184, 150, 0.7);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #e8c36a;
+  box-shadow: 0 0 0 3px rgba(232, 195, 106, 0.18);
+}
+
+.navbar-search-input,
+.navbar-mobile-search input {
+  background: transparent;
+  color: #f5ead0;
+}
+
+/* ---------- Shop chips ---------- */
+.category-filter,
+.shop-categories button {
+  background: #12100c;
+  color: #f5ead0;
+  border: 1px solid rgba(232, 195, 106, 0.28);
+}
+
+.category-filter.is-active,
+.shop-categories button.is-active,
+.category-filter[aria-pressed="true"] {
+  background: linear-gradient(180deg, #f3d98a, #e8c36a);
+  color: #0a0a0a;
+  border-color: #f3d98a;
+}
+
+/* ---------- Footer ---------- */
+.site-footer {
+  background: #000000;
+  color: #f5ead0;
+  border-top: 3px solid #e8c36a;
+}
+
+.footer-logo strong,
+.footer-column h3 {
+  color: #f3d98a;
+}
+
+.footer-logo em,
+.footer-description,
+.footer-column a {
+  color: #c9b896;
+}
+
+.footer-column a:hover {
+  color: #f3d98a;
+}
+
+.footer-social {
+  border-color: rgba(232, 195, 106, 0.4);
+  color: #f3d98a;
+}
+
+/* ---------- WhatsApp ---------- */
+.whatsapp-float {
+  background: #000;
+  color: #f3d98a;
+  border: 1px solid #e8c36a;
+}
+
+.whatsapp-float-icon {
+  background: linear-gradient(180deg, #f3d98a, #e8c36a);
+  color: #0a0a0a;
+}
+
+/* ---------- Hardcoded light leftovers ---------- */
+.cart-empty h1,
+.cart-heading h1,
+.checkout-success h1 {
+  color: #fff8e7;
+}
+
+.cart-item,
+.cart-summary,
+.checkout-item,
+.checkout-summary {
+  background: #12100c;
+  border: 1px solid rgba(232, 195, 106, 0.28);
+}
+
+.product-wishlist,
+.shop-product-card .wishlist-btn {
+  background: #000;
+  color: #f3d98a;
+  border: 1px solid rgba(232, 195, 106, 0.4);
+}
+
+.product-badge {
+  background: #e8c36a;
+  color: #0a0a0a;
+}
+
+.hero-floating-card {
+  background: #000;
+  border: 1px solid #e8c36a;
+  color: #f5ead0;
+}
+
+.hero-floating-card a {
+  color: #f3d98a;
+}
+
+.hero-image-frame {
+  background: #0c0b09;
+  border: 1px solid rgba(232, 195, 106, 0.38);
+  box-shadow: 0 24px 50px rgba(232, 195, 106, 0.12);
+}
+
+.category-card:has(img) h3,
+.category-card:has(img) p {
+  color: #fff8e7;
+}
+
+.back-to-top {
+  color: #c9b896;
+}
+
+.navbar-badge {
+  background: #e8c36a;
+  color: #0a0a0a;
+  border-color: #000;
+}
+
+.shop-product-name-link,
+.product-info h3 a,
+.recommended-product-info h3 a {
+  color: inherit;
+}
+
+.variant-pill {
+  background: #12100c;
+  color: #f5ead0;
+  border-color: rgba(232, 195, 106, 0.38);
+}
+
+.variant-pill:hover:not(:disabled) {
+  border-color: #f3d98a;
+}
+
+.variant-pill.active {
+  background: linear-gradient(180deg, #f3d98a 0%, #e8c36a 55%, #c9a227 100%);
+  color: #0a0a0a;
+  border-color: #f3d98a;
+}
+
+.variant-swatch {
+  border-color: rgba(232, 195, 106, 0.45);
+}
+
+.variant-swatch.active {
+  border-color: #f3d98a;
+  box-shadow: 0 0 0 2px #000, 0 0 0 4px #e8c36a;
+}
+
+.product-option-error {
+  color: #f3d98a;
+}
+
+.cart-item-option {
+  margin: 0.2rem 0 0.45rem;
+  color: #e8c36a;
+  font-size: 0.85rem;
+}
+
+/* Account / login leftovers */
+.account-page {
+  --cream: #070707;
+  --cream-light: #12100c;
+  --cream-dark: #0c0b09;
+  --ink: #f5ead0;
+  --ink-soft: #c9b896;
+  --muted: #c9b896;
+  --rose: #e8c36a;
+  --rose-dark: #d4af37;
+  --rose-light: rgba(232, 195, 106, 0.16);
+  --line: rgba(232, 195, 106, 0.28);
+  background: transparent;
+  color: #f5ead0;
+}
+
+.jw-root {
+  background:
+    radial-gradient(circle at 75% 25%, rgba(232, 195, 106, 0.28), transparent 30%),
+    radial-gradient(circle at 20% 75%, rgba(212, 175, 55, 0.16), transparent 32%),
+    #070707;
+}
+
+.jw-register-root {
+  --cream: #fff8e7;
+  --ink: #f5ead0;
+  --ink-soft: #c9b896;
+  background: #070707;
+}
+
+.jw-register-wordmark,
+.jw-register-caption p {
+  color: #fff8e7;
+}
+
+.jw-register-fallback {
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(232, 195, 106, 0.22), transparent 45%),
+    #070707;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    border-top-width: 3px;
+    border-bottom-width: 3px;
+  }
+}
+
+/* ---------- Readable text on black ---------- */
+.cart-page,
+.checkout-page,
+.wishlist-page,
+.track-page,
+.orders-page,
+.product-not-found,
+.shop-empty {
+  background: transparent;
+  color: #f5ead0;
+}
+
+.product-details-back,
+.cart-back-link,
+.checkout-back-link,
+.orders-back,
+.wishlist-back {
+  color: #f3d98a;
+}
+
+.product-details-back:hover,
+.cart-back-link:hover,
+.checkout-back-link:hover {
+  color: #fff8e7;
+}
+
+.checkout-heading p,
+.cart-heading p,
+.wishlist-heading p,
+.shop-empty p,
+.product-not-found p,
+.price-note,
+.product-details-quantity > span,
+.meta-content span,
+.cart-item-info > span,
+.wishlist-category,
+.wishlist-info p,
+.checkout-help-note,
+.remove-item-btn {
+  color: #c9b896;
+}
+
+.remove-item-btn:hover {
+  color: #f3d98a;
+}
+
+.cart-item-info h2,
+.cart-item-total,
+.cart-summary h2,
+.checkout-summary h2,
+.meta-content strong,
+.wishlist-heart-mark {
+  color: #fff8e7;
+}
+
+.cart-summary-row,
+.checkout-summary-row {
+  color: #c9b896;
+}
+
+.cart-summary-row strong,
+.cart-summary-total span,
+.cart-summary-total strong,
+.checkout-summary-total span,
+.checkout-summary-total strong {
+  color: #f3d98a;
+}
+
+.checkout-page a,
+.contact-page a,
+.track-page a {
+  color: #f3d98a;
+}
+
+.quantity-control,
+.product-details-quantity .quantity-control {
+  background: #0c0b09;
+  border: 1px solid rgba(232, 195, 106, 0.38);
+}
+
+.quantity-control button,
+.quantity-control strong,
+.product-details-quantity .quantity-control button,
+.product-details-quantity .quantity-control strong {
+  color: #f5ead0;
+  background: transparent;
+}
+
+.quantity-control button:hover:not(:disabled) {
+  background: rgba(232, 195, 106, 0.16);
+  color: #f3d98a;
+}
+
+.product-wishlist-btn {
+  background: #000;
+  color: #f3d98a;
+  border: 1px solid rgba(232, 195, 106, 0.45);
+}
+
+.product-wishlist-btn:hover,
+.product-wishlist-btn.active {
+  background: rgba(232, 195, 106, 0.14);
+  color: #fff8e7;
+  border-color: #f3d98a;
+}
+
+.trust-badge-pill {
+  background: #12100c;
+  border: 1px solid rgba(232, 195, 106, 0.32);
+  color: #f5ead0;
+}
+
+.meta-icon {
+  background: rgba(232, 195, 106, 0.16);
+  color: #e8c36a;
+}
+
+.product-details-extra {
+  border-top-color: rgba(232, 195, 106, 0.22);
+}
+
+.status-badge.in-stock {
+  background: rgba(36, 129, 63, 0.18);
+  color: #8ee0a4;
+}
+
+.status-badge.low-stock {
+  background: rgba(232, 195, 106, 0.16);
+  color: #f3d98a;
+}
+
+.status-badge.unavailable {
+  background: #1a1814;
+  color: #c9b896;
+}
+
+.variant-pill.unavailable {
+  color: #c9b896;
+}
+
+.profile-status {
+  background: #12100c;
+  border: 1px solid rgba(232, 195, 106, 0.28);
+  color: #f5ead0;
+}
+
+.track-result {
+  background: #12100c;
+  border: 1px solid rgba(232, 195, 106, 0.32);
+  color: #f5ead0;
+}
+
+.track-items li {
+  border-top-color: rgba(232, 195, 106, 0.18);
+  color: #f5ead0;
+}
+
+.cart-summary-divider,
+.checkout-summary-divider {
+  background: rgba(232, 195, 106, 0.22);
+}
+
+/* ---------- You may also like — black & gold ---------- */
+.product-recommendations-section {
+  background: transparent;
+  color: #f5ead0;
+  border-top: 1px solid rgba(232, 195, 106, 0.18);
+  padding-top: 56px;
+}
+
+.product-recommendations-heading h2 {
+  color: #fff8e7;
+}
+
+.product-recommendations-view-all {
+  color: #f3d98a;
+}
+
+.product-recommendations-view-all:hover {
+  color: #fff8e7;
+}
+
+.recommended-product-card {
+  background: #12100c;
+  border: 1px solid rgba(232, 195, 106, 0.28);
+  padding: 12px 12px 16px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+.recommended-product-image {
+  background: #0c0b09;
+  border: 1px solid rgba(232, 195, 106, 0.2);
+}
+
+.recommended-wishlist {
+  background: #000;
+  color: #f3d98a;
+  border: 1px solid rgba(232, 195, 106, 0.4);
+}
+
+.recommended-wishlist:hover,
+.recommended-wishlist.active {
+  background: #e8c36a;
+  color: #0a0a0a;
+}
+
+.recommended-product-info > span {
+  color: #e8c36a;
+}
+
+.recommended-product-info h3,
+.recommended-product-info h3 a {
+  color: #fff8e7;
+}
+
+.recommended-product-bottom strong {
+  color: #f3d98a;
+}
+
+.recommended-view-btn {
+  color: #f3d98a;
+}
+
+.recommended-view-btn:hover {
+  color: #fff8e7;
+}
+
+.recommended-add-btn {
+  background: linear-gradient(180deg, #f3d98a 0%, #e8c36a 48%, #c9a227 100%);
+  border: 1px solid #f3d98a;
+  color: #0a0a0a;
+}
+
+.recommended-add-btn:hover {
+  background: linear-gradient(180deg, #f7e4a6 0%, #e8c36a 55%, #b8921e 100%);
+  color: #000;
+}
+
+.recommended-add-btn.added {
+  background: #1a3a24;
+  border-color: #8ee0a4;
+  color: #8ee0a4;
+}
+
+.product-add-btn:disabled {
+  background: #1a1814;
+  border-color: rgba(232, 195, 106, 0.22);
+  color: #c9b896;
+}
+
+.product-back-link,
+.product-save-wishlist {
+  color: #f3d98a;
+  background: #000;
+  border-color: rgba(232, 195, 106, 0.4);
+}
+
+.product-back-link:hover,
+.product-save-wishlist:hover {
+  color: #fff8e7;
+  border-color: #f3d98a;
+}
+
+.product-meta,
+.product-meta-row {
+  border-color: rgba(232, 195, 106, 0.22);
+  color: #f5ead0;
+}
+
+.product-meta-row span:first-child {
+  color: #c9b896;
+}
+
+.product-meta-row span:last-child {
+  color: #fff8e7;
+}
+
+.checkout-item-info strong,
+.checkout-item > strong {
+  color: #fff8e7;
+}
+
+.checkout-item-info span {
+  color: #c9b896;
+}
+
+.checkout-field label {
+  color: #f3d98a;
+}
+
+.checkout-form-label {
+  color: #e8c36a;
+}
+
+.checkout-sms-optin,
+.checkout-pickup-note,
+.checkout-help-note,
+.checkout-pay-status,
+.checkout-payment-option p,
+.checkout-delivery-card span,
+.checkout-delivery-card small {
+  color: #c9b896;
+}
+
+.checkout-help-note a,
+.checkout-page a {
+  color: #f3d98a;
+}
+
+.checkout-delivery-card,
+.checkout-payment-option {
+  background: #12100c;
+  border: 1px solid rgba(232, 195, 106, 0.32);
+  color: #f5ead0;
+}
+
+.checkout-delivery-card.is-selected {
+  border-color: #f3d98a;
+  box-shadow: 0 0 0 1px #e8c36a;
+}
+
+.checkout-delivery-card-top em {
+  color: #f3d98a;
+}
+
+.checkout-empty p,
+.checkout-success p {
+  color: #c9b896;
+}
+
+.checkout-lipa dt {
+  color: #c9b896;
+}
+
+.checkout-lipa dd,
+.checkout-lipa h3 {
+  color: #fff8e7;
+}
+
+.cart-summary p,
+.checkout-summary p,
+.cart-layout p,
+.cart-note {
+  color: #c9b896;
+}
+
+.footer-bottom p,
+.footer-bottom-links a {
+  color: #c9b896;
+}
+
+.footer-bottom-links a:hover {
+  color: #f3d98a;
+}
+
+.shop-product-description,
+.shop-product-info p,
+.product-info p {
+  color: #c9b896;
+}
+
+.shop-sort-value,
+.shop-sort {
+  color: #f5ead0;
+}
+
+.product-bottom strong {
+  color: #f3d98a;
+}
+
+.product-details-price,
+.product-details-info .product-details-price,
+.product-price-wrapper strong {
+  color: #f3d98a;
+}
+
+.product-details-info h1 {
+  color: #fff8e7;
+}
+
+.product-details-category {
+  color: #e8c36a;
+}
+
+.product-quantity-label,
+.product-details-quantity > span {
+  color: #c9b896;
+}
+
+.product-quantity-control {
+  background: #0c0b09;
+  border-color: rgba(232, 195, 106, 0.38);
+}
+
+.product-quantity-control button,
+.product-quantity-control strong {
+  color: #f5ead0;
+}
+
+.product-add-to-cart {
+  background: linear-gradient(180deg, #f3d98a 0%, #e8c36a 48%, #c9a227 100%);
+  color: #0a0a0a;
+  box-shadow: 0 12px 28px rgba(232, 195, 106, 0.32);
+}
+
+.product-save-wishlist {
+  color: #f3d98a;
+  background: #000;
+  border-color: rgba(232, 195, 106, 0.4);
+}
+
+/* ---------- Second :root in index.css still set ivory tokens ---------- */
+:root {
+  --color-bg: #070707;
+  --color-surface: #12100c;
+  --color-surface-muted: #0c0b09;
+  --color-border: rgba(232, 195, 106, 0.32);
+  --color-border-hover: rgba(232, 195, 106, 0.55);
+  --color-text-primary: #fff8e7;
+  --color-text-secondary: #c9b896;
+  --color-text-muted: #c9b896;
+  --color-accent: #e8c36a;
+  --color-accent-hover: #f3d98a;
+}
+
+.newsletter-input-wrapper {
+  background: #0c0b09;
+  border: 1px solid rgba(232, 195, 106, 0.35);
+}
+
+.newsletter-input-wrapper input {
+  background: transparent;
+  color: #f5ead0;
+}
+
+.navbar-mobile-search {
+  background: rgba(12, 11, 9, 0.94);
+  border-color: rgba(232, 195, 106, 0.38);
+}
+
+.navbar-mobile-search input {
+  color: #f5ead0;
+}
+
+.product-details-wishlist {
+  background: #000;
+  color: #f3d98a;
+  border: 1px solid rgba(232, 195, 106, 0.45);
+}
+
+.product-details-wishlist:hover,
+.product-details-wishlist.active {
+  background: rgba(232, 195, 106, 0.16);
+  color: #fff8e7;
+}
+
+.product-reviews,
+.product-variant-selector span,
+.product-details-description,
+.price-note {
+  color: #c9b896;
+}
+
+.product-details-divider {
+  background: rgba(232, 195, 106, 0.22);
+}
+
+.wishlist-saved-badge {
+  background: rgba(12, 11, 9, 0.92);
+  color: #f3d98a;
+  border: 1px solid rgba(232, 195, 106, 0.32);
+}
+
+.shop-empty h2,
+.shop-empty-icon {
+  color: #fff8e7;
+}
+
+.shop-empty-icon {
+  background: rgba(232, 195, 106, 0.16);
+  color: #e8c36a;
+}
+
+.account-hero {
+  background:
+    radial-gradient(ellipse at 12% -10%, rgba(232, 195, 106, 0.18), transparent 46%),
+    #070707;
+  border-bottom: 1px solid rgba(232, 195, 106, 0.22);
+}
+
+.account-hero::before,
+.hero-decoration-one,
+.hero-decoration-two {
+  border-color: rgba(232, 195, 106, 0.18);
+  background: transparent;
+  box-shadow: none;
+}
+
+.account-title {
+  color: #fff8e7;
+}
+
+.account-eyebrow {
+  color: #e8c36a;
+}
+
+.account-intro,
+.account-email,
+.account-order-meta,
+.section-kicker {
+  color: #c9b896;
+}
+
+.account-action-card,
+.account-action-orders,
+.account-action-wishlist,
+.account-order-card {
+  background: #12100c;
+  border-color: rgba(232, 195, 106, 0.28);
+  color: #f5ead0;
+}
+
+.account-action-card::before {
+  background: rgba(232, 195, 106, 0.08);
+}
+
+.account-action-card:hover {
+  border-color: #e8c36a;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+.account-signout:hover {
+  background: rgba(232, 195, 106, 0.12);
+  border-color: #e8c36a;
+  color: #f3d98a;
+}
+
+.checkout-page h1,
+.checkout-page h2,
+.about-page h1 {
+  color: #fff8e7;
+}
+
+.checkout-page p,
+.checkout-page li {
+  color: #c9b896;
+}
+
+.recommended-add-btn:hover {
+  background: linear-gradient(180deg, #f7e4a6 0%, #e8c36a 55%, #b8921e 100%);
+  color: #000;
+  border-color: #f3d98a;
+}
+
+.account-shortcut,
+.account-panel {
+  background: #12100c;
+  border: 1px solid rgba(232, 195, 106, 0.28);
+  color: #f5ead0;
+}
+
+.account-shortcut strong,
+.account-panel-heading h2,
+.account-empty h3,
+.account-order-id {
+  color: #fff8e7;
+}
+
+.account-shortcut span,
+.account-empty p,
+.account-order-meta,
+.account-order-status {
+  color: #c9b896;
+}
+
+.account-field {
+  color: #f3d98a;
+}
+
+.account-order-track,
+.account-panel-link,
+.account-footer-copy a {
+  color: #f3d98a;
+}

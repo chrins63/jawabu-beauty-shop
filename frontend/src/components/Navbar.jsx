@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+
 import {
   FiHeart,
   FiShoppingBag,
@@ -8,288 +9,412 @@ import {
   FiMenu,
   FiX,
   FiLogOut,
-  FiChevronDown
-} from 'react-icons/fi'
+  FiChevronDown,
+  FiArrowRight,
+  FiPackage,
+  FiMapPin
+} from "react-icons/fi";
 
-import { supabase } from '../lib/supabase'
-import { useCart } from '../context/useCart'
-import { useWishlist } from '../context/useWishlist'
+import { supabase } from "../lib/supabase";
+import { useCart } from "../context/useCart";
+import { useWishlist } from "../context/useWishlist";
+import BrandLogo from "./BrandLogo";
+import { BRAND } from "../lib/brand";
+import { getStorefrontCommerce } from "../lib/storefront";
+import { whatsappHref, defaultWhatsAppText } from "../lib/whatsapp";
 
-import './Navbar.css'
+import "./Navbar.css";
+
+const NAV_LINKS = [
+  { to: "/", label: "Home" },
+  { to: "/shop", label: "Shop" },
+  { to: "/track", label: "Track" },
+  { to: "/about", label: "About" },
+  { to: "/contact", label: "Contact" }
+];
 
 const Navbar = () => {
-  const { cartCount } = useCart()
-  const { wishlistItems } = useWishlist()
+  const { cartCount } = useCart();
+  const { wishlistItems } = useWishlist();
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const wishlistCount = wishlistItems.length
+  const wishlistCount = wishlistItems.length;
 
-  const [user, setUser] = useState(null)
-  const [accountOpen, setAccountOpen] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
+  const [user, setUser] = useState(null);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-  /* =========================================
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const [whatsapp, setWhatsapp] = useState(
+    whatsappHref(BRAND.phone, defaultWhatsAppText())
+  );
+
+  const accountButtonRef = useRef(null);
+  const accountMenuRef = useRef(null);
+  const searchInputRef = useRef(null);
+
+  /* =====================================================
      GET CURRENT USER
-  ========================================= */
+  ===================================================== */
 
   useEffect(() => {
-    let mounted = true
+    let mounted = true;
 
     const loadUser = async () => {
       const {
         data: { user }
-      } = await supabase.auth.getUser()
+      } = await supabase.auth.getUser();
 
       if (mounted) {
-        setUser(user)
+        setUser(user);
       }
-    }
+    };
 
-    loadUser()
+    loadUser();
 
     const {
       data: { subscription }
-    } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (mounted) {
-          setUser(session?.user ?? null)
-        }
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (mounted) {
+        setUser(session?.user ?? null);
       }
-    )
+    });
 
     return () => {
-      mounted = false
-      subscription.unsubscribe()
-    }
-  }, [])
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
-  /* =========================================
-     NAVBAR SCROLL EFFECT
-  ========================================= */
+  useEffect(() => {
+    getStorefrontCommerce().then((data) => {
+      setWhatsapp(
+        whatsappHref(data.whatsapp_number || BRAND.phone, defaultWhatsAppText())
+      );
+    });
+  }, []);
+
+  /* =====================================================
+     NAVBAR SCROLL EFFECT (mirror intensifies on scroll)
+  ===================================================== */
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20)
-    }
+      setScrolled(window.scrollY > 20);
+    };
 
-    handleScroll()
-
-    window.addEventListener('scroll', handleScroll)
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
-      window.removeEventListener(
-        'scroll',
-        handleScroll
-      )
-    }
-  }, [])
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
-  /* =========================================
+  /* =====================================================
      CLOSE ACCOUNT DROPDOWN OUTSIDE
-  ========================================= */
+  ===================================================== */
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        !event.target.closest(
-          '.navbar-account-wrapper'
-        )
-      ) {
-        setAccountOpen(false)
+      if (!event.target.closest(".navbar-account-wrapper")) {
+        setAccountOpen(false);
       }
-    }
+      if (!event.target.closest(".navbar-search-wrapper")) {
+        setSearchOpen(false);
+      }
+    };
 
-    document.addEventListener(
-      'mousedown',
-      handleClickOutside
-    )
+    document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      document.removeEventListener(
-        'mousedown',
-        handleClickOutside
-      )
-    }
-  }, [])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
-  /* =========================================
-     ESCAPE KEY
-  ========================================= */
+  /* =====================================================
+     ESCAPE KEY + RETURN FOCUS
+  ===================================================== */
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.key === 'Escape') {
-        setMobileOpen(false)
-        setAccountOpen(false)
+      if (event.key === "Escape") {
+        if (accountOpen) {
+          setAccountOpen(false);
+          accountButtonRef.current?.focus();
+        }
+        if (searchOpen) {
+          setSearchOpen(false);
+        }
+        setMobileOpen(false);
       }
-    }
+    };
 
-    document.addEventListener(
-      'keydown',
-      handleKeyDown
-    )
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.removeEventListener(
-        'keydown',
-        handleKeyDown
-      )
-    }
-  }, [])
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [accountOpen, searchOpen]);
 
-  /* =========================================
+  /* =====================================================
+     LOCK BODY SCROLL WHILE MOBILE PANEL OPEN
+  ===================================================== */
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
+  /* =====================================================
+     CLOSE OVERLAYS ON ROUTE CHANGE
+  ===================================================== */
+
+  useEffect(() => {
+    let rafId = null;
+
+    rafId = window.requestAnimationFrame(() => {
+      setMobileOpen(false);
+      setAccountOpen(false);
+      setSearchOpen(false);
+    });
+
+    return () => {
+      if (rafId) {
+        window.cancelAnimationFrame(rafId);
+      }
+    };
+  }, [location.pathname]);
+
+  /* =====================================================
+     AUTOFOCUS SEARCH WHEN OPENED
+  ===================================================== */
+
+  useEffect(() => {
+    if (searchOpen) {
+      searchInputRef.current?.focus();
+    }
+  }, [searchOpen]);
+
+  /* =====================================================
+     KEYBOARD NAVIGATION INSIDE ACCOUNT DROPDOWN
+  ===================================================== */
+
+  const handleAccountMenuKeyDown = (event) => {
+    const items = Array.from(
+      accountMenuRef.current?.querySelectorAll(
+        "[role='menuitem']"
+      ) ?? []
+    );
+
+    if (items.length === 0) return;
+
+    const currentIndex = items.indexOf(document.activeElement);
+
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      const next = items[(currentIndex + 1) % items.length];
+      next?.focus();
+    }
+
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      const prev =
+        items[(currentIndex - 1 + items.length) % items.length];
+      prev?.focus();
+    }
+
+    if (event.key === "Home") {
+      event.preventDefault();
+      items[0]?.focus();
+    }
+
+    if (event.key === "End") {
+      event.preventDefault();
+      items[items.length - 1]?.focus();
+    }
+  };
+
+  /* =====================================================
+     SEARCH SUBMIT
+  ===================================================== */
+
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
+
+    const query = searchValue.trim();
+
+    if (!query) {
+      searchInputRef.current?.focus();
+      return;
+    }
+
+    navigate(`/shop?search=${encodeURIComponent(query)}`);
+    setSearchOpen(false);
+    setSearchValue("");
+  };
+
+  /* =====================================================
      SIGN OUT
-  ========================================= */
+  ===================================================== */
 
   const handleSignOut = async () => {
-    const { error } =
-      await supabase.auth.signOut()
+    const { error } = await supabase.auth.signOut();
 
     if (error) {
-      console.error(
-        'Sign out error:',
-        error
-      )
-      return
+      console.error("Sign out error:", error);
+      return;
     }
 
-    setUser(null)
-    setAccountOpen(false)
-    setMobileOpen(false)
+    setUser(null);
+    setAccountOpen(false);
+    setMobileOpen(false);
 
-    window.location.href = '/'
-  }
+    window.location.href = "/";
+  };
 
-  /* =========================================
+  /* =====================================================
      DISPLAY NAME
-  ========================================= */
+  ===================================================== */
 
   const displayName =
     user?.user_metadata?.full_name ||
     user?.user_metadata?.name ||
-    user?.email?.split('@')[0] ||
-    'Account'
+    user?.email?.split("@")[0] ||
+    "Account";
+
+  const isActive = (path) =>
+    path === "/"
+      ? location.pathname === "/"
+      : location.pathname.startsWith(path);
 
   return (
     <>
-      {/* =====================================
+      {/* =====================================================
           DESKTOP / MAIN NAVBAR
-      ===================================== */}
+      ===================================================== */}
 
       <header
-        className={`navbar${
-          scrolled
-            ? ' navbar--scrolled'
-            : ''
-        }`}
+        className={`navbar${scrolled ? " navbar--scrolled" : ""}`}
       >
+        {/* mirror sheen layer, purely decorative */}
+        <div className="navbar-sheen" aria-hidden="true" />
 
         <div className="navbar-container">
-
-          {/* =================================
+          {/* =================================================
               MOBILE MENU BUTTON
-          ================================= */}
+          ================================================= */}
 
           <button
             type="button"
             className="navbar-icon-btn navbar-menu-btn"
-            aria-label={
-              mobileOpen
-                ? 'Close menu'
-                : 'Open menu'
-            }
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
-            onClick={() =>
-              setMobileOpen(
-                current => !current
-              )
-            }
+            onClick={() => setMobileOpen((current) => !current)}
           >
-            {mobileOpen ? (
-              <FiX />
-            ) : (
-              <FiMenu />
-            )}
+            {mobileOpen ? <FiX /> : <FiMenu />}
           </button>
 
-
-          {/* =================================
+          {/* =================================================
               LOGO
-          ================================= */}
+          ================================================= */}
 
-          <Link
-            to="/"
-            className="navbar-logo"
-            onClick={() =>
-              setMobileOpen(false)
-            }
-          >
-            <span className="navbar-logo-mark">
-              JAWABU
-            </span>
+          <BrandLogo
+            onClick={() => {
+              setMobileOpen(false);
+              setAccountOpen(false);
+            }}
+          />
 
-            <span className="navbar-logo-script">
-              Beauty
-            </span>
-          </Link>
-
-
-          {/* =================================
+          {/* =================================================
               DESKTOP NAVIGATION
-          ================================= */}
+          ================================================= */}
 
-          <nav
-            className="navbar-links"
-            aria-label="Main navigation"
-          >
-
-            <Link
-              to="/"
-              className="navbar-link"
-            >
-              Home
-            </Link>
-
-            <Link
-              to="/shop"
-              className="navbar-link"
-            >
-              Shop
-            </Link>
-
-            <Link
-              to="/services"
-              className="navbar-link"
-            >
-              Services
-            </Link>
-
-            <Link
-              to="/about"
-              className="navbar-link"
-            >
-              About
-            </Link>
-
+          <nav className="navbar-links" aria-label="Main navigation">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`navbar-link${
+                  isActive(link.to) ? " is-active" : ""
+                }`}
+                aria-current={isActive(link.to) ? "page" : undefined}
+              >
+                {link.label}
+              </Link>
+            ))}
           </nav>
 
-
-          {/* =================================
+          {/* =================================================
               RIGHT SIDE ACTIONS
-          ================================= */}
+          ================================================= */}
 
           <div className="navbar-actions">
+            {/* =============================================
+                SEARCH (now functional)
+            ============================================= */}
 
-            {/* SEARCH */}
+            <div className="navbar-search-wrapper">
+              <button
+                type="button"
+                className="navbar-icon-btn"
+                aria-label={searchOpen ? "Close search" : "Search"}
+                aria-expanded={searchOpen}
+                onClick={() => setSearchOpen((current) => !current)}
+              >
+                {searchOpen ? <FiX /> : <FiSearch />}
+              </button>
 
-            <button
-              type="button"
+              {searchOpen && (
+                <form
+                  className="navbar-search-flyout"
+                  onSubmit={handleSearchSubmit}
+                  role="search"
+                >
+                  <FiSearch className="navbar-search-flyout-icon" />
+
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    className="navbar-search-input"
+                    placeholder="Search Sleek Sisters..."
+                    value={searchValue}
+                    onChange={(event) =>
+                      setSearchValue(event.target.value)
+                    }
+                    aria-label="Search products"
+                  />
+
+                  <button
+                    type="submit"
+                    className="navbar-search-submit"
+                    aria-label="Submit search"
+                  >
+                    <FiArrowRight />
+                  </button>
+                </form>
+              )}
+            </div>
+
+            {/* WHATSAPP */}
+
+            <a
+              href={whatsapp}
               className="navbar-icon-btn"
-              aria-label="Search"
+              aria-label="WhatsApp Sleek Sisters"
+              target="_blank"
+              rel="noreferrer"
             >
-              <FiSearch />
-            </button>
-
+              <span className="navbar-whatsapp-glyph" aria-hidden="true">
+                WA
+              </span>
+            </a>
 
             {/* WISHLIST */}
 
@@ -297,24 +422,17 @@ const Navbar = () => {
               to="/wishlist"
               className="navbar-icon-btn"
               aria-label={`Wishlist${
-                wishlistCount > 0
-                  ? `, ${wishlistCount} items`
-                  : ''
+                wishlistCount > 0 ? `, ${wishlistCount} items` : ""
               }`}
             >
-
               <FiHeart />
 
               {wishlistCount > 0 && (
                 <span className="navbar-badge">
-                  {wishlistCount > 99
-                    ? '99+'
-                    : wishlistCount}
+                  {wishlistCount > 99 ? "99+" : wishlistCount}
                 </span>
               )}
-
             </Link>
-
 
             {/* CART */}
 
@@ -322,288 +440,291 @@ const Navbar = () => {
               to="/cart"
               className="navbar-icon-btn"
               aria-label={`Shopping cart${
-                cartCount > 0
-                  ? `, ${cartCount} items`
-                  : ''
+                cartCount > 0 ? `, ${cartCount} items` : ""
               }`}
             >
-
               <FiShoppingBag />
 
               {cartCount > 0 && (
                 <span className="navbar-badge">
-                  {cartCount > 99
-                    ? '99+'
-                    : cartCount}
+                  {cartCount > 99 ? "99+" : cartCount}
                 </span>
               )}
-
             </Link>
 
-
-            {/* =================================
+            {/* =================================================
                 ACCOUNT
-            ================================= */}
+            ================================================= */}
 
             <div className="navbar-account-wrapper">
-
-              {/* ACCOUNT BUTTON */}
-
               <button
+                ref={accountButtonRef}
                 type="button"
                 className="navbar-account"
                 aria-label="Account menu"
+                aria-haspopup="true"
                 aria-expanded={accountOpen}
-                onClick={() =>
-                  setAccountOpen(
-                    current => !current
-                  )
-                }
+                onClick={() => setAccountOpen((current) => !current)}
               >
-
                 <FiUser />
-
-                <span>
-                  {user
-                    ? displayName
-                    : 'Account'}
-                </span>
-
+                <span>{user ? displayName : "Account"}</span>
                 <FiChevronDown
                   className={`navbar-account-chevron${
-                    accountOpen
-                      ? ' is-open'
-                      : ''
+                    accountOpen ? " is-open" : ""
                   }`}
                 />
-
               </button>
-
-
-              {/* =================================
-                  ACCOUNT DROPDOWN
-              ================================= */}
 
               {accountOpen && (
                 <div
+                  ref={accountMenuRef}
                   className="navbar-account-dropdown"
                   role="menu"
+                  onKeyDown={handleAccountMenuKeyDown}
                 >
-
                   {user ? (
                     <>
-
-                      {/* USER INFO */}
-
                       <div className="navbar-account-header">
-
                         <span className="navbar-account-name">
                           {displayName}
                         </span>
-
                         <span className="navbar-account-email">
                           {user.email}
                         </span>
-
                       </div>
-
-
-                      {/* MY ACCOUNT */}
 
                       <Link
                         to="/account"
                         className="navbar-account-link"
-                        onClick={() =>
-                          setAccountOpen(false)
-                        }
+                        role="menuitem"
+                        onClick={() => setAccountOpen(false)}
                       >
-
                         <FiUser />
-
-                        <span>
-                          My Account
-                        </span>
-
+                        <span>My Account</span>
                       </Link>
 
+                      <Link
+                        to="/orders"
+                        className="navbar-account-link"
+                        role="menuitem"
+                        onClick={() => setAccountOpen(false)}
+                      >
+                        <FiPackage />
+                        <span>My Orders</span>
+                      </Link>
 
-                      {/* SIGN OUT */}
+                      <Link
+                        to="/track"
+                        className="navbar-account-link"
+                        role="menuitem"
+                        onClick={() => setAccountOpen(false)}
+                      >
+                        <FiMapPin />
+                        <span>Track order</span>
+                      </Link>
+
+                      <Link
+                        to="/wishlist"
+                        className="navbar-account-link"
+                        role="menuitem"
+                        onClick={() => setAccountOpen(false)}
+                      >
+                        <FiHeart />
+                        <span>Wishlist</span>
+                        {wishlistCount > 0 && (
+                          <span className="navbar-account-link-count">
+                            {wishlistCount}
+                          </span>
+                        )}
+                      </Link>
+
+                      <div className="navbar-account-divider" />
 
                       <button
                         type="button"
                         className="navbar-signout"
-                        onClick={
-                          handleSignOut
-                        }
+                        role="menuitem"
+                        onClick={handleSignOut}
                       >
-
                         <FiLogOut />
-
-                        <span>
-                          Sign out
-                        </span>
-
+                        <span>Sign out</span>
                       </button>
-
                     </>
                   ) : (
                     <>
-
-                      {/* GUEST */}
-
                       <div className="navbar-account-header">
-
                         <span className="navbar-account-name">
-                          Welcome to Jawabu
+                          Welcome to Sleek Sisters
                         </span>
-
                         <span className="navbar-account-email">
                           Sign in to your account
                         </span>
-
                       </div>
-
-
-                      {/* SIGN IN */}
 
                       <Link
                         to="/login"
                         className="navbar-account-link"
-                        onClick={() =>
-                          setAccountOpen(false)
-                        }
+                        role="menuitem"
+                        onClick={() => setAccountOpen(false)}
                       >
-
                         <FiUser />
-
-                        <span>
-                          Sign in
-                        </span>
-
+                        <span>Sign in</span>
                       </Link>
-
-
-                      {/* CREATE ACCOUNT */}
 
                       <Link
                         to="/register"
                         className="navbar-account-link"
-                        onClick={() =>
-                          setAccountOpen(false)
-                        }
+                        role="menuitem"
+                        onClick={() => setAccountOpen(false)}
                       >
-
-                        <span>
-                          Create account
-                        </span>
-
+                        <FiArrowRight />
+                        <span>Create account</span>
                       </Link>
 
+                      <Link
+                        to="/track"
+                        className="navbar-account-link"
+                        role="menuitem"
+                        onClick={() => setAccountOpen(false)}
+                      >
+                        <FiMapPin />
+                        <span>Track order</span>
+                      </Link>
                     </>
                   )}
-
                 </div>
               )}
-
             </div>
-
           </div>
-
         </div>
-
       </header>
 
-
-      {/* =====================================
+      {/* =====================================================
           MOBILE BACKDROP
-      ===================================== */}
+      ===================================================== */}
 
       {mobileOpen && (
         <button
           type="button"
           className="navbar-mobile-backdrop"
           aria-label="Close menu"
-          onClick={() =>
-            setMobileOpen(false)
-          }
+          onClick={() => setMobileOpen(false)}
         />
       )}
 
-
-      {/* =====================================
+      {/* =====================================================
           MOBILE MENU
-      ===================================== */}
+      ===================================================== */}
 
       <aside
-        className={`navbar-mobile-panel${
-          mobileOpen
-            ? ' is-open'
-            : ''
-        }`}
+        className={`navbar-mobile-panel${mobileOpen ? " is-open" : ""}`}
         aria-hidden={!mobileOpen}
       >
+        <BrandLogo
+          onClick={() => {
+            setMobileOpen(false);
+            setAccountOpen(false);
+          }}
+        />
+
+        <form
+          className="navbar-mobile-search"
+          onSubmit={handleSearchSubmit}
+          role="search"
+        >
+          <FiSearch />
+          <input
+            type="text"
+            placeholder="Search Sleek Sisters..."
+            value={searchValue}
+            onChange={(event) => setSearchValue(event.target.value)}
+            aria-label="Search products"
+          />
+        </form>
 
         <nav className="navbar-mobile-links">
-
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              className={`navbar-mobile-link${
+                isActive(link.to) ? " is-active" : ""
+              }`}
+              onClick={() => setMobileOpen(false)}
+            >
+              {link.label}
+            </Link>
+          ))}
           <Link
-            to="/"
+            to="/cart"
             className="navbar-mobile-link"
-            onClick={() =>
-              setMobileOpen(false)
-            }
+            onClick={() => setMobileOpen(false)}
           >
-            Home
+            Cart
           </Link>
-
           <Link
-            to="/shop"
+            to="/wishlist"
             className="navbar-mobile-link"
-            onClick={() =>
-              setMobileOpen(false)
-            }
+            onClick={() => setMobileOpen(false)}
           >
-            Shop
+            Wishlist
           </Link>
-
           <Link
-            to="/services"
+            to="/orders"
             className="navbar-mobile-link"
-            onClick={() =>
-              setMobileOpen(false)
-            }
+            onClick={() => setMobileOpen(false)}
           >
-            Services
+            My Orders
           </Link>
-
-          <Link
-            to="/about"
+          <a
+            href={whatsapp}
             className="navbar-mobile-link"
-            onClick={() =>
-              setMobileOpen(false)
-            }
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => setMobileOpen(false)}
           >
-            About
-          </Link>
-
+            WhatsApp
+          </a>
         </nav>
-
 
         <div className="navbar-mobile-divider" />
 
-
-        {/* MOBILE ACCOUNT */}
+        {/* =================================================
+            MOBILE ACCOUNT
+        ================================================= */}
 
         {user ? (
           <>
-
+            <p className="navbar-mobile-account-label">
+              Signed in as {displayName}
+            </p>
             <Link
               to="/account"
               className="navbar-mobile-link"
-              onClick={() =>
-                setMobileOpen(false)
-              }
+              onClick={() => setMobileOpen(false)}
             >
               My Account
+            </Link>
+            <Link
+              to="/orders"
+              className="navbar-mobile-link"
+              onClick={() => setMobileOpen(false)}
+            >
+              My Orders
+            </Link>
+            <Link
+              to="/track"
+              className="navbar-mobile-link"
+              onClick={() => setMobileOpen(false)}
+            >
+              Track order
+            </Link>
+            <Link
+              to="/wishlist"
+              className="navbar-mobile-link"
+              onClick={() => setMobileOpen(false)}
+            >
+              Wishlist
             </Link>
 
             <button
@@ -611,23 +732,16 @@ const Navbar = () => {
               className="navbar-mobile-signout"
               onClick={handleSignOut}
             >
-
               <FiLogOut />
-
               Sign out
-
             </button>
-
           </>
         ) : (
           <>
-
             <Link
               to="/login"
               className="navbar-mobile-link"
-              onClick={() =>
-                setMobileOpen(false)
-              }
+              onClick={() => setMobileOpen(false)}
             >
               Sign in
             </Link>
@@ -635,19 +749,22 @@ const Navbar = () => {
             <Link
               to="/register"
               className="navbar-mobile-link"
-              onClick={() =>
-                setMobileOpen(false)
-              }
+              onClick={() => setMobileOpen(false)}
             >
               Create account
             </Link>
-
+            <Link
+              to="/track"
+              className="navbar-mobile-link"
+              onClick={() => setMobileOpen(false)}
+            >
+              Track order
+            </Link>
           </>
         )}
-
       </aside>
     </>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

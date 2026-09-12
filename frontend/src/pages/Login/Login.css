@@ -1,107 +1,311 @@
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Pinyon+Script&family=Inter:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Source+Sans+3:wght@400;500;600;700&display=swap");
+
+/* =========================================================
+   SLEEK SISTERS — LOGIN
+   Presentation theme: espresso, ivory, champagne gold
+   ========================================================= */
 
 .jw-root {
-  --cream: #fffbf6;
-  --ink: #1c1714;
-  --ink-soft: rgba(28, 23, 20, 0.58);
-  --rose: #e92063;
-  --rose-deep: #b5134a;
-  --blush: #f7d6dd;
-  --peach: #f4dec6;
-  --glass: rgba(255, 255, 255, 0.5);
-  --glass-border: rgba(255, 255, 255, 0.65);
+  /* =======================================================
+     COLOR SYSTEM
+     ======================================================= */
+
+  --cream: #ffffff;
+  --cream-soft: #e9e1d6;
+
+  --ink: #ffffff;
+  --ink-soft: rgba(255, 255, 255, 0.76);
+
+  --rose: #e8c36a;
+  --rose-deep: #d4af37;
+  --rose-soft: rgba(232, 195, 106, 0.28);
+
+  --blush: #e8c36a;
+  --blush-deep: #d4af37;
+
+  --peach: #e9e1d6;
+
+  --glass: rgba(255, 255, 255, 0.11);
+  --glass-border: rgba(255, 255, 255, 0.22);
 
   position: relative;
+
   min-height: 100vh;
   width: 100%;
 
-  font-family: "Inter", sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: Calibri, "Source Sans 3", "Segoe UI", sans-serif;
+
   color: var(--ink);
-  background: var(--ink);
+
+  background:
+    radial-gradient(
+      circle at 75% 25%,
+      rgba(201, 168, 118, 0.24),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 20% 75%,
+      rgba(168, 139, 88, 0.18),
+      transparent 32%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(201, 168, 118, 0.06),
+      transparent 45%
+    ),
+    #070707;
 
   overflow: hidden;
+
+  isolation: isolate;
 }
 
-/* =========================================
-   VIDEO / MEDIA
-========================================= */
+
+/* =========================================================
+   MEDIA / VIDEO BACKGROUND
+   ========================================================= */
 
 .jw-media {
   position: absolute;
   inset: 0;
+
+  z-index: -5;
+
   overflow: hidden;
 }
 
 .jw-video {
   position: absolute;
-  inset: 0;
 
-  width: 100%;
-  height: 100%;
+  inset: -4%;
+
+  width: 108%;
+  height: 108%;
 
   object-fit: cover;
 
-  animation: jw-kenburns 26s ease-in-out infinite alternate;
+  filter:
+    saturate(0.95)
+    contrast(1.08)
+    brightness(0.68);
+
+  transform: scale(1.04);
+
+  animation:
+    jw-kenburns 28s ease-in-out infinite alternate,
+    jw-breathe 10s ease-in-out infinite;
 }
+
+
+/* =========================================================
+   KEN BURNS
+   ========================================================= */
 
 @keyframes jw-kenburns {
   0% {
-    transform: scale(1.04) translate(0, 0);
+    transform:
+      scale(1.04)
+      translate3d(0, 0, 0);
   }
 
   100% {
-    transform: scale(1.14) translate(-1%, -1.5%);
+    transform:
+      scale(1.13)
+      translate3d(-1.2%, -1%, 0);
   }
 }
 
-/* Fallback if video fails */
+
+/* =========================================================
+   VIDEO BREATHE
+   ========================================================= */
+
+@keyframes jw-breathe {
+  0%,
+  100% {
+    filter:
+      saturate(0.95)
+      contrast(1.08)
+      brightness(0.68);
+  }
+
+  50% {
+    filter:
+      saturate(1.05)
+      contrast(1.10)
+      brightness(0.74);
+  }
+}
+
+
+/* =========================================================
+   FALLBACK BACKGROUND
+   ========================================================= */
 
 .jw-fallback {
   position: absolute;
   inset: 0;
 
   background:
+    radial-gradient(
+      circle at 15% 20%,
+      rgba(201, 168, 118, 0.28),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at 85% 75%,
+      rgba(168, 139, 88, 0.30),
+      transparent 38%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 198, 168, 0.08),
+      transparent 40%
+    ),
     linear-gradient(
-      120deg,
-      #f4dec6,
-      #f7d6dd 45%,
-      #e92063 130%
+      135deg,
+      #0b0710 0%,
+      #160b19 45%,
+      #240d19 100%
     );
 
-  background-size: 240% 240%;
+  background-size: 140% 140%;
 
-  animation: jw-gradient 16s ease-in-out infinite;
+  animation:
+    jw-gradient 18s ease-in-out infinite alternate;
 }
+
+
+/* =========================================================
+   FALLBACK ANIMATION
+   ========================================================= */
 
 @keyframes jw-gradient {
-  0%,
-  100% {
-    background-position: 0% 40%;
+  0% {
+    background-position: 0% 20%;
   }
 
-  50% {
-    background-position: 100% 60%;
+  100% {
+    background-position: 100% 80%;
   }
 }
 
-/* =========================================
+
+/* =========================================================
+   CINEMATIC SCRIM
+   ========================================================= */
+
+.jw-scrim {
+  position: absolute;
+  inset: 0;
+
+  z-index: -3;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(8, 5, 10, 0.82) 0%,
+      rgba(8, 5, 10, 0.58) 35%,
+      rgba(8, 5, 10, 0.18) 62%,
+      rgba(8, 5, 10, 0.72) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(8, 5, 10, 0.70) 0%,
+      transparent 25%,
+      transparent 72%,
+      rgba(8, 5, 10, 0.84) 100%
+    );
+}
+
+
+/* =========================================================
+   AMBIENT LIGHT
+   ========================================================= */
+
+.jw-root::before {
+  content: "";
+
+  position: absolute;
+
+  inset: -30%;
+
+  z-index: -2;
+
+  background:
+    radial-gradient(
+      circle at 75% 50%,
+      rgba(201, 168, 118, 0.18),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 25% 65%,
+      rgba(168, 139, 88, 0.11),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 60% 30%,
+      rgba(255, 255, 255, 0.035),
+      transparent 25%
+    );
+
+  pointer-events: none;
+
+  animation:
+    jw-ambient 12s ease-in-out infinite alternate;
+}
+
+
+/* =========================================================
+   AMBIENT ANIMATION
+   ========================================================= */
+
+@keyframes jw-ambient {
+  from {
+    transform:
+      translate3d(-2%, 1%, 0)
+      scale(1);
+  }
+
+  to {
+    transform:
+      translate3d(2%, -1%, 0)
+      scale(1.04);
+  }
+}
+
+
+/* =========================================================
    FILM GRAIN
-========================================= */
+   ========================================================= */
 
 .jw-grain {
   position: absolute;
-  inset: -20%;
 
-  opacity: 0.05;
+  inset: -25%;
+
+  z-index: 10;
+
+  opacity: 0.045;
 
   mix-blend-mode: overlay;
 
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 
-  animation: jw-grain-shift 1.4s steps(4) infinite;
+  animation:
+    jw-grain-shift 1.2s steps(4) infinite;
 
   pointer-events: none;
 }
+
+
+/* =========================================================
+   GRAIN ANIMATION
+   ========================================================= */
 
 @keyframes jw-grain-shift {
   0% {
@@ -125,34 +329,10 @@
   }
 }
 
-/* =========================================
-   VIDEO SCRIM
-========================================= */
 
-.jw-scrim {
-  position: absolute;
-  inset: 0;
-
-  background:
-    linear-gradient(
-      90deg,
-      rgba(20, 14, 13, 0.55) 0%,
-      rgba(20, 14, 13, 0.15) 42%,
-      rgba(20, 14, 13, 0.05) 60%,
-      rgba(28, 20, 20, 0.5) 100%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(20, 14, 13, 0.35) 0%,
-      transparent 22%,
-      transparent 72%,
-      rgba(20, 14, 13, 0.4) 100%
-    );
-}
-
-/* =========================================
+/* =========================================================
    CINEMATIC LETTERBOX
-========================================= */
+   ========================================================= */
 
 .jw-bar {
   position: absolute;
@@ -160,351 +340,798 @@
   left: 0;
   right: 0;
 
-  height: 7vh;
+  height: 6vh;
+  min-height: 42px;
 
-  background: #0f0b0a;
+  background:
+    linear-gradient(
+      90deg,
+      #070508,
+      #0d0710,
+      #070508
+    );
 
-  z-index: 5;
+  z-index: 20;
 
   transition:
-    transform 0.9s
-    cubic-bezier(0.65, 0, 0.24, 1);
+    transform 1s cubic-bezier(0.65, 0, 0.24, 1);
 }
+
+
+/* =========================================================
+   TOP BAR
+   ========================================================= */
 
 .jw-bar.top {
   top: 0;
-  transform: translateY(-100%);
+
+  transform:
+    translateY(-100%);
 }
+
+
+/* =========================================================
+   BOTTOM BAR
+   ========================================================= */
 
 .jw-bar.bottom {
   bottom: 0;
-  transform: translateY(100%);
+
+  transform:
+    translateY(100%);
 }
+
+
+/* =========================================================
+   BAR STAGES
+   ========================================================= */
 
 .jw-root.-stage1 .jw-bar.top,
 .jw-root.-stage2 .jw-bar.top,
 .jw-root.-stage3 .jw-bar.top {
-  transform: translateY(0);
+  transform:
+    translateY(0);
 }
 
 .jw-root.-stage1 .jw-bar.bottom,
 .jw-root.-stage2 .jw-bar.bottom,
 .jw-root.-stage3 .jw-bar.bottom {
-  transform: translateY(0);
+  transform:
+    translateY(0);
 }
 
-/* =========================================
-   NAVIGATION
-========================================= */
 
-.jw-nav {
-  position: absolute;
-
-  top: 7vh;
-  left: 0;
-  right: 0;
-
-  z-index: 4;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  padding: 30px 48px 0;
-
-  opacity: 0;
-
-  transform: translateY(-10px);
-
-  transition:
-    opacity 0.7s ease,
-    transform 0.7s ease;
-}
-
-.jw-root.-stage2 .jw-nav,
-.jw-root.-stage3 .jw-nav {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.jw-wordmark {
-  font-family: "Fraunces", serif;
-
-  font-size: 22px;
-
-  letter-spacing: 0.18em;
-
-  color: var(--cream);
-
-  text-decoration: none;
-}
-
-.jw-nav-tag {
-  font-size: 11px;
-
-  letter-spacing: 0.16em;
-
-  text-transform: uppercase;
-
-  color: rgba(255, 251, 246, 0.75);
-
-  text-decoration: none;
-}
-
-/* =========================================
-   MAIN CONTENT
-========================================= */
+/* =========================================================
+   MAIN STAGE
+   ========================================================= */
 
 .jw-stagearea {
   position: relative;
 
-  z-index: 3;
+  z-index: 5;
 
+  width: 100%;
   min-height: 100vh;
 
   display: flex;
 
   align-items: center;
+  justify-content: center;
 
-  justify-content: flex-end;
-
-  padding: 7vh 6vw;
+  padding:
+    calc(6vh + 40px)
+    7vw
+    calc(6vh + 40px);
 
   box-sizing: border-box;
 }
 
-/* =========================================
+
+/* =========================================================
    LEFT CAPTION
-========================================= */
+   ========================================================= */
 
 .jw-caption {
   position: absolute;
 
-  left: 6vw;
+  left: 7vw;
   bottom: 12vh;
 
-  z-index: 3;
+  z-index: 6;
 
-  max-width: 380px;
-
-  opacity: 0;
-
-  transform: translateY(14px);
-
-  transition:
-    opacity 0.8s ease,
-    transform 0.8s ease;
-}
-
-.jw-root.-stage2 .jw-caption,
-.jw-root.-stage3 .jw-caption {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.jw-caption p {
-  font-family: "Fraunces", serif;
-
-  font-size: 30px;
-
-  line-height: 1.2;
-
-  color: var(--cream);
-
-  margin: 0 0 6px;
-}
-
-.jw-caption .jw-script {
-  font-family: "Pinyon Script", cursive;
-
-  font-size: 44px;
-
-  color: var(--rose);
-
-  line-height: 1;
-
-  display: inline-block;
-}
-
-.jw-caption .eyebrow {
-  font-size: 11px;
-
-  letter-spacing: 0.16em;
-
-  text-transform: uppercase;
-
-  color: rgba(255, 251, 246, 0.7);
-}
-
-/* =========================================
-   LOGIN CARD
-========================================= */
-
-.jw-card {
-  position: relative;
-
-  width: 100%;
-  max-width: 400px;
-
-  background: var(--glass);
-
-  -webkit-backdrop-filter: blur(22px) saturate(140%);
-  backdrop-filter: blur(22px) saturate(140%);
-
-  border: 1px solid var(--glass-border);
-
-  border-radius: 20px;
-
-  padding: 40px 36px;
-
-  box-sizing: border-box;
-
-  box-shadow:
-    0 30px 70px rgba(20, 10, 15, 0.35);
+  max-width: 430px;
 
   opacity: 0;
 
   transform:
-    translateY(26px)
+    translateY(20px);
+
+  transition:
+    opacity 1s ease,
+    transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+/* =========================================================
+   CAPTION STAGE
+   ========================================================= */
+
+.jw-root.-stage2 .jw-caption,
+.jw-root.-stage3 .jw-caption {
+  opacity: 1;
+
+  transform:
+    translateY(0);
+}
+
+
+/* =========================================================
+   CAPTION TEXT
+   ========================================================= */
+
+.jw-caption p {
+  font-family: Cambria, "Cormorant Garamond", Georgia, serif;
+
+  font-size:
+    clamp(28px, 3vw, 42px);
+
+  line-height: 1.12;
+
+  color: #ffffff;
+
+  margin:
+    0 0 10px;
+
+  letter-spacing:
+    -0.02em;
+
+  text-shadow:
+    0 4px 30px rgba(0, 0, 0, 0.50);
+}
+
+
+/* =========================================================
+   SCRIPT FONT
+   ========================================================= */
+
+.jw-caption .jw-script {
+  font-family:
+    Cambria, "Cormorant Garamond",
+    cursive;
+
+  font-size:
+    clamp(44px, 5vw, 68px);
+
+  color:
+    #c9a876;
+
+  line-height:
+    0.8;
+
+  display:
+    inline-block;
+
+  text-shadow:
+    0 0 25px rgba(201, 168, 118, 0.35),
+    0 8px 30px rgba(0, 0, 0, 0.30);
+}
+
+
+/* =========================================================
+   CAPTION EYEBROW
+   ========================================================= */
+
+.jw-caption .eyebrow {
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  gap:
+    10px;
+
+  font-size:
+    10px;
+
+  letter-spacing:
+    0.22em;
+
+  text-transform:
+    uppercase;
+
+  color:
+    rgba(255, 255, 255, 0.75);
+}
+
+
+/* =========================================================
+   EYEBROW LINE
+   ========================================================= */
+
+.jw-caption .eyebrow::before {
+  content: "";
+
+  width:
+    28px;
+
+  height:
+    1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #a88b58,
+      #c9a876
+    );
+
+  box-shadow:
+    0 0 10px rgba(201, 168, 118, 0.60);
+}
+
+
+/* =========================================================
+   CARD GLOW
+   ========================================================= */
+
+.jw-card-glow {
+  position: absolute;
+
+  top: 50%;
+  right: 5vw;
+
+  transform:
+    translateY(-50%);
+
+  width:
+    440px;
+
+  height:
+    440px;
+
+  max-width:
+    90vw;
+
+  border-radius:
+    50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(201, 168, 118, 0.18) 25%,
+      rgba(168, 139, 88, 0.10) 45%,
+      transparent 70%
+    );
+
+  filter:
+    blur(32px);
+
+  z-index:
+    2;
+
+  pointer-events:
+    none;
+
+  opacity:
+    0;
+
+  transition:
+    opacity 1.4s ease;
+}
+
+
+/* =========================================================
+   CARD GLOW STAGE
+   ========================================================= */
+
+.jw-root.-stage3 .jw-card-glow {
+  opacity:
+    0.55;
+}
+
+
+/* =========================================================
+   LOGIN CARD
+   ========================================================= */
+
+.jw-card {
+  position:
+    relative;
+
+  width:
+    min(380px, 92vw);
+
+  padding:
+    32px 30px 28px;
+
+  box-sizing:
+    border-box;
+
+  border-radius:
+    18px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.15),
+      rgba(255, 255, 255, 0.055)
+    );
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.22);
+
+  -webkit-backdrop-filter:
+    blur(28px)
+    saturate(130%);
+
+  backdrop-filter:
+    blur(28px)
+    saturate(130%);
+
+  box-shadow:
+    0 20px 55px
+      rgba(0, 0, 0, 0.38),
+
+    0 0 35px
+      rgba(201, 168, 118, 0.08),
+
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.14);
+
+  opacity:
+    0;
+
+  transform:
+    translateY(28px)
     scale(0.98);
 
   transition:
-    opacity 0.8s
-      cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.8s
-      cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+
+  overflow:
+    hidden;
 }
 
+
+/* =========================================================
+   CARD LIGHT
+   ========================================================= */
+
+.jw-card::before {
+  content: "";
+
+  position:
+    absolute;
+
+  inset:
+    0;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.12),
+      transparent 40%
+    );
+
+  pointer-events:
+    none;
+}
+
+
+/* =========================================================
+   CARD PURPLE GLOW
+   ========================================================= */
+
+.jw-card::after {
+  content: "";
+
+  position:
+    absolute;
+
+  width:
+    220px;
+
+  height:
+    220px;
+
+  right:
+    -130px;
+
+  top:
+    -130px;
+
+  border-radius:
+    50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(201, 168, 118, 0.20),
+      transparent 68%
+    );
+
+  pointer-events:
+    none;
+}
+
+
+/* =========================================================
+   CARD STAGE
+   ========================================================= */
+
 .jw-root.-stage3 .jw-card {
-  opacity: 1;
+  opacity:
+    1;
 
   transform:
     translateY(0)
     scale(1);
 }
 
-/* =========================================
-   TEXT
-========================================= */
+
+/* =========================================================
+   CARD HEADER EYEBROW
+   ========================================================= */
 
 .jw-eyebrow {
-  font-size: 11px;
+  font-size:
+    9px;
 
-  letter-spacing: 0.16em;
+  letter-spacing:
+    0.24em;
 
-  text-transform: uppercase;
+  text-transform:
+    uppercase;
 
-  color: var(--rose-deep);
+  color:
+    #c9a876;
 
-  font-weight: 600;
+  font-weight:
+    600;
 
-  margin-bottom: 10px;
+  margin-bottom:
+    9px;
+
+  text-align:
+    center;
+
+  text-shadow:
+    0 0 15px rgba(201, 168, 118, 0.25);
 }
+
+
+/* =========================================================
+   TITLE
+   ========================================================= */
 
 .jw-title {
-  font-family: "Fraunces", serif;
+  font-family:
+    Cambria, "Cormorant Garamond",
+    serif;
 
-  font-size: 32px;
+  font-size:
+    27px;
 
-  font-weight: 500;
+  font-weight:
+    500;
 
-  line-height: 1.15;
+  line-height:
+    1.10;
 
-  margin: 0 0 6px;
+  letter-spacing:
+    -0.025em;
 
-  color: var(--ink);
+  margin:
+    0 0 6px;
+
+  color:
+    #ffffff;
+
+  text-align:
+    center;
+
+  text-shadow:
+    0 4px 25px rgba(0, 0, 0, 0.25);
 }
+
+
+/* =========================================================
+   TITLE SCRIPT
+   ========================================================= */
 
 .jw-title .jw-script {
-  font-family: "Pinyon Script", cursive;
+  font-family:
+    Cambria, "Cormorant Garamond",
+    cursive;
 
-  color: var(--rose);
+  color:
+    #c9a876;
 
-  font-size: 40px;
+  font-size:
+    34px;
 
-  font-weight: 400;
+  font-weight:
+    400;
 
-  margin-left: 4px;
+  margin-left:
+    5px;
+
+  text-shadow:
+    0 0 25px rgba(201, 168, 118, 0.35);
 }
+
+
+/* =========================================================
+   SUBTITLE
+   ========================================================= */
 
 .jw-sub {
-  font-size: 13.5px;
+  font-size:
+    12px;
 
-  color: var(--ink-soft);
+  line-height:
+    1.45;
 
-  margin: 0 0 28px;
+  color:
+    rgba(255, 255, 255, 0.72);
+
+  margin:
+    0 0 21px;
+
+  text-align:
+    center;
 }
+
+
+/* =========================================================
+   SUBTITLE LINK — CREATE ACCOUNT
+   ========================================================= */
 
 .jw-sub a {
-  color: var(--rose-deep);
+  color:
+    #c9a876;
 
-  text-decoration: none;
+  text-decoration:
+    underline;
 
-  font-weight: 600;
+  text-decoration-thickness:
+    1px;
+
+  text-underline-offset:
+    3px;
+
+  font-weight:
+    600;
+
+  cursor:
+    pointer;
+
+  transition:
+    color 0.2s ease,
+    opacity 0.2s ease;
 }
 
-/* =========================================
-   FORM FIELDS
-========================================= */
 
-.jw-field {
-  position: relative;
+/* =========================================================
+   CREATE ACCOUNT HOVER
+   ========================================================= */
 
-  margin-bottom: 18px;
+.jw-sub a:hover {
+  color:
+    #e5d2ff;
+
+  opacity:
+    0.85;
 }
 
-.jw-field input {
-  width: 100%;
 
-  box-sizing: border-box;
+/* =========================================================
+   ERROR MESSAGE
+   ========================================================= */
 
-  font-family: "Inter", sans-serif;
+.jw-error {
+  margin-bottom:
+    14px;
 
-  font-size: 14.5px;
-
-  padding: 19px 16px 7px;
+  padding:
+    10px 12px;
 
   border:
-    1.5px solid
-    rgba(28, 23, 20, 0.14);
+    1px solid
+    rgba(255, 111, 159, 0.30);
 
-  border-radius: 12px;
+  border-radius:
+    10px;
 
-  background: rgba(255, 255, 255, 0.75);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(168, 139, 88, 0.16),
+      rgba(201, 168, 118, 0.07)
+    );
 
-  color: var(--ink);
+  color:
+    #ffd5e3;
 
-  outline: none;
+  font-size:
+    11.5px;
+
+  line-height:
+    1.45;
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.08),
+
+    0 5px 20px
+      rgba(168, 139, 88, 0.06);
+}
+
+
+/* =========================================================
+   FORM FIELD
+   ========================================================= */
+
+.jw-field {
+  position:
+    relative;
+
+  margin-bottom:
+    12px;
+}
+
+
+/* =========================================================
+   INPUT
+   ========================================================= */
+
+.jw-field input {
+  width:
+    100%;
+
+  min-height:
+    50px;
+
+  box-sizing:
+    border-box;
+
+  font-family:
+    Calibri, "Source Sans 3",
+    sans-serif;
+
+  font-size:
+    13px;
+
+  font-weight:
+    500;
+
+  padding:
+    16px 44px 6px 16px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.22);
+
+  border-radius:
+    12px;
+
+  background:
+    rgba(255, 255, 255, 0.86);
+
+  color:
+    #000000;
+
+  outline:
+    none;
+
+  box-shadow:
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.08),
+
+    0 4px 15px
+      rgba(0, 0, 0, 0.10);
 
   transition:
     border-color 0.25s ease,
-    box-shadow 0.25s ease,
-    background 0.25s ease;
+    box-shadow 0.3s ease,
+    background 0.3s ease;
 }
+
+
+/* =========================================================
+   PLACEHOLDER
+   ========================================================= */
+
+.jw-field input::placeholder {
+  color:
+    transparent;
+}
+
+
+/* =========================================================
+   INPUT HOVER
+   ========================================================= */
+
+.jw-field input:hover {
+  background:
+    rgba(255, 255, 255, 0.92);
+
+  border-color:
+    rgba(201, 168, 118, 0.40);
+}
+
+
+/* =========================================================
+   INPUT FOCUS
+   ========================================================= */
 
 .jw-field input:focus {
-  border-color: var(--rose);
+  color:
+    #000000;
 
-  background: #fff;
+  background:
+    rgba(255, 255, 255, 0.96);
+
+  border-color:
+    #c9a876;
 
   box-shadow:
-    0 0 0 4px
-    rgba(233, 32, 99, 0.1);
+    0 0 0 3px
+      rgba(201, 168, 118, 0.12),
+
+    0 0 20px
+      rgba(201, 168, 118, 0.16),
+
+    inset 0 1px 0
+      rgba(255, 255, 255, 0.15);
 }
 
+
+/* =========================================================
+   AUTOFILL
+   ========================================================= */
+
+.jw-field input:-webkit-autofill,
+.jw-field input:-webkit-autofill:hover,
+.jw-field input:-webkit-autofill:focus {
+  -webkit-text-fill-color:
+    #000000;
+
+  box-shadow:
+    0 0 0 1000px
+    rgba(255, 255, 255, 0.95)
+    inset;
+}
+
+
+/* =========================================================
+   FIELD LABEL
+   ========================================================= */
+
 .jw-field label {
-  position: absolute;
+  position:
+    absolute;
 
-  left: 16px;
-  top: 15px;
+  left:
+    16px;
 
-  font-size: 14.5px;
+  top:
+    17px;
 
-  color: var(--ink-soft);
+  font-size:
+    12px;
 
-  pointer-events: none;
+  color:
+    rgba(0, 0, 0, 0.52);
 
-  transform-origin: left top;
+  pointer-events:
+    none;
+
+  transform-origin:
+    left top;
 
   transition:
     transform 0.2s ease,
@@ -512,344 +1139,897 @@
     top 0.2s ease;
 }
 
+
+/* =========================================================
+   ACTIVE LABEL
+   ========================================================= */
+
 .jw-field.-active label,
 .jw-field input:focus + label,
 .jw-field input:not(:placeholder-shown) + label {
-  top: 8px;
+  top:
+    8px;
 
-  transform: scale(0.7);
+  transform:
+    scale(0.65);
 
-  color: var(--rose-deep);
+  color:
+    #7c3aed;
+
+  text-shadow:
+    none;
 }
 
-/* =========================================
-   SHOW / HIDE PASSWORD
-========================================= */
+
+/* =========================================================
+   PASSWORD TOGGLE
+   ========================================================= */
 
 .jw-toggle {
-  position: absolute;
+  position:
+    absolute;
 
-  right: 14px;
-  top: 15px;
+  right:
+    9px;
 
-  background: none;
+  top:
+    50%;
 
-  border: none;
+  transform:
+    translateY(-50%);
 
-  font-size: 11px;
+  border:
+    none;
 
-  font-weight: 600;
+  background:
+    transparent;
 
-  letter-spacing: 0.03em;
+  color:
+    rgba(0, 0, 0, 0.55);
 
-  color: var(--ink-soft);
+  font-family:
+    Calibri, "Source Sans 3",
+    sans-serif;
 
-  cursor: pointer;
+  font-size:
+    8px;
 
-  padding: 4px 6px;
+  font-weight:
+    600;
+
+  letter-spacing:
+    0.12em;
+
+  cursor:
+    pointer;
+
+  padding:
+    7px;
+
+  border-radius:
+    7px;
+
+  transition:
+    color 0.25s ease,
+    background 0.25s ease;
 }
+
+
+/* =========================================================
+   PASSWORD TOGGLE HOVER
+   ========================================================= */
 
 .jw-toggle:hover {
-  color: var(--rose-deep);
+  color:
+    #7c3aed;
+
+  background:
+    rgba(201, 168, 118, 0.10);
 }
 
-/* =========================================
+
+/* =========================================================
+   PASSWORD TOGGLE ACTIVE
+   ========================================================= */
+
+.jw-toggle:active {
+  transform:
+    translateY(-50%)
+    scale(0.94);
+}
+
+
+/* =========================================================
    REMEMBER / FORGOT
-========================================= */
+   ========================================================= */
 
 .jw-row {
-  display: flex;
+  display:
+    flex;
 
-  align-items: center;
+  align-items:
+    center;
 
-  justify-content: space-between;
+  justify-content:
+    space-between;
 
-  margin: -2px 0 22px;
+  gap:
+    16px;
 
-  font-size: 12.5px;
+  margin:
+    1px 0 18px;
+
+  font-size:
+    11px;
 }
+
+
+/* =========================================================
+   REMEMBER
+   ========================================================= */
 
 .jw-remember {
-  display: flex;
+  display:
+    flex;
 
-  align-items: center;
+  align-items:
+    center;
 
-  gap: 7px;
+  gap:
+    7px;
 
-  color: var(--ink-soft);
+  color:
+    rgba(255, 255, 255, 0.70);
+
+  cursor:
+    pointer;
+
+  -webkit-user-select:
+    none;
+
+  user-select:
+    none;
 }
 
-.jw-remember input {
-  accent-color: var(--rose);
+/*=========================================================
+   CHECKBOX
+   ========================================================= */
 
-  width: 14px;
-  height: 14px;
+.jw-remember input[type="checkbox"] {
+  width:
+    14px;
+
+  height:
+    14px;
+
+  margin:
+    0;
+
+  padding:
+    0;
+
+  accent-color:
+    #9b5cff;
+
+  cursor:
+    pointer;
+
+  flex:
+    0 0 auto;
 }
+
+
+/* =========================================================
+   FORGOT LINK
+   ========================================================= */
 
 .jw-forgot {
-  color: var(--rose-deep);
+  color:
+    #c9a876;
 
-  text-decoration: none;
+  text-decoration:
+    none;
 
-  font-weight: 600;
+  font-weight:
+    600;
+
+  transition:
+    color 0.2s ease,
+    opacity 0.2s ease;
 }
 
-/* =========================================
-   LOGIN BUTTON
-========================================= */
+
+.jw-forgot:hover {
+  color:
+    #e5d2ff;
+
+  opacity:
+    1;
+}
+
+
+/* =========================================================
+   PRIMARY BUTTON
+   ========================================================= */
 
 .jw-btn {
-  position: relative;
+  position:
+    relative;
 
-  width: 100%;
+  width:
+    100%;
 
-  border: none;
+  min-height:
+    46px;
 
-  border-radius: 999px;
+  border:
+    none;
 
-  padding: 15px 20px;
+  border-radius:
+    999px;
 
-  font-family: "Inter", sans-serif;
+  padding:
+    12px 20px;
 
-  font-size: 14.5px;
+  font-family:
+    Calibri, "Source Sans 3",
+    sans-serif;
 
-  font-weight: 600;
+  font-size:
+    13px;
 
-  letter-spacing: 0.02em;
+  font-weight:
+    600;
 
-  color: #fff;
+  letter-spacing:
+    0.01em;
+
+  color:
+    #ffffff;
 
   background:
     linear-gradient(
-      120deg,
-      var(--rose-deep),
-      var(--rose)
+      110deg,
+      #7c3aed 0%,
+      #9b5cff 42%,
+      #a88b58 100%
     );
 
-  cursor: pointer;
+  cursor:
+    pointer;
 
-  overflow: hidden;
+  overflow:
+    hidden;
 
-  isolation: isolate;
-
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.25s ease;
-}
-
-.jw-btn:hover {
-  transform: translateY(-1px);
+  isolation:
+    isolate;
 
   box-shadow:
-    0 14px 28px
-    rgba(233, 32, 99, 0.35);
+    0 8px 24px
+      rgba(201, 168, 118, 0.28),
+
+    0 5px 18px
+      rgba(168, 139, 88, 0.12),
+
+    0 2px 0
+      rgba(255, 255, 255, 0.20)
+      inset;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.3s ease,
+    filter 0.3s ease;
 }
 
-.jw-btn:active {
-  transform: translateY(0);
+
+/* =========================================================
+   BUTTON BORDER
+   ========================================================= */
+
+.jw-btn::before {
+  content:
+    "";
+
+  position:
+    absolute;
+
+  inset:
+    1px;
+
+  border-radius:
+    inherit;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.20);
+
+  pointer-events:
+    none;
 }
 
-.jw-btn:disabled {
-  cursor: not-allowed;
 
-  opacity: 0.8;
-}
+/* =========================================================
+   BUTTON SHINE
+   ========================================================= */
 
 .jw-btn::after {
-  content: "";
+  content:
+    "";
 
-  position: absolute;
+  position:
+    absolute;
 
-  inset: 0;
+  inset:
+    0;
 
-  z-index: -1;
+  z-index:
+    -1;
 
   background:
     linear-gradient(
-      100deg,
-      transparent 30%,
-      rgba(255, 255, 255, 0.55) 50%,
-      transparent 70%
+      110deg,
+      transparent 20%,
+      rgba(255, 255, 255, 0.42) 50%,
+      transparent 80%
     );
 
-  background-size: 220% 100%;
+  background-size:
+    240% 100%;
 
-  background-position: 130% 0;
+  background-position:
+    130% 0;
 
   transition:
-    background-position 0.7s ease;
+    background-position 0.75s ease;
 }
+
+
+/* =========================================================
+   BUTTON HOVER
+   ========================================================= */
+
+.jw-btn:hover {
+  transform:
+    translateY(-2px);
+
+  filter:
+    brightness(1.08);
+
+  box-shadow:
+    0 14px 34px
+      rgba(201, 168, 118, 0.38),
+
+    0 8px 25px
+      rgba(168, 139, 88, 0.20),
+
+    0 2px 0
+      rgba(255, 255, 255, 0.22)
+      inset;
+}
+
+
+/* =========================================================
+   BUTTON SHINE HOVER
+   ========================================================= */
 
 .jw-btn:hover::after {
-  background-position: -30% 0;
+  background-position:
+    -30% 0;
 }
+
+
+/* =========================================================
+   BUTTON ACTIVE
+   ========================================================= */
+
+.jw-btn:active {
+  transform:
+    translateY(0)
+    scale(0.985);
+}
+
+
+/* =========================================================
+   DISABLED BUTTON
+   ========================================================= */
+
+.jw-btn:disabled {
+  cursor:
+    not-allowed;
+
+  opacity:
+    0.72;
+
+  transform:
+    none;
+}
+
+
+/* =========================================================
+   BUTTON LABEL
+   ========================================================= */
 
 .jw-btn-label {
-  display: inline-flex;
+  position:
+    relative;
 
-  align-items: center;
+  z-index:
+    2;
 
-  gap: 10px;
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    10px;
 }
 
-/* =========================================
+
+/* =========================================================
    SPINNER
-========================================= */
+   ========================================================= */
 
 .jw-spinner {
-  width: 13px;
-  height: 13px;
+  width:
+    14px;
 
-  border-radius: 50%;
+  height:
+    14px;
+
+  border-radius:
+    50%;
 
   border:
     2px solid
-    rgba(255, 255, 255, 0.4);
+    rgba(255, 255, 255, 0.35);
 
-  border-top-color: #fff;
+  border-top-color:
+    #ffffff;
 
   animation:
     jw-spin 0.7s linear infinite;
 }
 
+
+/* =========================================================
+   SPINNER ANIMATION
+   ========================================================= */
+
 @keyframes jw-spin {
   to {
-    transform: rotate(360deg);
+    transform:
+      rotate(360deg);
   }
 }
 
-/* =========================================
+
+/* =========================================================
    DIVIDER
-========================================= */
+   ========================================================= */
 
 .jw-divider {
-  display: flex;
+  display:
+    flex;
 
-  align-items: center;
+  align-items:
+    center;
 
-  gap: 10px;
+  gap:
+    10px;
 
-  margin: 24px 0;
+  margin:
+    18px 0;
 
-  color: var(--ink-soft);
+  color:
+    rgba(255, 255, 255, 0.45);
 
-  font-size: 11px;
+  font-size:
+    9px;
 
-  letter-spacing: 0.08em;
+  letter-spacing:
+    0.16em;
 
-  text-transform: uppercase;
+  text-transform:
+    uppercase;
 }
+
+
+/* =========================================================
+   DIVIDER LINES
+   ========================================================= */
 
 .jw-divider::before,
 .jw-divider::after {
-  content: "";
+  content:
+    "";
 
-  flex: 1;
+  flex:
+    1;
 
-  height: 1px;
+  height:
+    1px;
 
   background:
-    rgba(28, 23, 20, 0.15);
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(201, 168, 118, 0.30)
+    );
 }
 
-/* =========================================
-   GOOGLE BUTTON
-========================================= */
+.jw-divider::after {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(201, 168, 118, 0.30),
+      transparent
+    );
+}
+
+
+/* =========================================================
+   ALTERNATIVE LOGIN
+   ========================================================= */
 
 .jw-alt {
-  width: 100%;
+  width:
+    100%;
+
+  min-height:
+    42px;
 
   border:
-    1.5px solid
-    rgba(28, 23, 20, 0.15);
+    1px solid
+    rgba(255, 255, 255, 0.20);
 
   background:
-    rgba(255, 255, 255, 0.8);
+    rgba(255, 255, 255, 0.08);
 
-  border-radius: 999px;
+  border-radius:
+    999px;
 
-  padding: 12px 16px;
+  padding:
+    9px 14px;
 
-  font-family: "Inter", sans-serif;
+  font-family:
+    Calibri, "Source Sans 3",
+    sans-serif;
 
-  font-size: 13.5px;
+  font-size:
+    12px;
 
-  font-weight: 500;
+  font-weight:
+    500;
 
-  color: var(--ink);
+  color:
+    #ffffff;
 
-  cursor: pointer;
+  cursor:
+    pointer;
 
-  display: flex;
+  display:
+    flex;
 
-  align-items: center;
+  align-items:
+    center;
 
-  justify-content: center;
+  justify-content:
+    center;
 
-  gap: 10px;
+  gap:
+    10px;
 
   transition:
-    border-color 0.2s ease,
-    background 0.2s ease;
+    transform 0.2s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease,
+    border-color 0.25s ease;
 }
+
+
+/* =========================================================
+   ALTERNATIVE LOGIN HOVER
+   ========================================================= */
 
 .jw-alt:hover {
-  border-color: var(--rose);
+  background:
+    rgba(201, 168, 118, 0.12);
 
-  background: #fff;
+  border-color:
+    rgba(201, 168, 118, 0.40);
+
+  transform:
+    translateY(-1px);
+
+  box-shadow:
+    0 5px 18px
+      rgba(0, 0, 0, 0.12),
+
+    0 0 20px
+      rgba(201, 168, 118, 0.08);
 }
 
-/* =========================================
+
+/* =========================================================
+   ALTERNATIVE LOGIN ACTIVE
+   ========================================================= */
+
+.jw-alt:active {
+  transform:
+    scale(0.985);
+}
+
+
+/* =========================================================
    FOOTER
-========================================= */
+   ========================================================= */
 
 .jw-foot {
-  text-align: center;
+  text-align:
+    center;
 
-  margin-top: 24px;
+  margin-top:
+    17px;
 
-  font-size: 12px;
+  font-size:
+    10.5px;
 
-  color: var(--ink-soft);
+  line-height:
+    1.5;
+
+  color:
+    rgba(255, 255, 255, 0.64);
 }
+
+
+/* =========================================================
+   FOOTER LINKS
+   ========================================================= */
 
 .jw-foot a {
-  color: var(--rose-deep);
+  color:
+    #c9a876;
 
-  font-weight: 600;
+  font-weight:
+    600;
 
-  text-decoration: none;
+  text-decoration:
+    none;
+
+  transition:
+    color 0.2s ease,
+    opacity 0.2s ease;
 }
 
-/* =========================================
-   RESPONSIVE
-========================================= */
+.jw-foot a:hover {
+  color:
+    #e5d2ff;
+
+  opacity:
+    1;
+}
+
+
+/* =========================================================
+   ACCESSIBILITY — FOCUS
+   ========================================================= */
+
+.jw-btn:focus-visible,
+.jw-alt:focus-visible,
+.jw-toggle:focus-visible,
+.jw-forgot:focus-visible,
+.jw-sub a:focus-visible,
+.jw-foot a:focus-visible {
+
+  outline:
+    3px solid
+    rgba(201, 168, 118, 0.45);
+
+  outline-offset:
+    4px;
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+   ========================================================= */
 
 @media (max-width: 900px) {
+
   .jw-stagearea {
-    justify-content: center;
+    justify-content:
+      center;
 
-    padding: 12vh 20px;
-  }
-
-  .jw-nav {
-    padding: 20px 20px 0;
+    padding:
+      110px
+      5vw
+      90px;
   }
 
   .jw-caption {
-    display: none;
+    display:
+      none;
+  }
+
+  .jw-card-glow {
+    right:
+      50%;
+
+    transform:
+      translate(50%, -50%);
   }
 }
 
 
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
 
-    .jw-error {
-  margin-bottom: 18px;
-  padding: 12px 14px;
-  border: 1px solid rgba(181, 19, 74, 0.25);
-  border-radius: 10px;
-  background: rgba(181, 19, 74, 0.08);
-  color: #b5134a;
-  font-size: 13px;
-  line-height: 1.4;
+@media (max-width: 560px) {
+
+  .jw-root {
+    min-height:
+      100svh;
+  }
+
+  .jw-bar {
+    height:
+      4vh;
+
+    min-height:
+      28px;
+  }
+
+  .jw-stagearea {
+    min-height:
+      100svh;
+
+    padding:
+      65px
+      16px
+      50px;
+  }
+
+  .jw-card {
+    width:
+      min(380px, 100%);
+
+    padding:
+      28px
+      22px
+      24px;
+
+    border-radius:
+      16px;
+
+    -webkit-backdrop-filter:
+      blur(22px)
+      saturate(125%);
+
+    backdrop-filter:
+      blur(22px)
+      saturate(125%);
+  }
+
+  .jw-title {
+    font-size:
+      25px;
+  }
+
+  .jw-title .jw-script {
+    font-size:
+      31px;
+  }
+
+  .jw-sub {
+    margin-bottom:
+      19px;
+  }
+
+  .jw-field {
+    margin-bottom:
+      11px;
+  }
+
+  .jw-field input {
+    min-height:
+      48px;
+  }
+
+  .jw-row {
+    margin-bottom:
+      16px;
+  }
+
+  .jw-btn {
+    min-height:
+      44px;
+  }
+
+  .jw-divider {
+    margin:
+      16px 0;
+  }
+
+  .jw-alt {
+    min-height:
+      40px;
+  }
+
+  .jw-foot {
+    margin-top:
+      15px;
+  }
+
+  .jw-card-glow {
+    width:
+      420px;
+
+    height:
+      420px;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL SCREENS
+   ========================================================= */
+
+@media (max-width: 360px) {
+
+  .jw-card {
+    padding:
+      25px
+      17px
+      22px;
+  }
+
+  .jw-title {
+    font-size:
+      23px;
+  }
+
+  .jw-title .jw-script {
+    font-size:
+      28px;
+  }
+
+  .jw-field input {
+    min-height:
+      46px;
+
+    font-size:
+      12.5px;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .jw-video,
+  .jw-fallback,
+  .jw-grain,
+  .jw-root::before,
+  .jw-spinner {
+
+    animation:
+      none;
+  }
+
+  .jw-card,
+  .jw-caption,
+  .jw-bar {
+
+    transition:
+      none;
+  }
 }

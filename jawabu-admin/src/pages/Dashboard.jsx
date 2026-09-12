@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 
 function Dashboard() {
-  const { profile, logout } = useAuth();
+  const { profile } = useAuth();
 
   const [stats, setStats] = useState({
     todaySales: 0,
@@ -54,7 +54,7 @@ function Dashboard() {
       const { data: payments, error: paymentsError } = await supabase
         .from('payments')
         .select('amount')
-        .eq('status', 'completed')
+        .in('status', ['completed', 'paid'])
         .gte('created_at', startOfDay.toISOString())
         .lt('created_at', startOfTomorrow.toISOString());
 
@@ -217,7 +217,7 @@ function Dashboard() {
       <div style={styles.page}>
         <div style={styles.loading}>
           <div style={styles.spinner}></div>
-          <p>Loading Jawabu Beauty dashboard...</p>
+          <p>Loading Sleek Sisters dashboard...</p>
         </div>
       </div>
     );
@@ -226,57 +226,17 @@ function Dashboard() {
   return (
     <div style={styles.page}>
 
-      {/* =================================================
-          TOP HEADER
-      ================================================= */}
-
-      <header style={styles.header}>
-
-        <div>
-          <h1 style={styles.brand}>
-            Jawabu Beauty Admin
-          </h1>
-        </div>
-
-        <div style={styles.headerRight}>
-
-          <div style={styles.userInfo}>
-            <strong>
-              {profile?.first_name || 'Owner'}{' '}
-              {profile?.last_name || ''}
-            </strong>
-
-            <span>
-              {profile?.role || 'OWNER'}
-            </span>
-          </div>
-
-          <button
-            onClick={logout}
-            style={styles.logoutButton}
-          >
-            Logout
-          </button>
-
-        </div>
-
-      </header>
-
-      {/* =================================================
-          MAIN CONTENT
-      ================================================= */}
-
       <main style={styles.main}>
 
         <div style={styles.titleRow}>
 
           <div>
             <h2 style={styles.title}>
-              Welcome back!
+              Welcome back{profile?.first_name ? `, ${profile.first_name}` : ''}!
             </h2>
 
             <p style={styles.subtitle}>
-              Here's what's happening at Jawabu Beauty today.
+              Here's what's happening at Sleek Sisters today.
             </p>
           </div>
 
@@ -325,7 +285,7 @@ function Dashboard() {
             </h3>
 
             <p style={styles.cardDescription}>
-              Completed payments today
+              Paid and completed sales today
             </p>
 
           </div>
@@ -425,7 +385,7 @@ function Dashboard() {
               </h2>
 
               <p style={styles.sectionDescription}>
-                The latest orders placed in Jawabu Beauty.
+                The latest orders placed in Sleek Sisters.
               </p>
             </div>
 
@@ -575,9 +535,9 @@ function Dashboard() {
 const styles = {
 
   page: {
-    minHeight: '100vh',
-    background: '#f7f7f8',
-    color: '#111827',
+    minHeight: '100%',
+    background: '#fafaf8',
+    color: '#262220',
     fontFamily:
       'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
   },
@@ -629,7 +589,7 @@ const styles = {
   main: {
     maxWidth: '1400px',
     margin: '0 auto',
-    padding: '38px 34px 60px',
+    padding: '8px 0 40px',
   },
 
   titleRow: {
@@ -653,8 +613,9 @@ const styles = {
   },
 
   refreshButton: {
-    border: '1px solid #e5e7eb',
+    border: '1px solid #c9a876',
     background: '#ffffff',
+    color: '#262220',
     padding: '11px 18px',
     borderRadius: '9px',
     cursor: 'pointer',
@@ -671,11 +632,11 @@ const styles = {
 
   card: {
     background: '#ffffff',
-    border: '1px solid #e9eaec',
+    border: '1px solid #e9e1d6',
     borderRadius: '16px',
     padding: '25px',
     boxShadow:
-      '0 5px 18px rgba(0, 0, 0, 0.04)',
+      '0 5px 18px rgba(38, 34, 32, 0.04)',
   },
 
   lowStockCard: {

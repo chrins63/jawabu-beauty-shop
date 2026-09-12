@@ -1,9 +1,131 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
+import {
+  AreaChart,
+  LinearXAxis,
+  LinearXAxisTickSeries,
+  LinearXAxisTickLabel,
+  LinearYAxis,
+  LinearYAxisTickSeries,
+  AreaSeries,
+  Area,
+  Gradient,
+  GradientStop,
+  GridlineSeries,
+  Gridline,
+} from 'reaviz';
+
+import {
+  AlertCircle,
+  AlertTriangle,
+  BarChart3,
+  CalendarDays,
+  CheckCircle2,
+  CircleDollarSign,
+  CreditCard,
+  Package,
+  RefreshCw,
+  ShoppingBag,
+  Store,
+  TrendingUp,
+  XCircle,
+} from 'lucide-react';
+
 import { supabase } from '../lib/supabase';
 import './reports.css';
 
+/* =========================================================
+   CONSTANTS
+   ========================================================= */
+
+const SUCCESSFUL_STATUSES = ['completed', 'delivered'];
+
+const getDateString = (date = new Date()) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+};
+
+const getToday = () => getDateString(new Date());
+
+const formatCurrency = (amount) => {
+  return `KSh ${Number(amount || 0).toLocaleString('en-KE', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+};
+
+const formatCompactCurrency = (amount) => {
+  const value = Number(amount || 0);
+
+  if (value >= 1_000_000) {
+    return `KSh ${(value / 1_000_000).toFixed(1)}M`;
+  }
+
+  if (value >= 1_000) {
+    return `KSh ${(value / 1_000).toFixed(1)}K`;
+  }
+
+  return formatCurrency(value);
+};
+
+const formatDate = (value) => {
+  if (!value) return '—';
+
+  return new Date(value).toLocaleDateString('en-KE', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+};
+
+const normalizeLabel = (value) => {
+  if (!value) return 'Unknown';
+
+  return String(value)
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+};
+
+/* =========================================================
+   ICONS
+   ========================================================= */
+
+function MetricIcon({ type }) {
+  const common = {
+    size: 20,
+    strokeWidth: 2,
+  };
+
+  switch (type) {
+    case 'sales':
+      return <CircleDollarSign {...common} />;
+
+    case 'orders':
+      return <ShoppingBag {...common} />;
+
+    case 'average':
+      return <TrendingUp {...common} />;
+
+    case 'pending':
+      return <AlertCircle {...common} />;
+
+    case 'cancelled':
+      return <XCircle {...common} />;
+
+    default:
+      return <BarChart3 {...common} />;
+  }
+}
+
+/* =========================================================
+   MAIN COMPONENT
+   ========================================================= */
+
 function Reports() {
-  const today = new Date().toISOString().split('T')[0];
+  const today = getToday();
 
   const [startDate, setStartDate] = useState(today);
   const [endDate, setEndDate] = useState(today);
@@ -15,17 +137,19 @@ function Reports() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // =========================================================
-  // FETCH REPORT DATA
-  // =========================================================
+  /* =======================================================
+     FETCH REPORT DATA
+     ======================================================= */
 
-  const fetchReport = async () => {
+  const fetchReport = useCallback(async () => {
     setLoading(true);
     setError('');
 
     try {
       if (!startDate || !endDate) {
-        throw new Error('Please select both start and end dates.');
+        throw new Error(
+          'Please select both a start date and an end date.'
+        );
       }
 
       if (startDate > endDate) {
@@ -34,13 +158,19 @@ function Reports() {
         );
       }
 
-      // Include the entire end date.
+      /*
+       * We use the selected dates as boundaries.
+       *
+       * The database stores timestamps with timezone,
+       * so the final date is treated as the complete day.
+       */
+
       const startDateTime = `${startDate}T00:00:00`;
       const endDateTime = `${endDate}T23:59:59.999`;
 
-      // =====================================================
-      // 1. ORDERS
-      // =====================================================
+      /* ===================================================
+         ORDERS
+         =================================================== */
 
       const {
         data: orderData,
@@ -51,11 +181,13 @@ function Reports() {
           id,
           order_number,
           status,
+          payment_status,
           total_amount,
           delivery_fee,
           payment_method,
           sales_channel,
-          created_at
+          created_at,
+          order_date
         `)
         .gte('created_at', startDateTime)
         .lte('created_at', endDateTime)
@@ -69,19 +201,19 @@ function Reports() {
         );
       }
 
-      // =====================================================
-      // 2. ORDER ITEMS
-      // =====================================================
+      const loadedOrders = orderData || [];
 
-      const orderIds = (orderData || []).map(
-        (order) => order.id
-      );
+      /* ===================================================
+         ORDER ITEMS
+         =================================================== */
 
-      let itemData = [];
+      const orderIds = loadedOrders.map((order) => order.id);
+
+      let loadedOrderItems = [];
 
       if (orderIds.length > 0) {
         const {
-          data,
+          data: itemData,
           error: itemError,
         } = await supabase
           .from('order_items')
@@ -100,12 +232,12 @@ function Reports() {
           );
         }
 
-        itemData = data || [];
+        loadedOrderItems = itemData || [];
       }
 
-      // =====================================================
-      // 3. PRODUCTS
-      // =====================================================
+      /* ===================================================
+         PRODUCTS
+         =================================================== */
 
       const {
         data: productData,
@@ -116,7 +248,10 @@ function Reports() {
           id,
           name,
           price,
-          cost_price
+          cost_price,
+          stock_quantity,
+          image_url,
+          active
         `);
 
       if (productError) {
@@ -125,13 +260,14 @@ function Reports() {
         );
       }
 
-      setOrders(orderData || []);
-      setOrderItems(itemData);
+      setOrders(loadedOrders);
+      setOrderItems(loadedOrderItems);
       setProducts(productData || []);
     } catch (err) {
       console.error('Reports error:', err);
+
       setError(
-        err.message || 'Unable to load report.'
+        err?.message || 'Unable to load report.'
       );
 
       setOrders([]);
@@ -140,31 +276,31 @@ function Reports() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [startDate, endDate]);
 
-  // =========================================================
-  // INITIAL REPORT
-  // =========================================================
+  /* =======================================================
+     INITIAL REPORT
+     ======================================================= */
 
   useEffect(() => {
     fetchReport();
-  }, []);
+  }, [fetchReport]);
 
-  // =========================================================
-  // SUCCESSFUL ORDERS
-  // =========================================================
+  /* =======================================================
+     SUCCESSFUL ORDERS
+     ======================================================= */
 
   const successfulOrders = useMemo(() => {
-    return orders.filter(
-      (order) =>
-        order.status === 'delivered' ||
-        order.status === 'completed'
+    return orders.filter((order) =>
+      SUCCESSFUL_STATUSES.includes(
+        String(order.status || '').toLowerCase()
+      )
     );
   }, [orders]);
 
-  // =========================================================
-  // SUMMARY
-  // =========================================================
+  /* =======================================================
+     SUMMARY
+     ======================================================= */
 
   const summary = useMemo(() => {
     const totalSales = successfulOrders.reduce(
@@ -174,11 +310,21 @@ function Reports() {
     );
 
     const pendingOrders = orders.filter(
-      (order) => order.status === 'pending'
+      (order) =>
+        String(order.status || '').toLowerCase() ===
+        'pending'
     );
 
     const cancelledOrders = orders.filter(
-      (order) => order.status === 'cancelled'
+      (order) =>
+        String(order.status || '').toLowerCase() ===
+        'cancelled'
+    );
+
+    const processingOrders = orders.filter(
+      (order) =>
+        String(order.status || '').toLowerCase() ===
+        'processing'
     );
 
     const pendingAmount = pendingOrders.reduce(
@@ -205,13 +351,15 @@ function Reports() {
       pendingAmount,
       cancelledOrders: cancelledOrders.length,
       cancelledAmount,
+      processingOrders: processingOrders.length,
       averageOrderValue,
+      totalOrders: orders.length,
     };
   }, [orders, successfulOrders]);
 
-  // =========================================================
-  // PAYMENT METHOD BREAKDOWN
-  // =========================================================
+  /* =======================================================
+     PAYMENT BREAKDOWN
+     ======================================================= */
 
   const paymentBreakdown = useMemo(() => {
     const result = {};
@@ -245,9 +393,9 @@ function Reports() {
       );
   }, [successfulOrders]);
 
-  // =========================================================
-  // SALES CHANNEL BREAKDOWN
-  // =========================================================
+  /* =======================================================
+     SALES CHANNEL BREAKDOWN
+     ======================================================= */
 
   const channelBreakdown = useMemo(() => {
     const result = {};
@@ -281,9 +429,9 @@ function Reports() {
       );
   }, [successfulOrders]);
 
-  // =========================================================
-  // TOP PRODUCTS
-  // =========================================================
+  /* =======================================================
+     TOP PRODUCTS
+     ======================================================= */
 
   const topProducts = useMemo(() => {
     const result = {};
@@ -332,6 +480,15 @@ function Reports() {
           (p) => p.id === item.productId
         );
 
+        const costPrice =
+          Number(product?.cost_price || 0);
+
+        const estimatedCost =
+          costPrice * item.quantitySold;
+
+        const estimatedProfit =
+          item.revenue - estimatedCost;
+
         return {
           productId: item.productId,
           productName:
@@ -343,6 +500,8 @@ function Reports() {
             item.orderCount.size,
           revenue:
             item.revenue,
+          estimatedCost,
+          estimatedProfit,
         };
       })
       .sort(
@@ -355,60 +514,145 @@ function Reports() {
     successfulOrders,
   ]);
 
-  // =========================================================
-  // CURRENCY
-  // =========================================================
+  /* =======================================================
+     PROFIT SUMMARY
+     ======================================================= */
 
-  const formatCurrency = (amount) => {
-    return `KSh ${Number(
-      amount || 0
-    ).toLocaleString('en-KE', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
-  };
+  const profitSummary = useMemo(() => {
+    const revenue = topProducts.reduce(
+      (sum, item) =>
+        sum + item.revenue,
+      0
+    );
 
-  // =========================================================
-  // QUICK DATE FILTERS
-  // =========================================================
+    const estimatedCost = topProducts.reduce(
+      (sum, item) =>
+        sum + item.estimatedCost,
+      0
+    );
+
+    const estimatedProfit =
+      revenue - estimatedCost;
+
+    return {
+      revenue,
+      estimatedCost,
+      estimatedProfit,
+    };
+  }, [topProducts]);
+
+  /* =======================================================
+     CHART DATA
+     ======================================================= */
+
+  const chartData = useMemo(() => {
+    const start = new Date(`${startDate}T00:00:00`);
+    const end = new Date(`${endDate}T00:00:00`);
+
+    const days = [];
+
+    const cursor = new Date(start);
+
+    while (cursor <= end) {
+      days.push(new Date(cursor));
+      cursor.setDate(cursor.getDate() + 1);
+
+      /*
+       * Prevent extremely large charts when someone selects
+       * years of data.
+       */
+      if (days.length >= 31) {
+        break;
+      }
+    }
+
+    const dailySales = days.map((date) => {
+      const dateKey = getDateString(date);
+
+      const daySales = successfulOrders
+        .filter((order) => {
+          const orderDate = getDateString(
+            new Date(order.created_at)
+          );
+
+          return orderDate === dateKey;
+        })
+        .reduce(
+          (sum, order) =>
+            sum + Number(order.total_amount || 0),
+          0
+        );
+
+      return {
+        key: date,
+        data: daySales,
+      };
+    });
+
+    return [
+      {
+        key: 'Sales',
+        data: dailySales,
+      },
+    ];
+  }, [
+    startDate,
+    endDate,
+    successfulOrders,
+  ]);
+
+  /* =======================================================
+     LOW STOCK
+     ======================================================= */
+
+  const lowStockProducts = useMemo(() => {
+    return products
+      .filter(
+        (product) =>
+          product.active !== false &&
+          Number(product.stock_quantity || 0) <=
+            Number(product.low_stock_threshold || 5)
+      )
+      .sort(
+        (a, b) =>
+          Number(a.stock_quantity || 0) -
+          Number(b.stock_quantity || 0)
+      );
+  }, [products]);
+
+  /* =======================================================
+     QUICK DATE FILTERS
+     ======================================================= */
 
   const setToday = () => {
-    setStartDate(today);
-    setEndDate(today);
+    const current = getToday();
+
+    setStartDate(current);
+    setEndDate(current);
   };
 
   const setLast7Days = () => {
     const end = new Date();
-
     const start = new Date();
+
     start.setDate(
       start.getDate() - 6
     );
 
-    setStartDate(
-      start.toISOString().split('T')[0]
-    );
-
-    setEndDate(
-      end.toISOString().split('T')[0]
-    );
+    setStartDate(getDateString(start));
+    setEndDate(getDateString(end));
   };
 
   const setLast30Days = () => {
     const end = new Date();
-
     const start = new Date();
+
     start.setDate(
       start.getDate() - 29
     );
 
-    setStartDate(
-      start.toISOString().split('T')[0]
-    );
-
-    setEndDate(
-      end.toISOString().split('T')[0]
-    );
+    setStartDate(getDateString(start));
+    setEndDate(getDateString(end));
   };
 
   const setThisMonth = () => {
@@ -420,49 +664,146 @@ function Reports() {
       1
     );
 
-    setStartDate(
-      start.toISOString().split('T')[0]
-    );
-
-    setEndDate(
-      today
-    );
+    setStartDate(getDateString(start));
+    setEndDate(getDateString(now));
   };
 
-  // =========================================================
-  // RENDER
-  // =========================================================
+  /* =======================================================
+     METRIC CARDS
+     ======================================================= */
+
+  const metrics = [
+    {
+      id: 'sales',
+      label: 'Total Sales',
+      value: formatCompactCurrency(
+        summary.totalSales
+      ),
+      description: 'Successful sales',
+      icon: 'sales',
+      className: 'metric-purple',
+    },
+    {
+      id: 'orders',
+      label: 'Successful Orders',
+      value: summary.successfulOrders,
+      description: `${summary.totalOrders} total orders`,
+      icon: 'orders',
+      className: 'metric-blue',
+    },
+    {
+      id: 'average',
+      label: 'Average Order',
+      value: formatCompactCurrency(
+        summary.averageOrderValue
+      ),
+      description: 'Average successful order',
+      icon: 'average',
+      className: 'metric-green',
+    },
+    {
+      id: 'pending',
+      label: 'Pending Orders',
+      value: summary.pendingOrders,
+      description: formatCurrency(
+        summary.pendingAmount
+      ),
+      icon: 'pending',
+      className: 'metric-orange',
+    },
+    {
+      id: 'cancelled',
+      label: 'Cancelled',
+      value: summary.cancelledOrders,
+      description: formatCurrency(
+        summary.cancelledAmount
+      ),
+      icon: 'cancelled',
+      className: 'metric-red',
+    },
+  ];
+
+  /* =======================================================
+     RENDER
+     ======================================================= */
 
   return (
     <div className="reports-page">
 
-      <div className="reports-header">
-        <div>
-          <h1>Reports</h1>
+      {/* ===================================================
+          HEADER
+      =================================================== */}
 
-          <p>
-            Analyze Jawabu Beauty sales,
-            products and business performance.
-          </p>
+      <motion.div
+        className="reports-header"
+        initial={{
+          opacity: 0,
+          y: -15,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
+      >
+        <div>
+          <div className="reports-title-row">
+            <div className="reports-title-icon">
+              <BarChart3 size={24} />
+            </div>
+
+            <div>
+              <h1>Business Reports</h1>
+
+              <p>
+                Analyze Sleek Sisters sales,
+                products and business performance.
+              </p>
+            </div>
+          </div>
         </div>
 
         <button
           type="button"
+          className="run-report-button"
           onClick={fetchReport}
           disabled={loading}
         >
+          <RefreshCw
+            size={17}
+            className={
+              loading
+                ? 'spin-icon'
+                : ''
+            }
+          />
+
           {loading
             ? 'Loading...'
-            : '↻ Run Report'}
+            : 'Run Report'}
         </button>
-      </div>
+      </motion.div>
 
-      {/* DATE FILTER */}
+      {/* ===================================================
+          DATE FILTER
+      =================================================== */}
 
-      <section className="reports-filter">
-
-        <div>
+      <motion.section
+        className="reports-filter"
+        initial={{
+          opacity: 0,
+          y: 15,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
+        transition={{
+          delay: 0.05,
+        }}
+      >
+        <div className="filter-date-group">
           <label>
+            <CalendarDays size={15} />
             Start Date
           </label>
 
@@ -477,8 +818,9 @@ function Reports() {
           />
         </div>
 
-        <div>
+        <div className="filter-date-group">
           <label>
+            <CalendarDays size={15} />
             End Date
           </label>
 
@@ -494,7 +836,6 @@ function Reports() {
         </div>
 
         <div className="reports-quick-filters">
-
           <button
             type="button"
             onClick={setToday}
@@ -522,266 +863,530 @@ function Reports() {
           >
             This Month
           </button>
-
         </div>
+      </motion.section>
 
-      </section>
+      {/* ===================================================
+          ERROR
+      =================================================== */}
 
       {error && (
-        <div className="reports-error">
-          <strong>
-            Report Error
-          </strong>
+        <motion.div
+          className="reports-error"
+          initial={{
+            opacity: 0,
+            y: -10,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+        >
+          <AlertTriangle size={21} />
 
-          <p>
-            {error}
-          </p>
-        </div>
+          <div>
+            <strong>
+              Report Error
+            </strong>
+
+            <p>{error}</p>
+          </div>
+        </motion.div>
       )}
 
-      {/* SUMMARY */}
+      {/* ===================================================
+          METRICS
+      =================================================== */}
 
       <section className="reports-summary">
+        {metrics.map((metric, index) => (
+          <motion.div
+            key={metric.id}
+            className={`report-card ${metric.className}`}
+            initial={{
+              opacity: 0,
+              y: 20,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              delay:
+                0.08 + index * 0.05,
+            }}
+          >
+            <div className="metric-card-top">
+              <div className="metric-icon">
+                <MetricIcon
+                  type={metric.icon}
+                />
+              </div>
 
-        <div className="report-card">
-          <span>Total Sales</span>
-          <strong>
-            {formatCurrency(
-              summary.totalSales
-            )}
-          </strong>
-        </div>
+              <span className="metric-label">
+                {metric.label}
+              </span>
+            </div>
 
-        <div className="report-card">
-          <span>Successful Orders</span>
-          <strong>
-            {summary.successfulOrders}
-          </strong>
-        </div>
+            <div className="metric-value">
+              {metric.value}
+            </div>
 
-        <div className="report-card">
-          <span>Average Order</span>
-          <strong>
-            {formatCurrency(
-              summary.averageOrderValue
-            )}
-          </strong>
-        </div>
-
-        <div className="report-card">
-          <span>Pending Orders</span>
-          <strong>
-            {summary.pendingOrders}
-          </strong>
-
-          <small>
-            {formatCurrency(
-              summary.pendingAmount
-            )}
-          </small>
-        </div>
-
-        <div className="report-card">
-          <span>Cancelled Orders</span>
-          <strong>
-            {summary.cancelledOrders}
-          </strong>
-
-          <small>
-            {formatCurrency(
-              summary.cancelledAmount
-            )}
-          </small>
-        </div>
-
+            <div className="metric-description">
+              {metric.description}
+            </div>
+          </motion.div>
+        ))}
       </section>
 
-      {/* PAYMENT */}
+      {/* ===================================================
+          SALES CHART
+      =================================================== */}
 
-      <section className="reports-section">
+      <section className="reports-grid">
 
-        <div className="reports-section-header">
-          <div>
-            <h2>
-              Payment Methods
-            </h2>
+        <motion.div
+          className="reports-section sales-chart-section"
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: 0.2,
+          }}
+        >
+          <div className="reports-section-header">
+            <div>
+              <h2>Sales Performance</h2>
 
-            <p>
-              Successful sales by payment method.
-            </p>
-          </div>
-        </div>
+              <p>
+                Daily successful sales for the
+                selected period.
+              </p>
+            </div>
 
-        {paymentBreakdown.length === 0 ? (
-
-          <p>
-            No payment data for this period.
-          </p>
-
-        ) : (
-
-          <div className="reports-table-wrapper">
-
-            <table>
-
-              <thead>
-                <tr>
-                  <th>Payment Method</th>
-                  <th>Orders</th>
-                  <th>Sales</th>
-                </tr>
-              </thead>
-
-              <tbody>
-
-                {paymentBreakdown.map(
-                  (item) => (
-                    <tr key={item.method}>
-
-                      <td>
-                        {item.method}
-                      </td>
-
-                      <td>
-                        {item.orderCount}
-                      </td>
-
-                      <td>
-                        {formatCurrency(
-                          item.totalAmount
-                        )}
-                      </td>
-
-                    </tr>
-                  )
-                )}
-
-              </tbody>
-
-            </table>
-
+            <div className="chart-legend">
+              <span className="legend-dot" />
+              Sales
+            </div>
           </div>
 
-        )}
+          <div className="sales-chart">
+            {chartData[0]?.data?.length > 0 ? (
+              <AreaChart
+                height={280}
+                id="jawabu-sales-chart"
+                data={chartData}
+                xAxis={
+                  <LinearXAxis
+                    type="time"
+                    tickSeries={
+                      <LinearXAxisTickSeries
+                        label={
+                          <LinearXAxisTickLabel
+                            format={(value) =>
+                              new Date(
+                                value
+                              ).toLocaleDateString(
+                                'en-KE',
+                                {
+                                  month: 'numeric',
+                                  day: 'numeric',
+                                }
+                              )
+                            }
+                            fill="#8B8494"
+                          />
+                        }
+                        tickSize={8}
+                      />
+                    }
+                  />
+                }
+                yAxis={
+                  <LinearYAxis
+                    axisLine={null}
+                    tickSeries={
+                      <LinearYAxisTickSeries
+                        line={null}
+                        label={null}
+                        tickSize={8}
+                      />
+                    }
+                  />
+                }
+                series={
+                  <AreaSeries
+                    type="grouped"
+                    interpolation="smooth"
+                    area={
+                      <Area
+                        gradient={
+                          <Gradient
+                            stops={[
+                              <GradientStop
+                                key="start"
+                                stopOpacity={0.05}
+                              />,
+                              <GradientStop
+                                key="end"
+                                offset="100%"
+                                stopOpacity={0.35}
+                              />,
+                            ]}
+                          />
+                        }
+                      />
+                    }
+                    colorScheme={[
+                      '#5B14C5',
+                    ]}
+                  />
+                }
+                gridlines={
+                  <GridlineSeries
+                    line={
+                      <Gridline
+                        strokeColor="#E8E2ED"
+                      />
+                    }
+                  />
+                }
+              />
+            ) : (
+              <div className="empty-chart">
+                No sales data for this period.
+              </div>
+            )}
+          </div>
+        </motion.div>
 
+        {/* =================================================
+            PROFIT CARD
+        ================================================= */}
+
+        <motion.div
+          className="reports-section profit-card"
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            delay: 0.25,
+          }}
+        >
+          <div className="reports-section-header">
+            <div>
+              <h2>Profit Overview</h2>
+
+              <p>
+                Estimated performance from
+                recorded product costs.
+              </p>
+            </div>
+
+            <TrendingUp size={22} />
+          </div>
+
+          <div className="profit-main">
+            <span>Estimated Profit</span>
+
+            <strong>
+              {formatCurrency(
+                profitSummary.estimatedProfit
+              )}
+            </strong>
+          </div>
+
+          <div className="profit-row">
+            <span>Revenue</span>
+            <strong>
+              {formatCurrency(
+                profitSummary.revenue
+              )}
+            </strong>
+          </div>
+
+          <div className="profit-row">
+            <span>Estimated Cost</span>
+            <strong>
+              {formatCurrency(
+                profitSummary.estimatedCost
+              )}
+            </strong>
+          </div>
+
+          <div className="profit-note">
+            Profit is estimated from
+            <code>cost_price</code> on products.
+          </div>
+        </motion.div>
       </section>
 
-      {/* CHANNEL */}
+      {/* ===================================================
+          BREAKDOWNS
+      =================================================== */}
 
-      <section className="reports-section">
+      <section className="reports-grid">
 
-        <div className="reports-section-header">
-          <div>
-            <h2>
-              Sales Channels
-            </h2>
+        {/* PAYMENT */}
 
-            <p>
-              Performance by sales channel.
-            </p>
-          </div>
-        </div>
+        <motion.div
+          className="reports-section"
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+        >
+          <div className="reports-section-header">
+            <div>
+              <h2>Payment Methods</h2>
 
-        {channelBreakdown.length === 0 ? (
+              <p>
+                Successful sales by payment
+                method.
+              </p>
+            </div>
 
-          <p>
-            No channel data for this period.
-          </p>
-
-        ) : (
-
-          <div className="reports-table-wrapper">
-
-            <table>
-
-              <thead>
-                <tr>
-                  <th>Channel</th>
-                  <th>Orders</th>
-                  <th>Sales</th>
-                </tr>
-              </thead>
-
-              <tbody>
-
-                {channelBreakdown.map(
-                  (item) => (
-                    <tr key={item.channel}>
-
-                      <td>
-                        {item.channel}
-                      </td>
-
-                      <td>
-                        {item.orderCount}
-                      </td>
-
-                      <td>
-                        {formatCurrency(
-                          item.totalAmount
-                        )}
-                      </td>
-
-                    </tr>
-                  )
-                )}
-
-              </tbody>
-
-            </table>
-
+            <CreditCard size={22} />
           </div>
 
-        )}
+          {paymentBreakdown.length === 0 ? (
+            <div className="empty-state">
+              <CreditCard size={30} />
+              <p>
+                No payment data for this
+                period.
+              </p>
+            </div>
+          ) : (
+            <div className="breakdown-list">
+              {paymentBreakdown.map(
+                (item, index) => {
+                  const percentage =
+                    summary.totalSales > 0
+                      ? (item.totalAmount /
+                          summary.totalSales) *
+                        100
+                      : 0;
 
+                  return (
+                    <div
+                      className="breakdown-item"
+                      key={item.method}
+                    >
+                      <div className="breakdown-main">
+                        <div className="breakdown-rank">
+                          {index + 1}
+                        </div>
+
+                        <div>
+                          <strong>
+                            {normalizeLabel(
+                              item.method
+                            )}
+                          </strong>
+
+                          <span>
+                            {item.orderCount}{' '}
+                            orders
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="breakdown-value">
+                        <strong>
+                          {formatCurrency(
+                            item.totalAmount
+                          )}
+                        </strong>
+
+                        <span>
+                          {percentage.toFixed(
+                            1
+                          )}
+                          %
+                        </span>
+                      </div>
+                    </div>
+                  );
+                }
+              )}
+            </div>
+          )}
+        </motion.div>
+
+        {/* CHANNEL */}
+
+        <motion.div
+          className="reports-section"
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+        >
+          <div className="reports-section-header">
+            <div>
+              <h2>Sales Channels</h2>
+
+              <p>
+                Performance by sales
+                channel.
+              </p>
+            </div>
+
+            <Store size={22} />
+          </div>
+
+          {channelBreakdown.length === 0 ? (
+            <div className="empty-state">
+              <Store size={30} />
+              <p>
+                No channel data for this
+                period.
+              </p>
+            </div>
+          ) : (
+            <div className="breakdown-list">
+              {channelBreakdown.map(
+                (item, index) => {
+                  const percentage =
+                    summary.totalSales > 0
+                      ? (item.totalAmount /
+                          summary.totalSales) *
+                        100
+                      : 0;
+
+                  return (
+                    <div
+                      className="breakdown-item"
+                      key={item.channel}
+                    >
+                      <div className="breakdown-main">
+                        <div className="breakdown-rank">
+                          {index + 1}
+                        </div>
+
+                        <div>
+                          <strong>
+                            {normalizeLabel(
+                              item.channel
+                            )}
+                          </strong>
+
+                          <span>
+                            {item.orderCount}{' '}
+                            orders
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="breakdown-value">
+                        <strong>
+                          {formatCurrency(
+                            item.totalAmount
+                          )}
+                        </strong>
+
+                        <span>
+                          {percentage.toFixed(
+                            1
+                          )}
+                          %
+                        </span>
+                      </div>
+                    </div>
+                  );
+                }
+              )}
+            </div>
+          )}
+        </motion.div>
       </section>
 
-      {/* TOP PRODUCTS */}
+      {/* ===================================================
+          TOP PRODUCTS
+      =================================================== */}
 
-      <section className="reports-section">
-
+      <motion.section
+        className="reports-section"
+        initial={{
+          opacity: 0,
+          y: 20,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
+      >
         <div className="reports-section-header">
           <div>
-            <h2>
-              Top Products
-            </h2>
+            <h2>Top Products</h2>
 
             <p>
               Best-performing products during
               the selected period.
             </p>
           </div>
+
+          <Package size={22} />
         </div>
 
         {topProducts.length === 0 ? (
+          <div className="empty-state">
+            <Package size={30} />
 
-          <p>
-            No product sales for this period.
-          </p>
-
+            <p>
+              No product sales for this
+              period.
+            </p>
+          </div>
         ) : (
-
           <div className="reports-table-wrapper">
-
             <table>
-
               <thead>
                 <tr>
+                  <th>#</th>
                   <th>Product</th>
                   <th>Quantity Sold</th>
                   <th>Orders</th>
                   <th>Revenue</th>
+                  <th>Estimated Profit</th>
                 </tr>
               </thead>
 
               <tbody>
-
                 {topProducts.map(
-                  (item) => (
-                    <tr key={item.productId}>
+                  (item, index) => (
+                    <tr
+                      key={item.productId}
+                    >
+                      <td>
+                        <span className="table-rank">
+                          {index + 1}
+                        </span>
+                      </td>
 
                       <td>
-                        {item.productName}
+                        <strong>
+                          {item.productName}
+                        </strong>
                       </td>
 
                       <td>
@@ -793,25 +1398,138 @@ function Reports() {
                       </td>
 
                       <td>
-                        {formatCurrency(
-                          item.revenue
-                        )}
+                        <strong>
+                          {formatCurrency(
+                            item.revenue
+                          )}
+                        </strong>
                       </td>
 
+                      <td>
+                        <span
+                          className={
+                            item.estimatedProfit >=
+                            0
+                              ? 'profit-positive'
+                              : 'profit-negative'
+                          }
+                        >
+                          {formatCurrency(
+                            item.estimatedProfit
+                          )}
+                        </span>
+                      </td>
                     </tr>
                   )
                 )}
-
               </tbody>
-
             </table>
+          </div>
+        )}
+      </motion.section>
 
+      {/* ===================================================
+          INVENTORY ALERTS
+      =================================================== */}
+
+      <motion.section
+        className="reports-section inventory-alert-section"
+        initial={{
+          opacity: 0,
+          y: 20,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
+      >
+        <div className="reports-section-header">
+          <div>
+            <h2>Inventory Alerts</h2>
+
+            <p>
+              Products currently at or below
+              their low-stock threshold.
+            </p>
           </div>
 
+          <AlertTriangle size={22} />
+        </div>
+
+        {lowStockProducts.length === 0 ? (
+          <div className="inventory-good">
+            <CheckCircle2 size={24} />
+
+            <div>
+              <strong>
+                Inventory looks healthy
+              </strong>
+
+              <span>
+                No products are currently
+                below their low-stock threshold.
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="inventory-alert-list">
+            {lowStockProducts
+              .slice(0, 8)
+              .map((product) => (
+                <div
+                  className="inventory-alert"
+                  key={product.id}
+                >
+                  <Package size={19} />
+
+                  <div>
+                    <strong>
+                      {product.name}
+                    </strong>
+
+                    <span>
+                      Current stock:{' '}
+                      {product.stock_quantity}
+                    </span>
+                  </div>
+
+                  <span className="stock-warning">
+                    Low Stock
+                  </span>
+                </div>
+              ))}
+          </div>
         )}
+      </motion.section>
 
-      </section>
+      {/* ===================================================
+          REPORT FOOTER
+      =================================================== */}
 
+      <div className="reports-footer">
+        <span>
+          Report period:
+        </span>
+
+        <strong>
+          {formatDate(
+            `${startDate}T00:00:00`
+          )}
+          {' — '}
+          {formatDate(
+            `${endDate}T00:00:00`
+          )}
+        </strong>
+
+        <span>
+          •
+        </span>
+
+        <span>
+          {summary.totalOrders} orders
+          analyzed
+        </span>
+      </div>
     </div>
   );
 }

@@ -1,272 +1,405 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  FiUser,
-  FiMail,
-  FiShoppingBag,
   FiHeart,
   FiLogOut,
-  FiArrowRight
+  FiMail,
+  FiMapPin,
+  FiPackage,
+  FiShoppingBag,
+  FiUser,
 } from 'react-icons/fi'
 
 import { supabase } from '../lib/supabase'
+import { getRememberedOrderIds } from '../lib/checkout'
+import { isValidKenyanPhone } from '../lib/phone'
+import { useAuth } from '../context/AuthContext'
+import { useWishlist } from '../context/useWishlist'
+import { BRAND } from '../lib/brand'
+import { whatsappHref, defaultWhatsAppText } from '../lib/whatsapp'
 import './Account.css'
+
+function formatMoney(value) {
+  return `KSh ${Number(value || 0).toLocaleString('en-KE')}`
+}
+
+function formatDate(value) {
+  if (!value) return ''
+  return new Date(value).toLocaleString('en-KE', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  })
+}
+
+function statusLabel(value) {
+  const key = String(value || '').toLowerCase()
+  if (key === 'paid' || key === 'completed' || key === 'success') return 'Paid'
+  if (key === 'processing') return 'Being prepared'
+  if (key === 'shipped' || key === 'dispatched') return 'On the way'
+  if (key === 'delivered') return 'Delivered'
+  if (key === 'cancelled') return 'Cancelled'
+  if (key === 'pending') return 'Pending'
+  return value || 'Pending'
+}
 
 export default function Account() {
   const navigate = useNavigate()
+  const { user, loading: authLoading, logout } = useAuth()
+  const { wishlistItems } = useWishlist()
 
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [orders, setOrders] = useState([])
+  const [ordersLoading, setOrdersLoading] = useState(true)
   const [signingOut, setSigningOut] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [saveMessage, setSaveMessage] = useState('')
+  const [saveError, setSaveError] = useState('')
+
+  const [fullName, setFullName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [city, setCity] = useState('')
+  const [address, setAddress] = useState('')
 
   useEffect(() => {
-    let mounted = true
+    if (authLoading) return
+    if (!user) {
+      navigate('/login', { replace: true })
+    }
+  }, [authLoading, user, navigate])
 
-    const loadUser = async () => {
-      const {
-        data: { user },
-        error
-      } = await supabase.auth.getUser()
+  useEffect(() => {
+    if (!user) return
 
-      if (error || !user) {
-        navigate('/login', { replace: true })
-        return
+    setFullName(
+      user.user_metadata?.full_name ||
+        user.user_metadata?.name ||
+        ''
+    )
+    setPhone(user.user_metadata?.phone || '')
+    setCity(user.user_metadata?.city || '')
+    setAddress(user.user_metadata?.address || '')
+  }, [user])
+
+  useEffect(() => {
+    if (!user) return
+
+    const loadOrders = async () => {
+      setOrdersLoading(true)
+      const rememberedIds = getRememberedOrderIds()
+      const email = (user.email || '').trim()
+      const byId = new Map()
+
+      if (email) {
+        const { data, error } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('email', email)
+          .order('created_at', { ascending: false })
+          .limit(8)
+
+        if (error) {
+          console.error('Could not load account orders:', error)
+        } else {
+          for (const order of data || []) {
+            byId.set(order.id, order)
+          }
+        }
       }
 
-      if (mounted) {
-        setUser(user)
-        setLoading(false)
+      if (rememberedIds.length > 0) {
+        const { data } = await supabase
+          .from('orders')
+          .select('*')
+          .in('id', rememberedIds)
+
+        for (const order of data || []) {
+          byId.set(order.id, order)
+        }
       }
+
+      const merged = Array.from(byId.values()).sort((a, b) => {
+        return (
+          new Date(b.created_at || b.order_date || 0).getTime() -
+          new Date(a.created_at || a.order_date || 0).getTime()
+        )
+      })
+
+      setOrders(merged)
+      setOrdersLoading(false)
     }
 
-    loadUser()
+    loadOrders()
+  }, [user])
 
-    return () => {
-      mounted = false
-    }
-  }, [navigate])
+  const handleSaveProfile = async (event) => {
+    event.preventDefault()
+    setSaveMessage('')
+    setSaveError('')
 
-  const handleSignOut = async () => {
-    setSigningOut(true)
-
-    const { error } = await supabase.auth.signOut()
-
-    if (error) {
-      console.error('Sign out error:', error)
-      setSigningOut(false)
+    const name = fullName.trim()
+    if (!name) {
+      setSaveError('Please enter your name.')
       return
     }
 
+    if (phone.trim() && !isValidKenyanPhone(phone)) {
+      setSaveError('Enter a valid Kenyan phone number, or leave it blank.')
+      return
+    }
+
+    setSaving(true)
+    const { error } = await supabase.auth.updateUser({
+      data: {
+        full_name: name,
+        phone: phone.trim(),
+        city: city.trim(),
+        address: address.trim(),
+      },
+    })
+    setSaving(false)
+
+    if (error) {
+      setSaveError(error.message || 'Could not save your details.')
+      return
+    }
+
+    setSaveMessage('Your details have been saved.')
+  }
+
+  const handleSignOut = async () => {
+    setSigningOut(true)
+    const { error } = await logout()
+    if (error) {
+      setSigningOut(false)
+      return
+    }
     navigate('/', { replace: true })
   }
 
-  if (loading) {
+  if (authLoading || !user) {
     return (
       <main className="account-page account-loading">
-        <div className="account-loader">
-          Loading your account...
-        </div>
+        <div className="account-loader">Opening your account...</div>
       </main>
     )
   }
 
-  if (!user) {
-    return null
-  }
-
-  const fullName =
+  const displayName =
+    fullName ||
     user.user_metadata?.full_name ||
-    user.user_metadata?.name ||
     user.email?.split('@')[0] ||
-    'Jawabu Customer'
-
-  const email = user.email || ''
+    'there'
+  const firstName = displayName.split(' ')[0]
+  const recentOrders = orders.slice(0, 3)
+  const wishlistCount = wishlistItems.length
 
   return (
     <main className="account-page">
-
-      {/* HERO */}
-
       <section className="account-hero">
         <div className="account-container">
-
-          <div className="account-eyebrow">
-            JAWABU BEAUTY
-          </div>
-
+          <span className="account-eyebrow">My account</span>
           <h1 className="account-title">
-            Welcome back,
-            <span>{fullName}</span>
+            Hello, <em>{firstName}.</em>
           </h1>
-
           <p className="account-intro">
-            Manage your account, orders, wishlist,
-            and personal details from one place.
+            Track a delivery, review past orders, or update the details we use
+            to pack and send your Sleek Sisters order.
           </p>
-
         </div>
       </section>
 
-
-      {/* ACCOUNT CONTENT */}
-
       <section className="account-content">
         <div className="account-container">
-
-          {/* PROFILE CARD */}
-
-          <div className="account-profile-card">
-
-            <div className="account-avatar">
-              <FiUser />
-            </div>
-
-            <div className="account-profile-info">
-
-              <h2>{fullName}</h2>
-
-              <div className="account-email">
-                <FiMail />
-                <span>{email}</span>
-              </div>
-
-            </div>
-
+          <div className="account-shortcuts">
+            <Link to="/orders" className="account-shortcut">
+              <FiPackage />
+              <strong>My orders</strong>
+              <span>
+                {ordersLoading
+                  ? 'Loading...'
+                  : orders.length
+                    ? `${orders.length} on file`
+                    : 'No orders yet'}
+              </span>
+            </Link>
+            <Link to="/track" className="account-shortcut">
+              <FiMapPin />
+              <strong>Track order</strong>
+              <span>Find a delivery with your order number</span>
+            </Link>
+            <Link to="/wishlist" className="account-shortcut">
+              <FiHeart />
+              <strong>Wishlist</strong>
+              <span>
+                {wishlistCount
+                  ? `${wishlistCount} saved`
+                  : 'Save products for later'}
+              </span>
+            </Link>
+            <Link to="/shop" className="account-shortcut">
+              <FiShoppingBag />
+              <strong>Shop again</strong>
+              <span>Browse the collection</span>
+            </Link>
           </div>
 
+          <section className="account-panel">
+            <div className="account-panel-heading">
+              <div>
+                <span className="account-eyebrow">Recent orders</span>
+                <h2>What you bought</h2>
+              </div>
+              <Link to="/orders" className="account-panel-link">
+                View all orders
+              </Link>
+            </div>
 
-          {/* QUICK ACTIONS */}
+            {ordersLoading && (
+              <div className="account-loader">Fetching orders...</div>
+            )}
 
-          <div className="account-grid">
-
-            {/* ORDERS */}
-
-            <Link
-              to="/orders"
-              className="account-action-card"
-            >
-              <div className="account-action-icon">
+            {!ordersLoading && recentOrders.length === 0 && (
+              <div className="account-empty">
                 <FiShoppingBag />
-              </div>
-
-              <div className="account-action-content">
-                <h3>My Orders</h3>
-
+                <h3>No orders yet</h3>
                 <p>
-                  View your purchases and
-                  order status.
+                  When you check out with this email, your purchases will show
+                  up here.
                 </p>
+                <Link to="/shop" className="btn btn-primary">
+                  Shop products
+                </Link>
               </div>
+            )}
 
-              <FiArrowRight className="account-action-arrow" />
-            </Link>
+            {!ordersLoading && recentOrders.length > 0 && (
+              <div className="account-orders-list">
+                {recentOrders.map((order) => {
+                  const trackTo =
+                    order.order_number && order.phone
+                      ? `/track?order=${encodeURIComponent(order.order_number)}&phone=${encodeURIComponent(order.phone)}`
+                      : '/track'
 
-
-            {/* WISHLIST */}
-
-            <Link
-              to="/wishlist"
-              className="account-action-card"
-            >
-              <div className="account-action-icon">
-                <FiHeart />
+                  return (
+                    <article className="account-order-card" key={order.id}>
+                      <div>
+                        <span className="account-order-id">
+                          {order.order_number || `Order #${order.id}`}
+                        </span>
+                        <p className="account-order-meta">
+                          {formatDate(order.created_at || order.order_date)}
+                        </p>
+                      </div>
+                      <div className="account-order-status">
+                        {statusLabel(order.payment_status)} ·{' '}
+                        {statusLabel(order.status)}
+                      </div>
+                      <strong>
+                        {formatMoney(order.total_amount ?? order.total)}
+                      </strong>
+                      <Link to={trackTo} className="account-order-track">
+                        Track
+                      </Link>
+                    </article>
+                  )
+                })}
               </div>
-
-              <div className="account-action-content">
-                <h3>My Wishlist</h3>
-
-                <p>
-                  View products you've saved
-                  for later.
-                </p>
-              </div>
-
-              <FiArrowRight className="account-action-arrow" />
-            </Link>
-
-
-            {/* SHOP */}
-
-            <Link
-              to="/shop"
-              className="account-action-card"
-            >
-              <div className="account-action-icon">
-                <FiShoppingBag />
-              </div>
-
-              <div className="account-action-content">
-                <h3>Continue Shopping</h3>
-
-                <p>
-                  Explore the latest Jawabu
-                  beauty products.
-                </p>
-              </div>
-
-              <FiArrowRight className="account-action-arrow" />
-            </Link>
-
-
-            {/* PROFILE */}
-
-            <div className="account-action-card account-action-disabled">
-              <div className="account-action-icon">
-                <FiUser />
-              </div>
-
-              <div className="account-action-content">
-                <h3>Profile Details</h3>
-
-                <p>
-                  Profile editing will be
-                  available soon.
-                </p>
-              </div>
-            </div>
-
-          </div>
-
-
-          {/* ACCOUNT DETAILS */}
-
-          <section className="account-details">
-
-            <div className="account-section-heading">
-              <span>Account</span>
-              <h2>Your details</h2>
-            </div>
-
-            <div className="account-details-card">
-
-              <div className="account-detail-row">
-                <div className="account-detail-label">
-                  Name
-                </div>
-
-                <div className="account-detail-value">
-                  {fullName}
-                </div>
-              </div>
-
-              <div className="account-detail-row">
-                <div className="account-detail-label">
-                  Email
-                </div>
-
-                <div className="account-detail-value">
-                  {email}
-                </div>
-              </div>
-
-            </div>
-
+            )}
           </section>
 
+          <section className="account-panel">
+            <div className="account-panel-heading">
+              <div>
+                <span className="account-eyebrow">Profile</span>
+                <h2>Your details</h2>
+              </div>
+            </div>
 
-          {/* SIGN OUT */}
+            <form className="account-profile-form" onSubmit={handleSaveProfile}>
+              <div className="account-profile-grid">
+                <label className="account-field">
+                  <span>
+                    <FiUser /> Name
+                  </span>
+                  <input
+                    type="text"
+                    value={fullName}
+                    onChange={(event) => setFullName(event.target.value)}
+                    autoComplete="name"
+                    required
+                  />
+                </label>
 
-          <div className="account-signout-area">
+                <label className="account-field">
+                  <span>
+                    <FiMail /> Email
+                  </span>
+                  <input type="email" value={user.email || ''} disabled />
+                </label>
+
+                <label className="account-field">
+                  <span>Phone</span>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(event) => setPhone(event.target.value)}
+                    placeholder="0712 345 678"
+                    autoComplete="tel"
+                  />
+                </label>
+
+                <label className="account-field">
+                  <span>City / Town</span>
+                  <input
+                    type="text"
+                    value={city}
+                    onChange={(event) => setCity(event.target.value)}
+                    placeholder="Nairobi"
+                    autoComplete="address-level2"
+                  />
+                </label>
+
+                <label className="account-field account-field-wide">
+                  <span>Delivery address</span>
+                  <textarea
+                    rows={3}
+                    value={address}
+                    onChange={(event) => setAddress(event.target.value)}
+                    placeholder="Estate, street, building, landmark"
+                    autoComplete="street-address"
+                  />
+                </label>
+              </div>
+
+              {saveError && <p className="account-form-error">{saveError}</p>}
+              {saveMessage && (
+                <p className="account-form-success">{saveMessage}</p>
+              )}
+
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={saving}
+              >
+                {saving ? 'Saving...' : 'Save details'}
+              </button>
+            </form>
+          </section>
+
+          <div className="account-footer">
+            <div className="account-footer-copy">
+              <span>{BRAND.name.toUpperCase()}</span>
+              <p>
+                Need a hand?{' '}
+                <a
+                  href={whatsappHref(BRAND.phone, defaultWhatsAppText())}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  WhatsApp us
+                </a>{' '}
+                or <Link to="/contact">send a message</Link>.
+              </p>
+            </div>
 
             <button
               type="button"
@@ -275,17 +408,11 @@ export default function Account() {
               disabled={signingOut}
             >
               <FiLogOut />
-
-              {signingOut
-                ? 'Signing out...'
-                : 'Sign out'}
+              <span>{signingOut ? 'Signing out...' : 'Sign out'}</span>
             </button>
-
           </div>
-
         </div>
       </section>
-
     </main>
   )
 }

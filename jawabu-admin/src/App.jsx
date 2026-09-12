@@ -1,5 +1,6 @@
 import {
   BrowserRouter,
+  HashRouter,
   Routes,
   Route,
   Navigate,
@@ -18,11 +19,19 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminLayout from './layouts/AdminLayout';
 import POS from './pages/POS';
 import Reports from './pages/Reports';
+import Payments from './pages/Payments.jsx';
+import Customers from './pages/Customers';
+import Settings from './pages/Settings';
+import Categories from './pages/Categories';
+import Staff from './pages/Staff';
+
 
 function App() {
+  const Router = window.sleekDesktop ? HashRouter : BrowserRouter;
+
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <Router>
 
         <Routes>
 
@@ -106,6 +115,35 @@ function App() {
   path="/reports"
   element={<Reports />}
 />
+
+<Route
+  path="/payments"
+  element={<Payments />}
+/>
+            <Route
+  path="/customers"
+  element={<Customers />}
+/>
+            <Route
+              path="/settings"
+              element={<Settings />}
+            />
+            <Route
+              path="/categories"
+              element={<Categories />}
+            />
+            <Route
+              path="/staff/profile/:userId"
+              element={<Staff />}
+            />
+            <Route
+              path="/staff/reset/:userId"
+              element={<Staff />}
+            />
+            <Route
+              path="/staff"
+              element={<Staff />}
+            />
             </Route>
 
           </Route>
@@ -125,7 +163,7 @@ function App() {
 
         </Routes>
 
-      </BrowserRouter>
+      </Router>
     </AuthProvider>
   );
 }

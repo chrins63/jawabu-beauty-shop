@@ -14,6 +14,6 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
-    storageKey: "jawabu-store-auth",
+    storageKey: "sleek-store-auth",
   },
 });

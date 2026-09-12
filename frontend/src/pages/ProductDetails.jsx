@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import {
   FiArrowLeft,
@@ -8,15 +8,30 @@ import {
   FiPlus,
   FiShoppingBag,
   FiCheck,
-  FiArrowRight
+  FiArrowRight,
+  FiStar,
+  FiShield,
+  FiTruck,
+  FiRotateCcw,
+  FiInfo
 } from 'react-icons/fi'
 
 import { supabase } from '../lib/supabase'
+import { buildCategoryLookup, normalizeStoreProduct } from '../lib/storeProduct'
+import {
+  applySelectedVariant,
+  availableVariants,
+  colorSwatch,
+} from '../lib/productOptions'
 import { useCart } from '../context/useCart'
 import { useWishlist } from '../context/useWishlist'
+import { BRAND } from '../lib/brand'
+import { getStorefrontCommerce } from '../lib/storefront'
+import { whatsappHref } from '../lib/whatsapp'
 
 const ProductDetails = () => {
   const { id } = useParams()
+  const navigate = useNavigate()
 
   const { addToCart } = useCart()
 
@@ -32,10 +47,18 @@ const ProductDetails = () => {
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [whatsappNumber, setWhatsappNumber] = useState(BRAND.phone)
 
   const [added, setAdded] = useState(false)
   const [addedProductId, setAddedProductId] = useState(null)
+  const [selectedVariantId, setSelectedVariantId] = useState('')
+  const [optionError, setOptionError] = useState('')
 
+  useEffect(() => {
+    getStorefrontCommerce().then((data) => {
+      setWhatsappNumber(data.whatsapp_number || BRAND.phone)
+    })
+  }, [])
 
   // =========================================================
   // LOAD PRODUCT + SIMILAR PRODUCTS
@@ -47,91 +70,65 @@ const ProductDetails = () => {
       setError('')
       setProduct(null)
       setSimilarProducts([])
-
-      // -------------------------------------------------------
-      // LOAD SELECTED PRODUCT
-      // -------------------------------------------------------
+      setQuantity(1)
+      setAdded(false)
+      setSelectedVariantId('')
+      setOptionError('')
 
       const {
         data,
         error: productError
       } = await supabase
         .from('products')
-        .select('*')
+        .select('*, product_variants(*)')
         .eq('id', id)
-        .single()
+        .eq('active', true)
+        .maybeSingle()
 
-      if (productError) {
-        console.error(
-          'SUPABASE PRODUCT DETAILS ERROR:',
-          productError
-        )
+      if (productError || !data) {
+        if (productError) {
+          console.error(
+            'SUPABASE PRODUCT DETAILS ERROR:',
+            productError
+          )
+        }
 
         setError(
-          'We could not load this product right now.'
+          productError
+            ? 'We could not load this product right now.'
+            : 'The product you are looking for does not exist or may have been removed.'
         )
 
         setLoading(false)
         return
       }
 
-      // -------------------------------------------------------
-      // NORMALIZE SELECTED PRODUCT
-      // -------------------------------------------------------
+      const { data: categoryData } = await supabase
+        .from('category')
+        .select('id, name')
+        .order('id', { ascending: true })
 
-      const normalizedProduct = {
-        id: data.id,
+      const categoryLookup = buildCategoryLookup(categoryData)
+      const normalizedProduct = normalizeStoreProduct(
+        data,
+        categoryLookup
+      )
 
-        name:
-          data.name ||
-          data.product_name ||
-          'Unnamed Product',
+      const firstOption =
+        availableVariants(normalizedProduct).find(
+          (row) => Number(row.stock_quantity) > 0
+        ) || availableVariants(normalizedProduct)[0]
 
-        category:
-          data.category ||
-          data.category_name ||
-          'Beauty',
-
-        filter:
-          data.filter ||
-          data.category ||
-          data.category_name ||
-          'Skincare',
-
-        price:
-          Number(data.price) || 0,
-
-        image:
-          data.image ||
-          data.image_url ||
-          '/images/products/placeholder.jpg',
-
-        description:
-          data.description ||
-          'A beautiful addition to your everyday routine.',
-
-        stock_quantity:
-          Number(
-            data.stock_quantity ??
-            data.stock_qty ??
-            data.stock ??
-            0
-          )
-      }
-
+      setSelectedVariantId(firstOption?.id ? String(firstOption.id) : '')
       setProduct(normalizedProduct)
-
-
-      // -------------------------------------------------------
-      // LOAD ALL OTHER PRODUCTS
-      // -------------------------------------------------------
 
       const {
         data: allProducts,
         error: similarError
       } = await supabase
         .from('products')
-        .select('*')
+        .select('*, product_variants(*)')
+        .eq('active', true)
         .neq('id', id)
         .order('id', { ascending: true })
 
@@ -146,90 +143,42 @@ const ProductDetails = () => {
         return
       }
 
-
-      // -------------------------------------------------------
-      // NORMALIZE PRODUCTS
-      // -------------------------------------------------------
-
-      const normalizedProducts = (allProducts || []).map(
-        (item) => ({
-          id: item.id,
-
-          name:
-            item.name ||
-            item.product_name ||
-            'Unnamed Product',
-
-          category:
-            item.category ||
-            item.category_name ||
-            'Beauty',
-
-          filter:
-            item.filter ||
-            item.category ||
-            item.category_name ||
-            'Skincare',
-
-          price:
-            Number(item.price) || 0,
-
-          image:
-            item.image ||
-            item.image_url ||
-            '/images/products/placeholder.jpg',
-
-          description:
-            item.description ||
-            'A beautiful addition to your everyday routine.',
-
-          stock_quantity:
-            Number(
-              item.stock_quantity ??
-              item.stock_qty ??
-              item.stock ??
-              0
-            )
-        })
+      const normalizedProducts = (allProducts || []).map((item) =>
+        normalizeStoreProduct(item, categoryLookup)
       )
-
-
-      // -------------------------------------------------------
-      // FIND PRODUCTS IN SAME CATEGORY
-      // -------------------------------------------------------
 
       const sameCategory = normalizedProducts.filter(
-        (item) =>
-          item.category === normalizedProduct.category ||
-          item.filter === normalizedProduct.filter
+        (item) => item.category === normalizedProduct.category
       )
-
-
-      // -------------------------------------------------------
-      // IF NOT ENOUGH SAME CATEGORY PRODUCTS,
-      // ADD OTHER PRODUCTS
-      // -------------------------------------------------------
 
       const otherProducts = normalizedProducts.filter(
-        (item) =>
-          item.category !== normalizedProduct.category &&
-          item.filter !== normalizedProduct.filter
+        (item) => item.category !== normalizedProduct.category
       )
 
-
-      const recommendations = [
-        ...sameCategory,
-        ...otherProducts
-      ].slice(0, 4)
-
-
-      setSimilarProducts(recommendations)
+      setSimilarProducts(
+        [...sameCategory, ...otherProducts].slice(0, 4)
+      )
 
       setLoading(false)
     }
 
     loadProducts()
   }, [id])
+
+
+  const selectable = product ? availableVariants(product) : []
+  const selectedVariant = selectable.find(
+    (row) => String(row.id) === String(selectedVariantId)
+  ) || null
+  const displayProduct = product
+    ? applySelectedVariant(
+        product,
+        product.hasOptions ? selectedVariant : null
+      )
+    : null
+  const optionKind =
+    product?.variants?.[0]?.option_type === 'size' ? 'size' : 'color'
+  const optionTitle = optionKind === 'size' ? 'Size' : 'Colour'
 
 
   // =========================================================
@@ -244,11 +193,11 @@ const ProductDetails = () => {
 
 
   const handleIncrease = () => {
-    if (!product) return
+    if (!displayProduct) return
 
     setQuantity((current) =>
       Math.min(
-        product.stock_quantity,
+        displayProduct.stock_quantity,
         current + 1
       )
     )
@@ -260,17 +209,21 @@ const ProductDetails = () => {
   // =========================================================
 
   const handleAddToCart = () => {
-    if (!product) return
+    if (!displayProduct) return
 
-    if (product.stock_quantity <= 0) {
+    if (product.hasOptions && !selectedVariant) {
+      setOptionError(`Select a ${optionTitle.toLowerCase()} first.`)
       return
     }
 
-    for (let i = 0; i < quantity; i += 1) {
-      addToCart(product)
+    if (displayProduct.stock_quantity <= 0) {
+      return
     }
 
+    addToCart(displayProduct, quantity)
+
     setAdded(true)
+    setOptionError('')
 
     setTimeout(() => {
       setAdded(false)
@@ -283,6 +236,11 @@ const ProductDetails = () => {
   // =========================================================
 
   const handleAddRecommended = (recommendedProduct) => {
+    if (recommendedProduct.hasOptions) {
+      navigate(`/product/${recommendedProduct.id}`)
+      return
+    }
+
     if (recommendedProduct.stock_quantity <= 0) {
       return
     }
@@ -310,7 +268,7 @@ const ProductDetails = () => {
           <div className="container">
 
             <span className="section-eyebrow">
-              JAWABU BEAUTY
+              SLEEK SISTERS
             </span>
 
             <h1>
@@ -376,12 +334,13 @@ const ProductDetails = () => {
   // STOCK
   // =========================================================
 
-  const outOfStock =
-    product.stock_quantity <= 0
+  const outOfStock = product.hasOptions
+    ? !selectedVariant || displayProduct.stock_quantity <= 0
+    : displayProduct.stock_quantity <= 0
 
   const lowStock =
-    product.stock_quantity > 0 &&
-    product.stock_quantity <= 5
+    displayProduct.stock_quantity > 0 &&
+    displayProduct.stock_quantity <= 5
 
 
   // =========================================================
@@ -414,55 +373,62 @@ const ProductDetails = () => {
 
           <div className="product-details-layout">
 
-            {/* IMAGE */}
+            {/* IMAGE GALLERY */}
 
-            <div className="product-details-image">
+            <div className="product-gallery">
+              <div className="product-details-image">
 
-              <img
-                src={product.image}
-                alt={product.name}
-              />
+                <img
+                  src={displayProduct.image}
+                  alt={product.name}
+                />
 
 
-              {/* WISHLIST */}
+                {/* WISHLIST */}
 
-              <button
-                type="button"
-                className={
-                  isInWishlist(product.id)
-                    ? 'product-details-wishlist active'
-                    : 'product-details-wishlist'
-                }
-                onClick={() =>
-                  toggleWishlist(product)
-                }
-                aria-label={
-                  isInWishlist(product.id)
-                    ? `Remove ${product.name} from wishlist`
-                    : `Add ${product.name} to wishlist`
-                }
-              >
-                <FiHeart />
-              </button>
+                <button
+                  type="button"
+                  className={
+                    isInWishlist(product.id)
+                      ? 'product-details-wishlist active'
+                      : 'product-details-wishlist'
+                  }
+                  onClick={() =>
+                    toggleWishlist(product)
+                  }
+                  aria-label={
+                    isInWishlist(product.id)
+                      ? `Remove ${product.name} from wishlist`
+                      : `Add ${product.name} to wishlist`
+                  }
+                >
+                  <FiHeart />
+                </button>
 
+              </div>
             </div>
 
 
             {/* INFORMATION */}
 
             <div className="product-details-info">
+            
+              <div className="product-header-group">
+                <span className="product-details-category">
+                  {product.category}
+                </span>
 
-              <span className="product-details-category">
-                {product.category}
-              </span>
-
-              <h1>
-                {product.name}
-              </h1>
-
-              <strong className="product-details-price">
-                KSh {product.price.toLocaleString()}
-              </strong>
+                <h1>
+                  {product.name}
+                </h1>
+                
+                <div className="product-price-wrapper">
+                  <strong className="product-details-price">
+                    KSh {displayProduct.price.toLocaleString()}
+                  </strong>
+                  <span className="price-note">incl. tax</span>
+                </div>
+              </div>
 
               <div className="product-details-divider" />
 
@@ -470,28 +436,92 @@ const ProductDetails = () => {
                 {product.description}
               </p>
 
+              {product.hasOptions ? (
+                <div className="product-variant-selector">
+                  <span>
+                    {optionTitle}
+                    {selectedVariant ? ` — ${selectedVariant.option_value}` : ''}
+                  </span>
 
-              {/* STOCK */}
+                  <div className={optionKind === 'color' ? 'variant-swatches' : 'variant-pills'}>
+                    {product.variants
+                    .filter((variant) => variant.available !== false)
+                    .map((variant) => {
+                      const isSelected =
+                        String(variant.id) === String(selectedVariantId)
+                      const canBuy =
+                        variant.available !== false &&
+                        Number(variant.stock_quantity) > 0
+
+                      if (optionKind === 'color') {
+                        return (
+                          <button
+                            type="button"
+                            key={variant.id}
+                            className={`variant-swatch${isSelected ? ' active' : ''}${canBuy ? '' : ' unavailable'}`}
+                            style={{ background: colorSwatch(variant.option_value) }}
+                            disabled={!canBuy}
+                            onClick={() => {
+                              setSelectedVariantId(String(variant.id))
+                              setQuantity(1)
+                              setOptionError('')
+                            }}
+                            aria-label={variant.option_value}
+                            title={
+                              canBuy
+                                ? variant.option_value
+                                : `${variant.option_value} is not available`
+                            }
+                          />
+                        )
+                      }
+
+                      return (
+                        <button
+                          type="button"
+                          key={variant.id}
+                          className={`variant-pill${isSelected ? ' active' : ''}${canBuy ? '' : ' unavailable'}`}
+                          disabled={!canBuy}
+                          onClick={() => {
+                            setSelectedVariantId(String(variant.id))
+                            setQuantity(1)
+                            setOptionError('')
+                          }}
+                        >
+                          {variant.option_value}
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  {optionError ? (
+                    <p className="product-option-error">{optionError}</p>
+                  ) : null}
+                </div>
+              ) : null}
+
+
+              {/* STOCK STATUS */}
 
               <div className="product-details-stock">
 
                 {outOfStock ? (
 
-                  <strong>
-                    Out of stock
-                  </strong>
+                  <span className="status-badge unavailable">
+                    Currently Unavailable
+                  </span>
 
                 ) : lowStock ? (
 
-                  <strong>
-                    Only {product.stock_quantity} left in stock
-                  </strong>
+                  <span className="status-badge low-stock">
+                    Only {displayProduct.stock_quantity} left in stock
+                  </span>
 
                 ) : (
 
-                  <strong>
+                  <span className="status-badge in-stock">
                     In stock
-                  </strong>
+                  </span>
 
                 )}
 
@@ -528,7 +558,7 @@ const ProductDetails = () => {
                       onClick={handleIncrease}
                       disabled={
                         quantity >=
-                        product.stock_quantity
+                        displayProduct.stock_quantity
                       }
                       aria-label="Increase quantity"
                     >
@@ -542,112 +572,131 @@ const ProductDetails = () => {
               )}
 
 
+              {/* TRUST BADGES */}
+              <div className="trust-badges">
+                <div className="trust-badge-pill">
+                  <FiTruck /> Nairobi from KSh 200 · Pickup free
+                </div>
+                <div className="trust-badge-pill">
+                  <FiShield /> Secure Checkout
+                </div>
+                <div className="trust-badge-pill">
+                  <FiRotateCcw /> Easy Returns
+                </div>
+              </div>
+
+
               {/* ACTIONS */}
 
               <div className="product-details-actions">
 
-                <button
-                  type="button"
-                  className={
-                    added
-                      ? 'btn btn-primary product-add-btn added'
-                      : 'btn btn-primary product-add-btn'
-                  }
-                  onClick={handleAddToCart}
-                  disabled={outOfStock}
-                >
+                {outOfStock ? (
+                  <Link
+                    to="/contact"
+                    className="btn btn-primary product-add-btn"
+                  >
+                    Ask about this product
+                  </Link>
+                ) : (
+                  <div className="product-details-actions-row">
+                    <button
+                      type="button"
+                      className={
+                        added
+                          ? 'btn btn-primary product-add-btn added'
+                          : 'btn btn-primary product-add-btn'
+                      }
+                      onClick={handleAddToCart}
+                    >
+                      {added ? (
+                        <>
+                          <FiCheck />
+                          Added to Bag
+                        </>
+                      ) : (
+                        <>
+                          <FiShoppingBag />
+                          Add to Bag
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
 
-                  {outOfStock ? (
 
-                    <>
-                      <FiShoppingBag />
-                      Out of Stock
-                    </>
+                <div className="product-details-actions-row">
+                  <button
+                    type="button"
+                    className={
+                      isInWishlist(product.id)
+                        ? 'product-wishlist-btn active'
+                        : 'product-wishlist-btn'
+                    }
+                    onClick={() =>
+                      toggleWishlist(product)
+                    }
+                  >
 
-                  ) : added ? (
+                    <FiHeart />
 
-                    <>
-                      <FiCheck />
-                      Added to Bag
-                    </>
+                    {isInWishlist(product.id)
+                      ? 'Saved to Wishlist'
+                      : 'Save to Wishlist'}
 
-                  ) : (
+                  </button>
+                </div>
 
-                    <>
-                      <FiShoppingBag />
-                      Add to Bag
-                    </>
-
+                <a
+                  className="btn btn-secondary product-add-btn"
+                  href={whatsappHref(
+                    whatsappNumber,
+                    `Hello Sleek Sisters, I am interested in ${product.name}${selectedVariant ? ` (${selectedVariant.option_value})` : ''}.`
                   )}
-
-                </button>
-
-
-                <button
-                  type="button"
-                  className={
-                    isInWishlist(product.id)
-                      ? 'product-wishlist-btn active'
-                      : 'product-wishlist-btn'
-                  }
-                  onClick={() =>
-                    toggleWishlist(product)
-                  }
+                  target="_blank"
+                  rel="noreferrer"
                 >
-
-                  <FiHeart />
-
-                  {isInWishlist(product.id)
-                    ? 'Saved to Wishlist'
-                    : 'Save to Wishlist'}
-
-                </button>
+                  Ask on WhatsApp
+                </a>
 
               </div>
 
 
-              {/* EXTRA INFORMATION */}
+              {/* EXTRA INFORMATION / META GRID */}
 
               <div className="product-details-extra">
-
-                <div>
-
-                  <span>
-                    Category
-                  </span>
-
-                  <strong>
-                    {product.category}
-                  </strong>
-
+                <div className="meta-grid">
+                
+                  <div className="meta-item">
+                    <div className="meta-icon">
+                      <FiInfo />
+                    </div>
+                    <div className="meta-content">
+                      <span>Category</span>
+                      <strong>{product.category}</strong>
+                    </div>
+                  </div>
+                  
+                  <div className="meta-item">
+                    <div className="meta-icon">
+                      <FiStar />
+                    </div>
+                    <div className="meta-content">
+                      <span>Collection</span>
+                      <strong>Sleek Sisters</strong>
+                    </div>
+                  </div>
+                  
+                  <div className="meta-item">
+                    <div className="meta-icon">
+                      <FiCheck />
+                    </div>
+                    <div className="meta-content">
+                      <span>Availability</span>
+                      <strong>{outOfStock ? 'Out of Stock' : 'Available Now'}</strong>
+                    </div>
+                  </div>
+                  
                 </div>
-
-                <div>
-
-                  <span>
-                    Collection
-                  </span>
-
-                  <strong>
-                    Jawabu Beauty
-                  </strong>
-
-                </div>
-
-                <div>
-
-                  <span>
-                    Availability
-                  </span>
-
-                  <strong>
-                    {outOfStock
-                      ? 'Out of Stock'
-                      : 'Available'}
-                  </strong>
-
-                </div>
-
               </div>
 
             </div>
@@ -715,10 +764,16 @@ const ProductDetails = () => {
 
                       <div className="recommended-product-image">
 
-                        <img
-                          src={recommendedProduct.image}
-                          alt={recommendedProduct.name}
-                        />
+                        <Link
+                          to={`/product/${recommendedProduct.id}`}
+                          className="product-image-link"
+                          aria-label={`View ${recommendedProduct.name}`}
+                        >
+                          <img
+                            src={recommendedProduct.image}
+                            alt=""
+                          />
+                        </Link>
 
 
                         {/* WISHLIST */}
@@ -762,7 +817,12 @@ const ProductDetails = () => {
                         </span>
 
                         <h3>
-                          {recommendedProduct.name}
+                          <Link
+                            to={`/product/${recommendedProduct.id}`}
+                            className="shop-product-name-link"
+                          >
+                            {recommendedProduct.name}
+                          </Link>
                         </h3>
 
                         <div className="recommended-product-bottom">

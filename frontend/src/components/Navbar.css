@@ -1,558 +1,642 @@
 /* =========================================================
-   JAWABU BEAUTY — NAVBAR
-   Clean spacing / no overlapping
+   TOKENS
+   ========================================================= */
+
+:root {
+  --jwb-ink: #f5ead0;
+  --jwb-ink-soft: #f3d98a;
+  --jwb-cream: #000000;
+  --jwb-cream-soft: #111111;
+  --jwb-blush: rgba(232, 195, 106, 0.16);
+  --jwb-accent: #e8c36a;
+  --jwb-accent-deep: #f3d98a;
+  --jwb-border: rgba(232, 195, 106, 0.45);
+  --jwb-glass: #000000;
+  --jwb-glass-strong: #000000;
+  --jwb-mirror-line: rgba(243, 217, 138, 0.85);
+}
+
+.navbar-whatsapp-glyph {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--jwb-accent);
+}
+
+/* =========================================================
+   HEADER — BLACK AND GOLD
    ========================================================= */
 
 .navbar {
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 1500;
+  padding-top: env(safe-area-inset-top, 0px);
 
-  width: 100%;
-
-  background: #fcf8f3;
-
-  border-bottom: 1px solid rgba(43, 29, 34, 0.08);
+  background: #000000;
+  border-bottom: 3px solid #e8c36a;
+  border-top: 3px solid #e8c36a;
+  box-shadow:
+    0 1px 0 #f3d98a,
+    0 14px 36px rgba(0, 0, 0, 0.55);
 
   transition:
-    background 0.3s ease,
-    box-shadow 0.3s ease,
-    border-color 0.3s ease;
+    background 0.35s ease,
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
 }
 
+/* the "mirror" reflection: a thin bright line along the top edge
+   plus a soft vertical fade, like light catching polished glass */
 
-/* =========================================================
-   SCROLLED
-   ========================================================= */
+.navbar-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      180deg,
+      var(--jwb-mirror-line) 0%,
+      rgba(255, 255, 255, 0) 2px
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.35) 0%,
+      rgba(255, 255, 255, 0) 60%
+    );
+
+  opacity: 0.8;
+}
 
 .navbar--scrolled {
-  background: rgba(252, 248, 243, 0.92);
-
-  -webkit-backdrop-filter: blur(14px) saturate(150%);
-  backdrop-filter: blur(14px) saturate(150%);
-
-  border-bottom-color: rgba(43, 29, 34, 0.1);
-
-  box-shadow: 0 8px 30px -20px rgba(43, 29, 34, 0.35);
+  background: #000000;
+  box-shadow:
+    0 1px 0 #f3d98a,
+    0 18px 40px rgba(0, 0, 0, 0.75);
+  border-bottom-color: #e8c36a;
 }
 
-
-/* =========================================================
-   MAIN CONTAINER
-   ========================================================= */
-
 .navbar-container {
-  width: 100%;
-  max-width: 1400px;
-
-  min-height: 68px;
-
+  max-width: 1320px;
   margin: 0 auto;
+  padding: 0 20px;
 
-  padding: 0 28px;
-
-  box-sizing: border-box;
+  height: 84px;
 
   display: flex;
   align-items: center;
+  gap: 18px;
 
-  gap: 0;
+  position: relative;
 }
-
 
 /* =========================================================
    LOGO
    ========================================================= */
 
-.navbar-logo {
+.navbar .brand-logo,
+.navbar-mobile-panel .brand-logo {
   display: inline-flex;
-  align-items: baseline;
-
-  gap: 7px;
-
-  flex-shrink: 0;
-
+  align-items: center;
+  gap: 12px;
   text-decoration: none;
-
-  line-height: 1;
+  flex-shrink: 0;
+  min-width: 0;
 }
 
-.navbar-logo-mark {
-  font-family:
-    'Fraunces',
-    Georgia,
-    serif;
-
-  font-size: 24px;
-
-  font-weight: 600;
-
-  letter-spacing: 0.08em;
-
-  color: #2b1d22;
+.brand-logo-mark {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
 }
 
+.brand-logo-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.brand-logo-name {
+  font-family: Cambria, "Cormorant Garamond", Georgia, serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #f3d98a;
+  line-height: 1.1;
+  white-space: nowrap;
+  text-shadow: 0 0 18px rgba(232, 195, 106, 0.35);
+}
+
+.brand-logo-tagline {
+  font-family: "Palatino Linotype", Palatino, Cambria, serif;
+  font-style: italic;
+  font-size: 11px;
+  color: #e8d5a3;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.navbar-logo,
+.navbar-logo-mark,
 .navbar-logo-script {
-  font-family:
-    'Pinyon Script',
-    cursive;
-
-  font-size: 21px;
-
-  color: #e31c79;
-
-  transform: translateY(2px);
+  display: none;
 }
-
 
 /* =========================================================
-   DESKTOP NAVIGATION
+   DESKTOP NAV LINKS
    ========================================================= */
 
 .navbar-links {
   display: flex;
   align-items: center;
-
-  gap: 38px;
-
-  margin-left: 75px;
+  gap: 4px;
+  margin-left: 12px;
 }
 
 .navbar-link {
   position: relative;
 
-  display: inline-flex;
-  align-items: center;
+  padding: 9px 14px;
+  border-radius: 2px;
 
-  padding: 8px 2px;
-
-  font-family:
-    'Inter',
-    Arial,
-    sans-serif;
-
-  font-size: 14px;
-
+  color: #f5ead0;
+  font-family: Calibri, "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: 13.5px;
   font-weight: 500;
-
-  color: #2b1d22;
 
   text-decoration: none;
 
-  white-space: nowrap;
-
-  transition: color 0.2s ease;
-}
-
-.navbar-link:hover {
-  color: #b8115c;
+  transition: color 0.2s ease, background 0.2s ease;
 }
 
 .navbar-link::after {
-  content: '';
-
+  content: "";
   position: absolute;
-
-  left: 0;
+  left: 14px;
+  right: 14px;
   bottom: 3px;
+  height: 3px;
+  border-radius: 2px;
 
-  width: 100%;
-  height: 1.5px;
-
-  background: #e31c79;
-
+  background: #e8c36a;
   transform: scaleX(0);
-  transform-origin: right;
-
+  transform-origin: left;
   transition: transform 0.25s ease;
 }
 
-.navbar-link:hover::after,
-.navbar-link:focus-visible::after {
-  transform: scaleX(1);
-  transform-origin: left;
+.navbar-link:hover {
+  color: #e8d5a3;
+  background: rgba(201, 168, 118, 0.12);
 }
 
+.navbar-link:hover::after {
+  transform: scaleX(1);
+}
+
+.navbar-link.is-active {
+  color: #f3d98a;
+  font-weight: 600;
+}
+
+.navbar-link.is-active::after {
+  transform: scaleX(1);
+}
 
 /* =========================================================
-   ACTIONS
+   NAVBAR ACTIONS
    ========================================================= */
 
 .navbar-actions {
   margin-left: auto;
-
   display: flex;
   align-items: center;
-
-  gap: 8px;
-
+  gap: 6px;
   flex-shrink: 0;
-
   white-space: nowrap;
 }
 
-
 /* =========================================================
-   ICON BUTTON
+   ICON BUTTONS
    ========================================================= */
 
-.navbar-icon-btn {
+.navbar-actions .navbar-icon-btn,
+.navbar-menu-btn {
   position: relative;
 
   width: 40px;
   height: 40px;
-
   flex: 0 0 40px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  box-sizing: border-box;
-
-  padding: 0;
-
-  border: none;
+  border: 1px solid transparent;
   border-radius: 50%;
-
   background: transparent;
 
-  color: #2b1d22;
-
+  color: var(--jwb-ink);
   font-size: 18px;
 
   text-decoration: none;
-
   cursor: pointer;
 
   transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
+    background 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.navbar-icon-btn:hover {
-  background: #f6dce0;
-
-  color: #b8115c;
-
-  transform: translateY(-1px);
+.navbar-actions .navbar-icon-btn svg,
+.navbar-menu-btn svg {
+  width: 18px;
+  height: 18px;
+  color: inherit;
+  stroke: currentColor;
+  display: block;
+  transition: transform 0.25s ease;
 }
 
-.navbar-icon-btn:focus-visible {
-  outline: 2px solid #e31c79;
+.navbar-actions .navbar-icon-btn:hover,
+.navbar-menu-btn:hover {
+  background: var(--jwb-blush);
+  border-color: rgba(201, 168, 118, 0.18);
+  color: var(--jwb-accent-deep);
+  transform: translateY(-2px);
+}
+
+.navbar-actions .navbar-icon-btn:hover svg {
+  transform: scale(1.08);
+}
+
+.navbar-actions .navbar-icon-btn:active {
+  transform: translateY(0) scale(0.94);
+}
+
+.navbar-actions .navbar-icon-btn:focus-visible,
+.navbar-menu-btn:focus-visible {
+  outline: 2px solid var(--jwb-accent);
   outline-offset: 2px;
 }
 
-
 /* =========================================================
-   CART / WISHLIST BADGES
+   BADGES
    ========================================================= */
 
-.navbar-badge {
+.navbar-actions .navbar-badge {
   position: absolute;
-
-  top: 2px;
-  right: 2px;
+  top: 0;
+  right: 0;
 
   min-width: 17px;
   height: 17px;
-
   padding: 0 4px;
-
-  box-sizing: border-box;
 
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
 
   border-radius: 999px;
-
-  background: #e31c79;
-
+  background: var(--jwb-accent);
   color: #fff;
+  border: 2px solid #0a0a0a;
+  box-shadow: 0 2px 6px rgba(201, 168, 118, 0.35);
 
-  border: 2px solid #fcf8f3;
-
-  font-family: 'Inter', sans-serif;
-
+  font-family: Calibri, "Source Sans 3", "Segoe UI", sans-serif;
   font-size: 9px;
-
   font-weight: 700;
-
   line-height: 1;
+  color: #0a0a0a;
+
+  animation: navbar-badge-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+@keyframes navbar-badge-pop {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
 
 /* =========================================================
-   ACCOUNT WRAPPER
+   SEARCH — NEW FUNCTIONAL FLYOUT
    ========================================================= */
 
-.navbar-account-wrapper {
+.navbar-search-wrapper {
   position: relative;
+}
+
+.navbar-search-flyout {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+
+  width: 320px;
+  max-width: calc(100vw - 40px);
 
   display: flex;
   align-items: center;
+  gap: 8px;
 
-  flex: 0 0 auto;
+  padding: 8px 10px;
+  box-sizing: border-box;
 
-  margin-left: 4px;
+  background: rgba(10, 10, 10, 0.96);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+
+  border: 1px solid rgba(201, 168, 118, 0.35);
+  border-radius: 2px;
+
+  box-shadow:
+    0 20px 44px -20px rgba(43, 29, 34, 0.35),
+    0 1px 0 var(--jwb-mirror-line) inset;
+
+  z-index: 2000;
+
+  animation: navbar-dropdown-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.navbar-search-flyout-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--jwb-ink-soft);
+  flex-shrink: 0;
+}
 
-/* =========================================================
-   ACCOUNT BUTTON
-   ========================================================= */
+.navbar-search-input {
+  flex: 1;
+  min-width: 0;
 
-.navbar-account {
-  height: 40px;
+  border: none;
+  outline: none;
+  background: transparent;
 
-  min-width: 88px;
+  color: var(--jwb-ink);
+  font-family: Calibri, "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: 13.5px;
+}
+
+.navbar-search-input::placeholder {
+  color: var(--jwb-ink-soft);
+}
+
+.navbar-search-submit {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
+  border: none;
+  border-radius: 50%;
+  background: var(--jwb-accent);
+  color: #0a0a0a;
+
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.navbar-search-submit:hover {
+  background: var(--jwb-accent-deep);
+  transform: scale(1.05);
+}
+
+.navbar-search-submit svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* =========================================================
+   ACCOUNT BUTTON
+   ========================================================= */
+
+.navbar-account-wrapper {
+  position: relative;
+}
+
+.navbar-account-wrapper .navbar-account {
+  height: 40px;
+  min-width: 88px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   gap: 7px;
 
-  padding: 0 11px;
+  padding: 0 14px;
 
-  box-sizing: border-box;
-
-  border: none;
+  border: 1px solid transparent;
   border-radius: 999px;
-
   background: transparent;
 
-  color: #2b1d22;
-
-  font-family:
-    'Inter',
-    Arial,
-    sans-serif;
-
+  color: var(--jwb-ink);
+  font-family: Calibri, "Source Sans 3", Arial, sans-serif;
   font-size: 13px;
-
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 
   white-space: nowrap;
-
   cursor: pointer;
 
   transition:
-    background 0.2s ease,
-    color 0.2s ease;
+    background 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease;
 }
 
-.navbar-account:hover {
-  background: #f6dce0;
-
-  color: #b8115c;
-}
-
-.navbar-account:focus-visible {
-  outline: 2px solid #e31c79;
-  outline-offset: 2px;
-}
-
-.navbar-account svg {
+.navbar-account-wrapper .navbar-account svg {
   width: 17px;
   height: 17px;
-
-  flex: 0 0 17px;
+  color: inherit;
+  stroke: currentColor;
+  display: block;
 }
 
-
-/* =========================================================
-   ACCOUNT CHEVRON
-   ========================================================= */
-
-.navbar-account-chevron {
-  width: 13px !important;
-  height: 13px !important;
-
-  transition: transform 0.2s ease;
+.navbar-account-wrapper .navbar-account .navbar-account-chevron {
+  width: 12px !important;
+  height: 12px !important;
+  transition: transform 0.25s ease;
 }
 
-.navbar-account-chevron.is-open {
+.navbar-account-wrapper .navbar-account .navbar-account-chevron.is-open {
   transform: rotate(180deg);
 }
 
+.navbar-account-wrapper .navbar-account:hover {
+  background: rgba(201, 168, 118, 0.14);
+  border-color: #c9a876;
+  color: #e8d5a3;
+}
 
 /* =========================================================
-   ACCOUNT DROPDOWN
+   ACCOUNT DROPDOWN — MIRROR GLASS PANEL
    ========================================================= */
 
 .navbar-account-dropdown {
   position: absolute;
-
-  top: calc(100% + 10px);
-
+  top: calc(100% + 12px);
   right: 0;
 
-  width: 250px;
-
-  padding: 10px;
-
+  width: 300px;
+  padding: 12px;
   box-sizing: border-box;
 
-  background: rgba(255, 250, 247, 0.98);
+  background: #111111;
+  backdrop-filter: blur(20px) saturate(170%);
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
 
-  border: 1px solid rgba(43, 29, 34, 0.1);
-
-  border-radius: 16px;
+  border: 1px solid rgba(201, 168, 118, 0.35);
+  border-radius: 4px;
 
   box-shadow:
-    0 20px 45px -20px rgba(43, 29, 34, 0.42);
-
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-
-  display: flex;
-  flex-direction: column;
-
-  gap: 2px;
+    0 24px 50px -20px rgba(43, 29, 34, 0.35),
+    0 6px 18px rgba(43, 29, 34, 0.08),
+    0 1px 0 var(--jwb-mirror-line) inset;
 
   z-index: 2000;
 
-  animation: navbar-dropdown-in 0.18s ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  animation: navbar-dropdown-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes navbar-dropdown-in {
   from {
     opacity: 0;
-    transform: translateY(-7px);
+    transform: translateY(-6px) scale(0.98);
   }
-
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
-
-/* =========================================================
-   ACCOUNT HEADER
-   ========================================================= */
+/* pointer nub, echoes the reflective edge on the header */
+.navbar-account-dropdown::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  right: 22px;
+  width: 12px;
+  height: 12px;
+  background: #111111;
+  border-left: 1px solid var(--jwb-border);
+  border-top: 1px solid var(--jwb-border);
+  transform: rotate(45deg);
+  border-radius: 2px;
+}
 
 .navbar-account-header {
+  padding: 10px 12px 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--jwb-border);
+
   display: flex;
   flex-direction: column;
-
-  gap: 3px;
-
-  padding: 11px;
-
-  margin-bottom: 3px;
-
-  border-bottom: 1px solid rgba(43, 29, 34, 0.1);
+  gap: 2px;
 }
 
-.navbar-account-name {
-  font-family:
-    'Fraunces',
-    Georgia,
-    serif;
-
+.navbar-account-dropdown .navbar-account-name {
+  color: var(--jwb-ink);
+  font-family: Cambria, "Cormorant Garamond", Georgia, serif;
   font-size: 15px;
-
-  font-weight: 600;
-
-  color: #2b1d22;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-weight: 500;
 }
 
-.navbar-account-email {
-  font-family:
-    'Inter',
-    Arial,
-    sans-serif;
-
-  font-size: 11px;
-
-  color: rgba(43, 29, 34, 0.55);
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.navbar-account-dropdown .navbar-account-email {
+  color: var(--jwb-ink-soft);
+  font-size: 12px;
 }
 
+/* DROPDOWN LINKS */
 
-/* =========================================================
-   ACCOUNT LINKS
-   ========================================================= */
-
-.navbar-account-link,
-.navbar-signout {
-  width: 100%;
-
-  min-height: 40px;
-
+.navbar-account-dropdown .navbar-account-link,
+.navbar-account-dropdown .navbar-signout {
   display: flex;
   align-items: center;
+  gap: 10px;
 
-  gap: 9px;
+  padding: 9px 10px;
+  border-radius: 10px;
 
-  padding: 10px 11px;
-
-  box-sizing: border-box;
-
-  border: none;
-  border-radius: 9px;
-
+  color: var(--jwb-ink);
   background: transparent;
+  border: none;
 
-  color: #2b1d22;
-
-  font-family:
-    'Inter',
-    Arial,
-    sans-serif;
-
-  font-size: 13px;
-
+  font-family: Calibri, "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: 13.5px;
   font-weight: 500;
-
-  text-decoration: none;
-
   text-align: left;
 
-  white-space: nowrap;
-
   cursor: pointer;
-
-  transition:
-    background 0.18s ease,
-    color 0.18s ease;
+  transition: background 0.18s ease, color 0.18s ease, padding-left 0.18s ease;
 }
 
-.navbar-account-link svg,
-.navbar-signout svg {
-  width: 15px;
-  height: 15px;
-
-  flex: 0 0 15px;
+.navbar-account-dropdown .navbar-account-link svg,
+.navbar-account-dropdown .navbar-signout svg {
+  width: 16px;
+  height: 16px;
+  color: inherit;
+  stroke: currentColor;
+  flex-shrink: 0;
 }
 
-.navbar-account-link:hover,
-.navbar-signout:hover {
-  background: #fff0f4;
-
-  color: #e31c79;
+.navbar-account-dropdown .navbar-account-link:hover,
+.navbar-account-dropdown .navbar-account-link:focus-visible {
+  background: var(--jwb-blush);
+  color: var(--jwb-accent-deep);
+  padding-left: 14px;
+  outline: none;
 }
 
+.navbar-account-link-count {
+  margin-left: auto;
 
-/* =========================================================
-   MOBILE MENU
-   ========================================================= */
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
 
-.navbar-menu-btn {
-  display: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+  background: var(--jwb-accent);
+  color: #0a0a0a;
+
+  font-size: 10px;
+  font-weight: 700;
 }
 
+.navbar-account-divider {
+  height: 1px;
+  margin: 6px 4px;
+  background: rgba(232, 195, 106, 0.28);
+}
+
+/* SIGN OUT */
+
+.navbar-account-dropdown .navbar-signout {
+  color: var(--jwb-accent-deep);
+  margin-top: 2px;
+}
+
+.navbar-account-dropdown .navbar-signout:hover,
+.navbar-account-dropdown .navbar-signout:focus-visible {
+  background: rgba(201, 168, 118, 0.16);
+  color: #c9a876;
+  padding-left: 14px;
+  outline: none;
+}
 
 /* =========================================================
    MOBILE BACKDROP
@@ -560,270 +644,229 @@
 
 .navbar-mobile-backdrop {
   position: fixed;
-
   inset: 0;
-
-  width: 100%;
-  height: 100%;
-
-  padding: 0;
+  z-index: 1600;
 
   border: none;
-
   background: rgba(43, 29, 34, 0.35);
-
-  cursor: default;
-
-  z-index: 900;
-}
-
-
-/* =========================================================
-   MOBILE PANEL
-   ========================================================= */
-
-.navbar-mobile-panel {
-  position: fixed;
-
-  top: 0;
-  left: 0;
-
-  width: min(78vw, 320px);
-  height: 100vh;
-
-  box-sizing: border-box;
-
-  padding: 5.5rem 1.75rem 2rem;
-
-  background: #fcf8f3;
-
-  border-right: 1px solid rgba(43, 29, 34, 0.1);
-
-  box-shadow:
-    20px 0 45px -20px rgba(43, 29, 34, 0.4);
-
-  transform: translateX(-100%);
-
-  transition:
-    transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
-
-  z-index: 950;
-
-  display: flex;
-  flex-direction: column;
-
-  gap: 0.4rem;
-
-  visibility: hidden;
-}
-
-.navbar-mobile-panel.is-open {
-  transform: translateX(0);
-
-  visibility: visible;
-}
-
-
-/* =========================================================
-   MOBILE LINKS
-   ========================================================= */
-
-.navbar-mobile-links {
-  display: flex;
-  flex-direction: column;
-}
-
-.navbar-mobile-link {
-  font-family:
-    'Fraunces',
-    Georgia,
-    serif;
-
-  font-size: 1.35rem;
-
-  color: #2b1d22;
-
-  text-decoration: none;
-
-  padding: 0.65rem 0;
-
-  transition: color 0.2s ease;
-}
-
-.navbar-mobile-link:hover {
-  color: #e31c79;
-}
-
-
-/* =========================================================
-   MOBILE DIVIDER
-   ========================================================= */
-
-.navbar-mobile-divider {
-  width: 100%;
-
-  height: 1px;
-
-  margin: 0.75rem 0;
-
-  background: rgba(43, 29, 34, 0.1);
-}
-
-
-/* =========================================================
-   MOBILE SIGN OUT
-   ========================================================= */
-
-.navbar-mobile-signout {
-  display: flex;
-  align-items: center;
-
-  gap: 8px;
-
-  padding: 0.5rem 0;
-
-  border: none;
-
-  background: transparent;
-
-  color: #b8115c;
-
-  font-family: 'Inter', sans-serif;
-
-  font-size: 0.95rem;
-
-  font-weight: 600;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 
   cursor: pointer;
 }
 
-
 /* =========================================================
-   TABLET / MOBILE
+   MOBILE PANEL — MIRROR GLASS SLIDE-IN
    ========================================================= */
 
-@media (max-width: 860px) {
+.navbar-mobile-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1700;
 
-  .navbar-container {
-    min-height: 64px;
+  width: min(84vw, 340px);
 
-    padding: 0 16px;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 
+  padding: calc(24px + env(safe-area-inset-top, 0px)) 18px 24px;
+  box-sizing: border-box;
+
+  background: #0a0a0a;
+  backdrop-filter: blur(22px) saturate(170%);
+  -webkit-backdrop-filter: blur(22px) saturate(170%);
+
+  border-right: 1px solid rgba(201, 168, 118, 0.28);
+  box-shadow: 24px 0 60px -24px rgba(43, 29, 34, 0.4);
+
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.navbar-mobile-panel.is-open {
+  transform: translateX(0);
+}
+
+.navbar-mobile-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 14px;
+  margin-bottom: 10px;
+
+  border: 1px solid var(--jwb-border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.navbar-mobile-search svg {
+  width: 16px;
+  height: 16px;
+  color: var(--jwb-ink-soft);
+  flex-shrink: 0;
+}
+
+.navbar-mobile-search input {
+  flex: 1;
+  min-width: 0;
+
+  border: none;
+  outline: none;
+  background: transparent;
+
+  font-family: Calibri, "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: 13.5px;
+  color: var(--jwb-ink);
+}
+
+.navbar-mobile-links {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navbar-mobile-link {
+  padding: 12px 14px;
+  border-radius: 12px;
+
+  color: var(--jwb-ink);
+  font-family: Calibri, "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+
+  text-decoration: none;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.navbar-mobile-link.is-active {
+  background: var(--jwb-blush);
+  color: var(--jwb-accent-deep);
+  font-weight: 600;
+}
+
+.navbar-mobile-link:hover {
+  background: rgba(201, 168, 118, 0.12);
+  color: #e8d5a3;
+}
+
+.navbar-mobile-divider {
+  height: 1px;
+  margin: 10px 4px;
+  background: var(--jwb-border);
+}
+
+.navbar-mobile-account-label {
+  margin: 4px 14px 8px;
+  font-size: 12px;
+  color: #c9b896;
+}
+
+.navbar-mobile-signout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: none;
+
+  background: transparent;
+  color: var(--jwb-accent-deep);
+
+  font-family: Calibri, "Source Sans 3", "Segoe UI", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.navbar-mobile-signout:hover {
+  background: rgba(201, 168, 118, 0.16);
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (min-width: 901px) {
   .navbar-menu-btn {
-    display: inline-flex;
+    display: none;
   }
+}
 
+@media (max-width: 900px) {
   .navbar-links {
     display: none;
   }
 
-  .navbar-logo {
-    margin-left: 15px;
-  }
-
-  .navbar-actions {
-    gap: 4px;
-  }
-
-  .navbar-icon-btn {
-    width: 38px;
-    height: 38px;
-
-    flex-basis: 38px;
-  }
-
-  .navbar-account {
-    min-width: 38px;
-
-    width: 38px;
-
-    padding: 0;
-  }
-
-  .navbar-account span {
-    display: none;
-  }
-
+  .navbar-account span,
   .navbar-account-chevron {
     display: none;
   }
 
-  .navbar-account-wrapper {
-    margin-left: 2px;
+  .navbar-search-flyout {
+    position: fixed;
+    top: calc(58px + env(safe-area-inset-top, 0px));
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-width: none;
   }
-}
 
+  .navbar-search-input {
+    font-size: 16px;
+  }
 
-/* =========================================================
-   SMALL PHONES
-   ========================================================= */
+  .brand-logo-name {
+    font-size: 16px;
+  }
 
-@media (max-width: 480px) {
+  .brand-logo-tagline {
+    display: none;
+  }
+
+  .brand-logo-mark {
+    width: 48px;
+    height: 48px;
+  }
 
   .navbar-container {
-    padding: 0 10px;
+    height: 58px;
   }
 
-  .navbar-logo-script {
-    display: none;
+  .navbar-actions .navbar-icon-btn,
+  .navbar-menu-btn {
+    min-height: 0;
+    padding: 0;
   }
 
-  .navbar-logo-mark {
-    font-size: 20px;
-  }
-
-  .navbar-actions {
-    gap: 2px;
-  }
-
-  .navbar-icon-btn {
-    width: 36px;
-    height: 36px;
-
-    flex-basis: 36px;
-  }
-
-  .navbar-actions
-  > .navbar-icon-btn:first-child {
-    display: none;
-  }
-
-  .navbar-account {
-    width: 36px;
-    min-width: 36px;
-  }
-
-  .navbar-account-dropdown {
-    position: fixed;
-
-    top: 70px;
-    right: 12px;
-
-    width: min(
-      250px,
-      calc(100vw - 24px)
-    );
+  .whatsapp-float {
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(16px, env(safe-area-inset-bottom));
   }
 }
-
 
 /* =========================================================
    REDUCED MOTION
    ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-
   .navbar,
+  .navbar-link,
   .navbar-link::after,
   .navbar-icon-btn,
   .navbar-account,
   .navbar-account-chevron,
   .navbar-account-dropdown,
+  .navbar-search-flyout,
   .navbar-mobile-panel,
-  .navbar-mobile-link {
-    transition: none;
-
-    animation: none;
+  .navbar-badge {
+    animation: none !important;
+    transition: none !important;
   }
 }

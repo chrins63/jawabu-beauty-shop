@@ -1,5 +1,5 @@
 /* =========================================================
-   JAWABU BEAUTY ADMIN — PRODUCTS
+   SLEEK SISTERS ADMIN — PRODUCTS
    ========================================================= */
 
 .products-page {
@@ -23,12 +23,12 @@
   margin: 0 0 8px;
   font-size: 32px;
   font-weight: 700;
-  color: #111827;
+  color: #262220;
 }
 
 .products-header p {
   margin: 0;
-  color: #64748b;
+  color: #6b6560;
   font-size: 16px;
 }
 
@@ -50,7 +50,7 @@
   border: 1px solid #d8dee7;
   border-radius: 8px;
   background: #ffffff;
-  color: #111827;
+  color: #262220;
   font-size: 14px;
   outline: none;
   box-sizing: border-box;
@@ -61,8 +61,8 @@
 }
 
 .products-toolbar input:focus {
-  border-color: #ed1761;
-  box-shadow: 0 0 0 3px rgba(237, 23, 97, 0.08);
+  border-color: #c9a876;
+  box-shadow: 0 0 0 3px rgba(201, 168, 118, 0.18);
 }
 
 /* ---------------------------------------------------------
@@ -112,12 +112,12 @@
 .products-card-header h2 {
   margin: 0 0 5px;
   font-size: 20px;
-  color: #111827;
+  color: #262220;
 }
 
 .products-card-header p {
   margin: 0;
-  color: #64748b;
+  color: #6b6560;
   font-size: 14px;
 }
 
@@ -127,8 +127,8 @@
 
 .add-product-button {
   border: none;
-  background: #ed1761;
-  color: #ffffff;
+  background: #c9a876;
+  color: #262220;
   padding: 10px 16px;
   border-radius: 8px;
   font-size: 14px;
@@ -139,7 +139,7 @@
 }
 
 .add-product-button:hover {
-  background: #d91457;
+  background: #a8884e;
   transform: translateY(-1px);
 }
 
@@ -211,12 +211,12 @@
 }
 
 .product-cell strong {
-  color: #111827;
+  color: #262220;
   font-size: 14px;
 }
 
 .product-cell small {
-  color: #64748b;
+  color: #6b6560;
   font-size: 12px;
   line-height: 1.4;
   max-width: 280px;
@@ -254,7 +254,7 @@
    --------------------------------------------------------- */
 
 .products-table td strong {
-  color: #111827;
+  color: #262220;
 }
 
 .products-table td:nth-child(5) strong {
@@ -309,7 +309,7 @@
 .archive-button {
   border: 1px solid #d8dee7;
   background: #ffffff;
-  color: #111827;
+  color: #262220;
   padding: 7px 11px;
   border-radius: 7px;
   font-size: 13px;
@@ -322,9 +322,9 @@
 
 .view-button:hover,
 .edit-button:hover {
-  border-color: #ed1761;
-  color: #ed1761;
-  background: #fdf2f8;
+  border-color: #c9a876;
+  color: #a8884e;
+  background: #f4ead8;
 }
 
 .archive-button {
@@ -349,7 +349,7 @@
   align-items: center;
   text-align: center;
   padding: 40px 20px;
-  color: #64748b;
+  color: #6b6560;
 }
 
 .products-empty .empty-icon {
@@ -373,7 +373,7 @@
    --------------------------------------------------------- */
 
 .products-empty .loading-spinner {
-  color: #64748b;
+  color: #6b6560;
   font-size: 15px;
 }
 

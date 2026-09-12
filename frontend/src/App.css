@@ -4,13 +4,13 @@
   padding: 6px 16px;
   border-radius: var(--radius-pill);
   color: var(--color-white);
-  background: linear-gradient(155deg, #ff4d80 0%, var(--color-primary) 55%, var(--color-primary-dark) 100%);
+  background: linear-gradient(155deg, #d4b896 0%, var(--color-primary) 55%, var(--color-primary-dark) 100%);
   border: 2px solid transparent;
   transition: box-shadow 0.3s, transform 0.25s;
   margin-bottom: 24px;
 
   &:hover {
-    box-shadow: 0 10px 22px rgba(216, 30, 91, 0.28);
+    box-shadow: 0 10px 22px rgba(201, 168, 118, 0.28);
     transform: translateY(-2px);
   }
   &:focus-visible {

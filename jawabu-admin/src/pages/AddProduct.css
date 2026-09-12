@@ -153,8 +153,8 @@
 .form-field select:focus,
 .form-field textarea:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  border-color: #c9a876;
+  box-shadow: 0 0 0 3px rgba(201, 168, 118, 0.18);
 }
 
 .form-field textarea {
@@ -209,9 +209,9 @@
 }
 
 .save-product-button {
-  background-color: #2563eb;
+  background-color: #c9a876;
   border: 1px solid transparent;
-  color: #ffffff;
+  color: #262220;
   padding: 0.625rem 1.5rem;
   border-radius: 0.375rem;
   font-size: 0.95rem;
@@ -221,7 +221,57 @@
 }
 
 .save-product-button:hover:not(:disabled) {
-  background-color: #1d4ed8;
+  background-color: #a8884e;
+}
+
+.form-field-note {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #6b7280;
+}
+
+.product-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.product-option-row {
+  display: grid;
+  grid-template-columns: minmax(130px, 1.1fr) minmax(110px, 0.9fr) minmax(110px, 0.9fr) 100px minmax(140px, 1.2fr) auto auto;
+  gap: 0.75rem;
+  align-items: end;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.6rem;
+  background: #fafaf8;
+}
+
+.product-option-available {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+  white-space: nowrap;
+  padding-bottom: 0.65rem;
+}
+
+.product-option-available input {
+  width: auto;
+}
+
+@media (max-width: 900px) {
+  .product-option-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .product-option-available,
+  .product-option-row .back-button {
+    grid-column: 1 / -1;
+  }
 }
 
 button:disabled {

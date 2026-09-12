@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   RefreshCw,
   X,
@@ -6,6 +7,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { formatOrderCustomer } from '../lib/phone';
 import './order.css';
 
 const STATUS_OPTIONS = [
@@ -17,9 +19,10 @@ const STATUS_OPTIONS = [
 ];
 
 function Orders() {
+  const [searchParams] = useSearchParams();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(searchParams.get('order') || '');
   const [statusFilter, setStatusFilter] = useState('all');
 
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -35,6 +38,28 @@ function Orders() {
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  useEffect(() => {
+    const tracked = searchParams.get('order');
+    if (!tracked) {
+      return;
+    }
+
+    setSearch(tracked);
+
+    if (!orders.length) {
+      return;
+    }
+
+    const match = orders.find((order) =>
+      String(order.order_number || '').toLowerCase() === tracked.toLowerCase()
+      || String(order.id) === tracked
+    );
+
+    if (match) {
+      openOrder(match);
+    }
+  }, [searchParams, orders]);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -212,6 +237,9 @@ function Orders() {
 
     const matchesSearch =
       !searchText ||
+      String(order.order_number || '')
+        .toLowerCase()
+        .includes(searchText) ||
       String(order.id)
         .toLowerCase()
         .includes(searchText) ||
@@ -310,7 +338,7 @@ function Orders() {
           <h1>Orders</h1>
 
           <p>
-            Manage and track Jawabu Beauty orders.
+            Manage and track Sleek Sisters orders.
           </p>
         </div>
 
@@ -343,7 +371,7 @@ function Orders() {
 
         <input
           type="text"
-          placeholder="Search by order ID, customer, email or phone..."
+          placeholder="Search by order number, customer, email or phone..."
           value={search}
           onChange={(event) =>
             setSearch(
@@ -483,7 +511,7 @@ function Orders() {
 
                       <td>
                         <strong>
-                          #{order.id}
+                          {order.order_number || `#${order.id}`}
                         </strong>
                       </td>
 
@@ -493,17 +521,13 @@ function Orders() {
                       <td>
 
                         <div className="customer-name">
-
-                          {order.first_name || ''}{' '}
-
-                          {order.last_name || ''}
-
+                          {formatOrderCustomer(order)}
                         </div>
 
                         <div className="customer-contact">
 
-                          {order.email ||
-                            order.phone ||
+                          {order.phone ||
+                            order.email ||
                             'No contact'}
 
                         </div>
@@ -630,7 +654,7 @@ function Orders() {
               <div>
 
                 <h2>
-                  Order #{selectedOrder.id}
+                  {selectedOrder.order_number || `Order #${selectedOrder.id}`}
                 </h2>
 
                 <p>
@@ -661,11 +685,10 @@ function Orders() {
             <div className="order-details-grid">
 
               <div>
-                <span>Customer</span>
+                <span>Placed by</span>
 
                 <strong>
-                  {selectedOrder.first_name || ''}{' '}
-                  {selectedOrder.last_name || ''}
+                  {formatOrderCustomer(selectedOrder)}
                 </strong>
               </div>
 
@@ -754,6 +777,21 @@ function Orders() {
                 {selectedOrder.delivery_address ||
                   'No delivery address'}
               </p>
+              {selectedOrder.city && (
+                <p>{selectedOrder.city}</p>
+              )}
+              {selectedOrder.delivery_lat != null &&
+                selectedOrder.delivery_lng != null && (
+                  <p>
+                    <a
+                      href={`https://www.google.com/maps?q=${selectedOrder.delivery_lat},${selectedOrder.delivery_lng}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Open pin in Google Maps
+                    </a>
+                  </p>
+                )}
 
             </div>
 

@@ -1,69 +1,182 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   FiArrowRight,
   FiHeart,
-  FiStar
+  FiStar,
 } from 'react-icons/fi'
 
+import { supabase } from '../lib/supabase'
+import { subscribeToSms } from '../lib/sms'
+import { subscribeToEmail } from '../lib/email'
+import { BRAND, HOME_CATEGORIES } from '../lib/brand'
+import { buildCategoryLookup, normalizeStoreProduct } from '../lib/storeProduct'
+import { useWishlist } from '../context/useWishlist'
+
+import './Home.css'
+
+const ADVANTAGES = [
+  {
+    number: '01',
+    title: 'Authentic Products',
+    copy: 'Carefully selected beauty and lifestyle pieces you can trust.',
+  },
+  {
+    number: '02',
+    title: 'Affordable Prices',
+    copy: 'Premium quality without a premium-only price tag.',
+  },
+  {
+    number: '03',
+    title: 'Excellent Service',
+    copy: 'We help you choose products that suit your routine.',
+  },
+  {
+    number: '04',
+    title: 'Fast, Reliable Delivery',
+    copy: 'Orders packed with care and sent across Kenya.',
+  },
+  {
+    number: '05',
+    title: 'Selected Brands',
+    copy: 'Skincare, fragrance and accessories chosen for everyday elegance.',
+  },
+  {
+    number: '06',
+    title: 'Repeat Customers',
+    copy: 'People come back because the products and service hold up.',
+  },
+]
+
 const Home = () => {
+  const { isInWishlist, toggleWishlist } = useWishlist()
+  const [newArrivals, setNewArrivals] = useState([])
+  const [bestsellers, setBestsellers] = useState([])
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [newsletterStatus, setNewsletterStatus] = useState('')
+
+  useEffect(() => {
+    const loadHomeProducts = async () => {
+      const [{ data: categoryData }, { data: newest }, { data: popular }] =
+        await Promise.all([
+          supabase.from('category').select('id, name'),
+          supabase
+            .from('products')
+            .select('id, name, price, image_url, sku, category, category_id, stock_quantity, created_at')
+            .eq('active', true)
+            .order('created_at', { ascending: false })
+            .order('id', { ascending: false })
+            .limit(8),
+          supabase.rpc('list_bestselling_products', { p_limit: 8 }),
+        ])
+
+      const categoryLookup = buildCategoryLookup(categoryData)
+
+      setNewArrivals(
+        (newest || []).map((item) =>
+          normalizeStoreProduct(item, categoryLookup)
+        )
+      )
+      setBestsellers(
+        (popular || []).map((item) =>
+          normalizeStoreProduct(item, categoryLookup)
+        )
+      )
+    }
+
+    loadHomeProducts()
+  }, [])
+
+  const handleNewsletter = async (event) => {
+    event.preventDefault()
+    const cleanEmail = email.trim().toLowerCase()
+    const cleanPhone = phone.trim()
+
+    if (!cleanEmail && !cleanPhone) {
+      return
+    }
+
+    const notes = []
+
+    if (cleanEmail) {
+      const { error } = await subscribeToEmail({
+        supabase,
+        email: cleanEmail,
+        source: 'home',
+      })
+
+      if (error) {
+        if (/duplicate|already exists/i.test(String(error.message || ''))) {
+          notes.push('You are already on the email list.')
+        } else {
+          setNewsletterStatus(
+            error.message || 'Could not subscribe just now. Try again shortly.'
+          )
+          return
+        }
+      } else {
+        notes.push(
+          'We will email you from Sleek Sisters when a new product lands.'
+        )
+      }
+    }
+
+    if (cleanPhone) {
+      const { error } = await subscribeToSms({
+        supabase,
+        phone: cleanPhone,
+        source: 'home',
+      })
+
+      if (error) {
+        setNewsletterStatus(
+          error.message || 'Could not save that phone number.'
+        )
+        return
+      }
+
+      notes.push('We will text you when new products drop.')
+    }
+
+    setEmail('')
+    setPhone('')
+    setNewsletterStatus(notes.join(' ') || 'Thank you — we will keep you posted.')
+  }
+
   return (
     <div className="home-page">
-
-      {/* =====================================================
-          HERO SECTION
-      ===================================================== */}
-
       <section className="hero">
-
         <div className="container hero-container">
-
           <div className="hero-content">
-
             <span className="hero-eyebrow">
-              BEAUTY • CARE • CONFIDENCE
+              Your one-stop beauty &amp; lifestyle store
             </span>
 
             <h1>
-              Beauty that
-              <span>feels personal.</span>
+              Look Good. Feel Beautiful.
+              <span>Smell Amazing, Stay Sleek.</span>
             </h1>
 
             <p>
-              Discover carefully selected beauty products and
-              professional services designed to help you look
-              good, feel confident and enjoy your routine.
+              Welcome to {BRAND.name} — your trusted destination for premium
+              skincare, fragrances and stylish accessories at prices that feel
+              good.
             </p>
 
             <div className="hero-actions">
-
-              <Link
-                to="/shop"
-                className="btn btn-primary"
-              >
-                Shop Products
+              <Link to="/shop" className="btn btn-primary">
+                Shop the collection
                 <FiArrowRight />
               </Link>
 
-              <Link
-                to="/services"
-                className="btn btn-secondary"
-              >
-                Explore Services
+              <Link to="/about" className="btn btn-secondary">
+                Our story
               </Link>
-
-              <Link
-                to="/login"
-                className="btn btn-secondary"
-              >
-                Sign In
-              </Link>
-
             </div>
 
             <div className="hero-trust">
-
               <div className="hero-rating">
-
                 <div className="hero-stars">
                   <FiStar />
                   <FiStar />
@@ -71,1005 +184,311 @@ const Home = () => {
                   <FiStar />
                   <FiStar />
                 </div>
-
-                <span>
-                  Beauty made personal
-                </span>
-
+                <span>Authentic products, selected with care</span>
               </div>
 
               <span className="hero-trust-divider" />
 
               <span className="hero-trust-text">
-                Nairobi • Kenya
+                {BRAND.city} • Fast delivery
               </span>
-
             </div>
-
           </div>
 
-
           <div className="hero-visual">
-
             <div className="hero-image-frame">
-
-              <div className="hero-image-placeholder">
-
-                <span className="hero-placeholder-brand">
-                  JAWABU
-                </span>
-
-                <span className="hero-placeholder-subtitle">
-                  BEAUTY • CARE • CONFIDENCE
-                </span>
-
-              </div>
-
+              <img
+                src="/images/deck/ginseng.jpg"
+                alt="Sleek Sisters ginseng skincare and lifestyle products"
+                className="hero-image"
+              />
             </div>
 
-
             <div className="hero-floating-card">
-
-              <span className="floating-label">
-                THE JAWABU EDIT
-              </span>
-
-              <strong>
-                Your beauty.
-              </strong>
-
-              <strong>
-                Your moment.
-              </strong>
-
+              <span className="floating-label">{BRAND.name.toUpperCase()}</span>
+              <strong>Smell Amazing.</strong>
+              <strong>Stay Sleek.</strong>
               <Link to="/shop">
                 Discover
                 <FiArrowRight />
               </Link>
-
             </div>
-
           </div>
-
         </div>
-
       </section>
 
-
-      {/* =====================================================
-          SHOP BY CATEGORY
-      ===================================================== */}
-
       <section className="categories-section">
-
         <div className="container">
-
           <div className="section-heading">
-
             <div>
-
-              <span className="section-eyebrow">
-                SHOP BY CATEGORY
-              </span>
-
+              <span className="section-eyebrow">Our product categories</span>
               <h2>
-                Find your
-                <span>beauty essentials.</span>
+                Five categories,
+                <span> one promise of elegance.</span>
               </h2>
-
             </div>
 
-            <Link
-              to="/shop"
-              className="view-all"
-            >
+            <Link to="/shop" className="view-all">
               View all products
               <FiArrowRight />
             </Link>
-
           </div>
 
+          <div className="categories-grid sleek-categories">
+            {HOME_CATEGORIES.map((category, index) => (
+              <Link
+                key={category.slug}
+                to={`/shop?category=${category.slug}`}
+                className="category-card"
+              >
+                <div className="category-image">
+                  <img src={category.image} alt={category.name} />
+                </div>
 
-          <div className="categories-grid">
+                <div className="category-card-top">
+                  <span>{String(index + 1).padStart(2, '0')}</span>
+                  <FiArrowRight />
+                </div>
 
-            <Link
-              to="/shop?category=skincare"
-              className="category-card"
-            >
-
-              <div className="category-card-top">
-                <span>01</span>
-                <FiArrowRight />
-              </div>
-
-              <div className="category-card-content">
-
-                <span className="category-number">
-                  SKINCARE
-                </span>
-
-                <h3>
-                  Skincare
-                </h3>
-
-                <p>
-                  Care for your everyday glow.
-                </p>
-
-              </div>
-
-            </Link>
-
-
-            <Link
-              to="/shop?category=hair"
-              className="category-card"
-            >
-
-              <div className="category-card-top">
-                <span>02</span>
-                <FiArrowRight />
-              </div>
-
-              <div className="category-card-content">
-
-                <span className="category-number">
-                  HAIR CARE
-                </span>
-
-                <h3>
-                  Hair Care
-                </h3>
-
-                <p>
-                  Products for beautiful hair.
-                </p>
-
-              </div>
-
-            </Link>
-
-
-            <Link
-              to="/shop?category=makeup"
-              className="category-card"
-            >
-
-              <div className="category-card-top">
-                <span>03</span>
-                <FiArrowRight />
-              </div>
-
-              <div className="category-card-content">
-
-                <span className="category-number">
-                  MAKEUP
-                </span>
-
-                <h3>
-                  Makeup
-                </h3>
-
-                <p>
-                  Express your personal style.
-                </p>
-
-              </div>
-
-            </Link>
-
-
-            <Link
-              to="/shop?category=fragrance"
-              className="category-card"
-            >
-
-              <div className="category-card-top">
-                <span>04</span>
-                <FiArrowRight />
-              </div>
-
-              <div className="category-card-content">
-
-                <span className="category-number">
-                  FRAGRANCE
-                </span>
-
-                <h3>
-                  Fragrance
-                </h3>
-
-                <p>
-                  Find a scent that feels like you.
-                </p>
-
-              </div>
-
-            </Link>
-
+                <div className="category-card-content">
+                  <span className="category-number">{category.label}</span>
+                  <h3>{category.name}</h3>
+                  <p>{category.copy}</p>
+                </div>
+              </Link>
+            ))}
           </div>
-
         </div>
-
       </section>
 
-
-      {/* =====================================================
-          FEATURED PRODUCTS
-      ===================================================== */}
-
       <section className="featured-section">
-
         <div className="container">
-
           <div className="section-heading">
-
             <div>
-
-              <span className="section-eyebrow">
-                JAWABU EDIT
-              </span>
-
+              <span className="section-eyebrow">JUST IN</span>
               <h2>
-                Featured
-                <span>beauty picks.</span>
+                New products
+                <span> on the shelf.</span>
               </h2>
-
             </div>
 
-            <Link
-              to="/shop"
-              className="view-all"
-            >
+            <Link to="/shop" className="view-all">
               Shop all
               <FiArrowRight />
             </Link>
-
           </div>
 
-
-          <div className="products-grid">
-
-            {/* PRODUCT 1 */}
-
-            <article className="product-card">
-
-              <div className="product-image">
-
-                <span>
-                  PRODUCT IMAGE
-                </span>
-
-                <button
-                  type="button"
-                  className="product-wishlist"
-                  aria-label="Add to wishlist"
-                >
-                  <FiHeart />
-                </button>
-
-                <span className="product-badge">
-                  FEATURED
-                </span>
-
-              </div>
-
-              <div className="product-info">
-
-                <span className="product-category">
-                  SKINCARE
-                </span>
-
-                <h3>
-                  Daily Glow Essentials
-                </h3>
-
-                <p className="product-description">
-                  Everyday essentials for a thoughtful skincare routine.
-                </p>
-
-                <div className="product-bottom">
-
-                  <strong>
-                    KSh 1,500
-                  </strong>
-
-                  <Link to="/shop">
-                    View
-                    <FiArrowRight />
-                  </Link>
-
-                </div>
-
-              </div>
-
-            </article>
-
-
-            {/* PRODUCT 2 */}
-
-            <article className="product-card">
-
-              <div className="product-image">
-
-                <span>
-                  PRODUCT IMAGE
-                </span>
-
-                <button
-                  type="button"
-                  className="product-wishlist"
-                  aria-label="Add to wishlist"
-                >
-                  <FiHeart />
-                </button>
-
-              </div>
-
-              <div className="product-info">
-
-                <span className="product-category">
-                  HAIR CARE
-                </span>
-
-                <h3>
-                  Nourishing Hair Care
-                </h3>
-
-                <p className="product-description">
-                  Carefully selected products for your hair routine.
-                </p>
-
-                <div className="product-bottom">
-
-                  <strong>
-                    KSh 1,200
-                  </strong>
-
-                  <Link to="/shop">
-                    View
-                    <FiArrowRight />
-                  </Link>
-
-                </div>
-
-              </div>
-
-            </article>
-
-
-            {/* PRODUCT 3 */}
-
-            <article className="product-card">
-
-              <div className="product-image">
-
-                <span>
-                  PRODUCT IMAGE
-                </span>
-
-                <button
-                  type="button"
-                  className="product-wishlist"
-                  aria-label="Add to wishlist"
-                >
-                  <FiHeart />
-                </button>
-
-                <span className="product-badge">
-                  NEW
-                </span>
-
-              </div>
-
-              <div className="product-info">
-
-                <span className="product-category">
-                  FRAGRANCE
-                </span>
-
-                <h3>
-                  Signature Scent
-                </h3>
-
-                <p className="product-description">
-                  Find a fragrance that complements your personal style.
-                </p>
-
-                <div className="product-bottom">
-
-                  <strong>
-                    KSh 2,500
-                  </strong>
-
-                  <Link to="/shop">
-                    View
-                    <FiArrowRight />
-                  </Link>
-
-                </div>
-
-              </div>
-
-            </article>
-
-
-            {/* PRODUCT 4 */}
-
-            <article className="product-card">
-
-              <div className="product-image">
-
-                <span>
-                  PRODUCT IMAGE
-                </span>
-
-                <button
-                  type="button"
-                  className="product-wishlist"
-                  aria-label="Add to wishlist"
-                >
-                  <FiHeart />
-                </button>
-
-              </div>
-
-              <div className="product-info">
-
-                <span className="product-category">
-                  MAKEUP
-                </span>
-
-                <h3>
-                  Everyday Beauty
-                </h3>
-
-                <p className="product-description">
-                  Beauty essentials for effortless everyday looks.
-                </p>
-
-                <div className="product-bottom">
-
-                  <strong>
-                    KSh 1,800
-                  </strong>
-
-                  <Link to="/shop">
-                    View
-                    <FiArrowRight />
-                  </Link>
-
-                </div>
-
-              </div>
-
-            </article>
-
-          </div>
-
+          <HomeProductGrid
+            products={newArrivals}
+            badge="NEW"
+            isInWishlist={isInWishlist}
+            toggleWishlist={toggleWishlist}
+          />
         </div>
-
       </section>
 
-
-      {/* =====================================================
-          WHY JAWABU
-      ===================================================== */}
-
-      <section className="why-jawabu-section">
-
+      <section className="featured-section bestsellers-section">
         <div className="container">
-
-          <div className="why-jawabu-heading">
-
+          <div className="section-heading">
             <div>
-
-              <span className="section-eyebrow">
-                THE JAWABU STANDARD
-              </span>
-
+              <span className="section-eyebrow">MOST LOVED</span>
               <h2>
-                Beauty shopping,
-                <span>done differently.</span>
+                Best selling
+                <span> and most requested.</span>
               </h2>
-
             </div>
 
-            <p>
-              We bring together carefully selected beauty products
-              and professional services so you can discover, shop
-              and care for yourself with confidence.
-            </p>
-
-          </div>
-
-
-          <div className="benefits-grid">
-
-            <div className="benefit-card">
-
-              <span className="benefit-number">
-                01
-              </span>
-
-              <h3>
-                Carefully Selected
-              </h3>
-
-              <p>
-                We focus on products chosen with quality,
-                usefulness and everyday beauty routines in mind.
-              </p>
-
-            </div>
-
-
-            <div className="benefit-card">
-
-              <span className="benefit-number">
-                02
-              </span>
-
-              <h3>
-                Beauty With Purpose
-              </h3>
-
-              <p>
-                Discover products designed to fit naturally
-                into your beauty routine.
-              </p>
-
-            </div>
-
-
-            <div className="benefit-card">
-
-              <span className="benefit-number">
-                03
-              </span>
-
-              <h3>
-                Professional Services
-              </h3>
-
-              <p>
-                Go beyond shopping with beauty services designed
-                around your needs.
-              </p>
-
-            </div>
-
-
-            <div className="benefit-card">
-
-              <span className="benefit-number">
-                04
-              </span>
-
-              <h3>
-                Simple Shopping
-              </h3>
-
-              <p>
-                Browse, choose, add to your bag and manage your
-                orders from one simple experience.
-              </p>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      {/* =====================================================
-          BEAUTY SERVICES
-      ===================================================== */}
-
-      <section className="beauty-services-section">
-
-        <div className="container">
-
-          <div className="services-section-header">
-
-            <div>
-
-              <span className="section-eyebrow">
-                JAWABU BEAUTY STUDIO
-              </span>
-
-              <h2>
-                Your beauty,
-                <span>your moment.</span>
-              </h2>
-
-            </div>
-
-            <div className="services-header-side">
-
-              <p>
-                Take time for yourself. Discover professional
-                beauty services designed to help you look polished,
-                feel confident and leave feeling refreshed.
-              </p>
-
-              <Link
-                to="/services"
-                className="view-all"
-              >
-                View all services
-                <FiArrowRight />
-              </Link>
-
-            </div>
-
-          </div>
-
-
-          <div className="services-list">
-
-            <Link
-              to="/services"
-              className="service-row"
-            >
-
-              <span className="service-number">
-                01
-              </span>
-
-              <div className="service-main">
-
-                <h3>
-                  Hair & Styling
-                </h3>
-
-                <p>
-                  Styling, treatments and professional hair care
-                  tailored to your look.
-                </p>
-
-              </div>
-
-              <span className="service-price">
-                From KSh 800
-              </span>
-
-              <span className="service-arrow">
-                <FiArrowRight />
-              </span>
-
-            </Link>
-
-
-            <Link
-              to="/services"
-              className="service-row"
-            >
-
-              <span className="service-number">
-                02
-              </span>
-
-              <div className="service-main">
-
-                <h3>
-                  Nails
-                </h3>
-
-                <p>
-                  Beautiful, polished nails with professional
-                  care and attention to detail.
-                </p>
-
-              </div>
-
-              <span className="service-price">
-                From KSh 700
-              </span>
-
-              <span className="service-arrow">
-                <FiArrowRight />
-              </span>
-
-            </Link>
-
-
-            <Link
-              to="/services"
-              className="service-row"
-            >
-
-              <span className="service-number">
-                03
-              </span>
-
-              <div className="service-main">
-
-                <h3>
-                  Skincare & Facial
-                </h3>
-
-                <p>
-                  Relaxing facial treatments and skincare designed
-                  around your routine.
-                </p>
-
-              </div>
-
-              <span className="service-price">
-                From KSh 1,000
-              </span>
-
-              <span className="service-arrow">
-                <FiArrowRight />
-              </span>
-
-            </Link>
-
-
-            <Link
-              to="/services"
-              className="service-row"
-            >
-
-              <span className="service-number">
-                04
-              </span>
-
-              <div className="service-main">
-
-                <h3>
-                  Makeup
-                </h3>
-
-                <p>
-                  Professional makeup for everyday looks,
-                  celebrations and special occasions.
-                </p>
-
-              </div>
-
-              <span className="service-price">
-                From KSh 1,500
-              </span>
-
-              <span className="service-arrow">
-                <FiArrowRight />
-              </span>
-
-            </Link>
-
-          </div>
-
-
-          <div className="services-booking-cta">
-
-            <div>
-
-              <span className="section-eyebrow">
-                READY WHEN YOU ARE
-              </span>
-
-              <h3>
-                Make time for yourself.
-              </h3>
-
-            </div>
-
-            <Link
-              to="/services"
-              className="btn btn-primary"
-            >
-              Book an Appointment
+            <Link to="/shop" className="view-all">
+              Shop all
               <FiArrowRight />
             </Link>
-
           </div>
 
+          <HomeProductGrid
+            products={bestsellers}
+            badge="POPULAR"
+            isInWishlist={isInWishlist}
+            toggleWishlist={toggleWishlist}
+          />
         </div>
-
       </section>
 
+      <section className="why-jawabu-section">
+        <div className="container">
+          <div className="why-jawabu-heading">
+            <div>
+              <span className="section-eyebrow">Our advantage</span>
+              <h2>
+                Why choose
+                <span> Sleek Sisters?</span>
+              </h2>
+            </div>
+            <p>
+              We believe every individual deserves to look good, feel confident
+              and enjoy quality products at affordable prices.
+            </p>
+          </div>
 
-      {/* =====================================================
-          JAWABU BRAND STORY
-      ===================================================== */}
+          <div className="benefits-grid sleek-benefits">
+            {ADVANTAGES.map((item) => (
+              <div className="benefit-card" key={item.number}>
+                <span className="benefit-number">{item.number}</span>
+                <h3>{item.title}</h3>
+                <p>{item.copy}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <section className="brand-story-section">
-
         <div className="container">
-
           <div className="brand-story-grid">
-
             <div className="brand-story-image">
-
+              <img
+                src="/images/deck/moisturizer.jpg"
+                alt="Sleek Sisters skincare collection"
+              />
               <div className="brand-story-image-content">
-
-                <span>
-                  JAWABU
-                </span>
-
-                <p>
-                  BEAUTY • CARE • CONFIDENCE
-                </p>
-
+                <span>{BRAND.wordmark}</span>
+                <p>BEAUTY • SKINCARE • FRAGRANCE • FASHION</p>
               </div>
-
             </div>
-
 
             <div className="brand-story-content">
-
-              <span className="section-eyebrow">
-                OUR STORY
-              </span>
-
+              <span className="section-eyebrow">OUR STORY</span>
               <h2>
-                Beauty should
-                <span>feel personal.</span>
+                Healthy skin.
+                <span> A lasting impression.</span>
               </h2>
-
               <p className="brand-story-lead">
-                Jawabu is being built as a beauty destination
-                where discovering products and taking care of
-                yourself can feel simple, personal and enjoyable.
+                {BRAND.name} is a one-stop destination for authentic skincare,
+                fragrance, body mists, bags and gift packages.
               </p>
-
               <p>
-                From everyday beauty essentials to professional
-                services, our goal is to bring everything together
-                in one thoughtful experience.
+                Our products are chosen to help you achieve healthy skin, smell
+                amazing and complete your everyday look with elegance — with
+                service that actually helps you choose.
               </p>
-
-              <p>
-                Whether you are refreshing your routine, preparing
-                for something special or simply taking a moment
-                for yourself, Jawabu is designed to make beauty
-                feel accessible and intentional.
-              </p>
-
-              <Link
-                to="/about"
-                className="brand-story-link"
-              >
-                Discover Jawabu
+              <Link to="/about" className="brand-story-link">
+                Read our mission
                 <FiArrowRight />
               </Link>
-
             </div>
-
           </div>
-
 
           <div className="brand-philosophy">
-
             <div className="philosophy-item">
-
-              <span>
-                01
-              </span>
-
-              <strong>
-                BEAUTY
-              </strong>
-
-              <p>
-                Discover products and experiences that fit your
-                personal routine.
-              </p>
-
+              <span>01</span>
+              <strong>BEAUTY</strong>
+              <p>Look good and feel confident in products made for real routines.</p>
             </div>
-
-
             <div className="philosophy-item">
-
-              <span>
-                02
-              </span>
-
-              <strong>
-                CARE
-              </strong>
-
-              <p>
-                Make space for thoughtful self-care and
-                professional beauty services.
-              </p>
-
+              <span>02</span>
+              <strong>FRAGRANCE</strong>
+              <p>Leave a lasting impression with scents for every day and night.</p>
             </div>
-
-
             <div className="philosophy-item">
-
-              <span>
-                03
-              </span>
-
-              <strong>
-                CONFIDENCE
-              </strong>
-
-              <p>
-                Feel good about the way you express and care
-                for yourself.
-              </p>
-
+              <span>03</span>
+              <strong>FASHION</strong>
+              <p>Finish the look with bags, gifts and accessories that travel well.</p>
             </div>
-
           </div>
-
         </div>
-
       </section>
 
-
-      {/* =====================================================
-          NEWSLETTER
-      ===================================================== */}
-
       <section className="newsletter-section">
-
         <div className="container">
-
           <div className="newsletter-card">
-
             <div className="newsletter-content">
-
-              <span className="section-eyebrow">
-                STAY IN THE LOOP
-              </span>
-
+              <span className="section-eyebrow">Thank you</span>
               <h2>
-                Beauty updates,
-                <span>delivered.</span>
+                Order today.
+                <span> Let your beauty shine.</span>
               </h2>
-
               <p>
-                Be the first to discover new products, beauty
-                tips, special offers and updates from Jawabu.
+                Be the first to hear about new skincare, fragrances and offers
+                from {BRAND.name}. Leave your email for a Sleek Sisters message
+                when something new lands, or your phone for an SMS with a link.
               </p>
-
             </div>
 
-
-            <form
-              className="newsletter-form"
-              onSubmit={(event) => event.preventDefault()}
-            >
-
+            <form className="newsletter-form" onSubmit={handleNewsletter}>
               <div className="newsletter-input-wrapper">
-
                 <input
                   type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
                   placeholder="Your email address"
                   aria-label="Email address"
                 />
-
-                <button
-                  type="submit"
-                  className="newsletter-submit"
-                >
+              </div>
+              <div className="newsletter-input-wrapper">
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(event) => setPhone(event.target.value)}
+                  placeholder="0712 345 678"
+                  aria-label="Phone number for SMS alerts"
+                />
+                <button type="submit" className="newsletter-submit">
                   Subscribe
                   <FiArrowRight />
                 </button>
-
               </div>
-
-              <small>
-                By subscribing, you agree to receive updates
-                from Jawabu.
-              </small>
-
+              {newsletterStatus ? <p>{newsletterStatus}</p> : null}
             </form>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}
 
+function HomeProductGrid({ products, badge, isInWishlist, toggleWishlist }) {
+  if (!products.length) {
+    return null
+  }
+
+  return (
+    <div className="products-grid">
+      {products.map((product) => (
+        <article className="product-card" key={product.id}>
+          <div className="product-image">
+            <Link
+              to={`/product/${product.id}`}
+              className="product-image-link"
+              aria-label={`View ${product.name}`}
+            >
+              <img
+                src={product.image}
+                alt=""
+              />
+            </Link>
+            {badge ? <span className="product-badge">{badge}</span> : null}
+            <button
+              type="button"
+              className="product-wishlist"
+              aria-label={`Save ${product.name}`}
+              onClick={() => toggleWishlist(product)}
+            >
+              <FiHeart
+                fill={isInWishlist(product.id) ? 'currentColor' : 'none'}
+              />
+            </button>
           </div>
 
-        </div>
-
-      </section>
-
+          <div className="product-info">
+            <span className="product-category">{product.category || 'Sleek Sisters'}</span>
+            <h3>
+              <Link to={`/product/${product.id}`}>{product.name}</Link>
+            </h3>
+            <div className="product-bottom">
+              <strong>KSh {Number(product.price || 0).toLocaleString()}</strong>
+            </div>
+          </div>
+        </article>
+      ))}
     </div>
   )
 }

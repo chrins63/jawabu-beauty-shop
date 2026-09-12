@@ -43,7 +43,7 @@ const Cart = () => {
 
             <p>
               Discover something beautiful from the
-              Jawabu collection.
+              Sleek Sisters collection.
             </p>
 
             <Link
@@ -110,7 +110,7 @@ const Cart = () => {
 
                 <article
                   className="cart-item"
-                  key={item.id}
+                  key={item.cartKey || `${item.id}:${item.variant_id || 0}`}
                 >
 
                   {/* IMAGE */}
@@ -137,6 +137,12 @@ const Cart = () => {
                       {item.name}
                     </h2>
 
+                    {item.variant_label ? (
+                      <p className="cart-item-option">
+                        {item.option_type === 'size' ? 'Size' : 'Colour'}: {item.variant_label}
+                      </p>
+                    ) : null}
+
                     <strong>
                       KSh {Number(item.price).toLocaleString()}
                     </strong>
@@ -155,7 +161,7 @@ const Cart = () => {
                         <button
                           type="button"
                           onClick={() =>
-                            decreaseQuantity(item.id)
+                            decreaseQuantity(item.cartKey || `${item.id}:${item.variant_id || 0}`)
                           }
                           disabled={item.quantity <= 1}
                           aria-label={`Decrease quantity of ${item.name}`}
@@ -176,7 +182,11 @@ const Cart = () => {
                         <button
                           type="button"
                           onClick={() =>
-                            increaseQuantity(item.id)
+                            increaseQuantity(item.cartKey || `${item.id}:${item.variant_id || 0}`)
+                          }
+                          disabled={
+                            Number(item.stock_quantity) > 0 &&
+                            item.quantity >= item.stock_quantity
                           }
                           aria-label={`Increase quantity of ${item.name}`}
                         >
@@ -192,7 +202,7 @@ const Cart = () => {
                         type="button"
                         className="remove-item-btn"
                         onClick={() =>
-                          removeFromCart(item.id)
+                          removeFromCart(item.cartKey || `${item.id}:${item.variant_id || 0}`)
                         }
                       >
                         <FiTrash2 />
@@ -295,8 +305,8 @@ const Cart = () => {
 
 
               <p className="cart-note">
-                Checkout and delivery options will be
-                available here.
+                Delivery is chosen at checkout — Nairobi from KSh 200, or free
+                Nairobi pickup.
               </p>
 
             </aside>

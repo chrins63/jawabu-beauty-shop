@@ -1,0 +1,30 @@
+{
+  "fonts": [
+    "ABCDEE+Calibri",
+    "ABCDEE+Calibri,Bold",
+    "ABCDEE+Calibri,Italic",
+    "ABCDEE+Cambria",
+    "ABCDEE+Cambria,Bold",
+    "ABCDEE+Cambria,BoldItalic",
+    "ABCDEE+Cambria,Italic",
+    "ABCDEE+Wingdings",
+    "Arial",
+    "Times#20New#20Roman",
+    "Times#20New#20Roman,Bold"
+  ],
+  "namedFonts": [
+    "ABCDEE+Calibri",
+    "ABCDEE+Calibri,Bold",
+    "ABCDEE+Calibri,Italic",
+    "ABCDEE+Cambria",
+    "ABCDEE+Cambria,Bold",
+    "ABCDEE+Cambria,BoldItalic",
+    "ABCDEE+Cambria,Italic",
+    "ABCDEE+Wingdings",
+    "Arial",
+    "Times#20New#20Roman",
+    "Times#20New#20Roman,Bold"
+  ],
+  "rgbTop": [],
+  "scnTop": []
+}

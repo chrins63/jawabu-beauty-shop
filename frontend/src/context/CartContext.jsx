@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { capQuantity, normalizeStoreProduct } from '../lib/storeProduct'
+import { cartLineKey } from '../lib/productOptions'
 import { CartContext, STORAGE_KEY } from './cart-context.js'
 
 export const CartProvider = ({ children }) => {
@@ -13,7 +15,6 @@ export const CartProvider = ({ children }) => {
     }
   })
 
-  // Save cart whenever cartItems changes
   useEffect(() => {
     try {
       localStorage.setItem(
@@ -25,63 +26,73 @@ export const CartProvider = ({ children }) => {
     }
   }, [cartItems])
 
-  // Add product
-  const addToCart = (product) => {
+  const addToCart = (product, quantity = 1) => {
+    const incoming = {
+      ...normalizeStoreProduct(product),
+      quantity: capQuantity(quantity, product.stock_quantity),
+    }
+
+    const incomingKey = cartLineKey(incoming)
+
     setCartItems((currentItems) => {
       const existingItem = currentItems.find(
-        (item) => item.id === product.id
+        (item) => cartLineKey(item) === incomingKey
       )
 
       if (existingItem) {
-        return currentItems.map((item) =>
-          item.id === product.id
-            ? {
-                ...item,
-                quantity: item.quantity + 1
-              }
-            : item
-        )
+        return currentItems.map((item) => {
+          if (cartLineKey(item) !== incomingKey) {
+            return item
+          }
+
+          const stock = incoming.stock_quantity || item.stock_quantity
+
+          return {
+            ...item,
+            ...incoming,
+            quantity: capQuantity(
+              item.quantity + incoming.quantity,
+              stock
+            ),
+          }
+        })
       }
 
-      return [
-        ...currentItems,
-        {
-          ...product,
-          quantity: 1
-        }
-      ]
+      return [...currentItems, incoming]
     })
   }
 
-  // Remove product
-  const removeFromCart = (productId) => {
+  const removeFromCart = (lineKey) => {
     setCartItems((currentItems) =>
       currentItems.filter(
-        (item) => item.id !== productId
+        (item) => cartLineKey(item) !== lineKey
       )
     )
   }
 
-  // Increase quantity
-  const increaseQuantity = (productId) => {
+  const increaseQuantity = (lineKey) => {
     setCartItems((currentItems) =>
-      currentItems.map((item) =>
-        item.id === productId
-          ? {
-              ...item,
-              quantity: item.quantity + 1
-            }
-          : item
-      )
+      currentItems.map((item) => {
+        if (cartLineKey(item) !== lineKey) {
+          return item
+        }
+
+        return {
+          ...item,
+          quantity: capQuantity(
+            item.quantity + 1,
+            item.stock_quantity
+          ),
+        }
+      })
     )
   }
 
-  // Decrease quantity
-  const decreaseQuantity = (productId) => {
+  const decreaseQuantity = (lineKey) => {
     setCartItems((currentItems) =>
       currentItems
         .map((item) =>
-          item.id === productId
+          cartLineKey(item) === lineKey
             ? {
                 ...item,
                 quantity: item.quantity - 1
@@ -92,18 +103,15 @@ export const CartProvider = ({ children }) => {
     )
   }
 
-  // Clear cart
   const clearCart = () => {
     setCartItems([])
   }
 
-  // Total number of products
   const cartCount = cartItems.reduce(
     (total, item) => total + item.quantity,
     0
   )
 
-  // Total price
   const cartTotal = cartItems.reduce(
     (total, item) =>
       total + Number(item.price || 0) * item.quantity,

@@ -1,0 +1,17 @@
+[functions.mpesa-stk-callback]
+verify_jwt = false
+
+[functions.mpesa-stk-push]
+verify_jwt = true
+
+[functions.dispatch-sms]
+verify_jwt = true
+
+[functions.invite-staff]
+verify_jwt = true
+
+[functions.staff-login]
+verify_jwt = false
+
+[functions.dispatch-email]
+verify_jwt = true

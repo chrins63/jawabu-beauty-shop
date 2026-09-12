@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import ProductOptionsEditor from '../components/ProductOptionsEditor';
+import {
+  emptyOptionRow,
+  rowsFromVariants,
+  saveProductOptions,
+} from '../lib/productOptions';
+import './AddProduct.css';
 
 function EditProduct() {
   const { id } = useParams();
@@ -24,8 +31,12 @@ function EditProduct() {
     sku: '',
     barcode: '',
     category_id: '',
+    category_name: '',
     image_url: '',
   });
+
+  const [optionType, setOptionType] = useState('');
+  const [optionRows, setOptionRows] = useState([emptyOptionRow()]);
 
   /*
    * ==========================================
@@ -55,6 +66,22 @@ function EditProduct() {
       return;
     }
 
+    const { data: variants, error: variantError } = await supabase
+      .from('product_variants')
+      .select('*')
+      .eq('product_id', id)
+      .order('sort_order', { ascending: true });
+
+    if (variantError) {
+      console.error('Error loading product options:', variantError);
+      setError(variantError.message);
+      setLoading(false);
+      return;
+    }
+
+    setOptionType(variants?.[0]?.option_type || '');
+    setOptionRows(rowsFromVariants(variants || []));
+
     setForm({
       name: data.name || '',
       description: data.description || '',
@@ -65,6 +92,7 @@ function EditProduct() {
       sku: data.sku || '',
       barcode: data.barcode || '',
       category_id: data.category_id ?? '',
+      category_name: data.category || '',
       image_url: data.image_url || '',
     });
 
@@ -81,9 +109,9 @@ function EditProduct() {
     setLoadingCategories(true);
 
     const { data, error } = await supabase
-      .from('categories')
+      .from('category')
       .select('*')
-      .order('id', { ascending: true });
+      .order('name', { ascending: true });
 
     if (error) {
       console.error('Error loading categories:', error);
@@ -100,6 +128,23 @@ function EditProduct() {
    * HANDLE INPUT
    * ==========================================
    */
+
+  useEffect(() => {
+    if (form.category_id || !form.category_name || categories.length === 0) {
+      return;
+    }
+
+    const match = categories.find(
+      (item) => item.name === form.category_name
+    );
+
+    if (match) {
+      setForm((current) => ({
+        ...current,
+        category_id: match.id,
+      }));
+    }
+  }, [categories, form.category_id, form.category_name]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -163,6 +208,14 @@ function EditProduct() {
       return;
     }
 
+    if (
+      optionType &&
+      !optionRows.some((row) => String(row.option_value || '').trim())
+    ) {
+      setError('Add at least one colour or size, or turn options off.');
+      return;
+    }
+
     setSaving(true);
 
     const productData = {
@@ -199,6 +252,11 @@ function EditProduct() {
           ? null
           : Number(form.category_id),
 
+      category:
+        categories.find(
+          (item) => String(item.id) === String(form.category_id)
+        )?.name || form.category_name || null,
+
       image_url:
         form.image_url.trim() || null,
 
@@ -215,6 +273,15 @@ function EditProduct() {
     if (error) {
       console.error('Error updating product:', error);
       setError(error.message);
+      setSaving(false);
+      return;
+    }
+
+    try {
+      await saveProductOptions(supabase, id, optionType, optionRows);
+    } catch (optionsError) {
+      console.error('Error saving product options:', optionsError);
+      setError(optionsError.message || 'Product saved, but colours/sizes failed.');
       setSaving(false);
       return;
     }
@@ -576,16 +643,23 @@ function EditProduct() {
                 Stock Quantity
               </label>
 
-              <input
-                id="stock_quantity"
-                name="stock_quantity"
-                type="number"
-                min="0"
-                step="1"
-                value={form.stock_quantity}
-                onChange={handleChange}
-                placeholder="0"
-              />
+              {optionType ? (
+                <p className="form-field-note">
+                  Stock is set for each colour or size below. Uncheck
+                  Available to hide an option from customers.
+                </p>
+              ) : (
+                <input
+                  id="stock_quantity"
+                  name="stock_quantity"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={form.stock_quantity}
+                  onChange={handleChange}
+                  placeholder="0"
+                />
+              )}
 
             </div>
 
@@ -614,6 +688,13 @@ function EditProduct() {
           </div>
 
         </section>
+
+        <ProductOptionsEditor
+          optionType={optionType}
+          rows={optionRows}
+          onTypeChange={setOptionType}
+          onRowsChange={setOptionRows}
+        />
 
 
         {/* =====================================

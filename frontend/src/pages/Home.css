@@ -1,0 +1,1053 @@
+/* =====================================================
+   SLEEK SISTERS — HOME PAGE
+   Presentation theme: ivory #fafaf8, espresso #262220,
+   champagne gold #c9a876 · Cambria headings, Calibri body
+   =====================================================
+
+   HOW TO ADD IMAGES
+   ------------------
+   Every placeholder block below (.hero-image-frame,
+   .category-card, .product-image, .brand-story-image) is built
+   to hold a real <img>. Just drop an <img> tag INSIDE the
+   existing wrapper div, e.g.:
+
+     <div className="product-image">
+       <img src="/images/products/glow-set.jpg" alt="Daily Glow Essentials" />
+       ...badge/wishlist button stays as-is...
+     </div>
+
+   The CSS below:
+   - sizes/crops the image with object-fit: cover
+   - automatically hides the text placeholder (span) once an
+     <img> is present, using the :has() selector
+   - if a browser doesn't support :has(), just delete the
+     placeholder <span> yourself when you add the image — no
+     visual difference either way.
+===================================================== */
+
+:root {
+  --flame: #e8c36a;
+  --flame-dark: #d4af37;
+  --cream: #070707;
+  --blush: #14110c;
+  --ink: #f5ead0;
+  --ink-soft: #c9b896;
+  --font-display: Cambria, "Cormorant Garamond", Georgia, serif;
+  --font-body: Calibri, "Source Sans 3", "Segoe UI", sans-serif;
+  --radius-lg: 8px;
+  --radius-md: 4px;
+  --radius-sm: 2px;
+  --shadow-soft: 0 16px 40px rgba(0, 0, 0, 0.45);
+  --shadow-lift: 0 20px 48px rgba(232, 195, 106, 0.22);
+}
+
+.home-page {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+.container {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.home-page h1,
+.home-page h2,
+.home-page h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--ink);
+  margin: 0;
+}
+
+.home-page p {
+  color: var(--ink-soft);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.section-eyebrow,
+.hero-eyebrow {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  color: var(--flame);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.section-heading h2,
+.why-jawabu-heading h2,
+.services-section-header h2,
+.newsletter-content h2 {
+  font-size: clamp(28px, 3.6vw, 40px);
+}
+
+.section-heading h2 span,
+.why-jawabu-heading h2 span,
+.services-section-header h2 span,
+.newsletter-content h2 span,
+.hero-content h1 span,
+.brand-story-content h2 span {
+  display: block;
+  color: var(--flame);
+  font-style: italic;
+}
+
+.view-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.view-all:hover {
+  color: var(--flame);
+  border-color: var(--flame);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 26px;
+  border-radius: 2px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--flame);
+  color: #0a0a0a;
+  box-shadow: var(--shadow-lift);
+}
+
+.btn-primary:hover {
+  background: var(--flame-dark);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid rgba(36, 20, 25, 0.16);
+}
+
+.btn-secondary:hover {
+  border-color: var(--flame);
+  color: var(--flame);
+}
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.hero {
+  padding: 96px 0 72px;
+}
+
+.hero-container {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.hero-content h1 {
+  font-size: clamp(38px, 5vw, 58px);
+  margin-bottom: 20px;
+}
+
+.hero-content p {
+  max-width: 480px;
+  font-size: 17px;
+  margin-bottom: 32px;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 40px;
+}
+
+.hero-trust {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.hero-rating {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-stars {
+  display: flex;
+  gap: 2px;
+  color: var(--flame);
+}
+
+.hero-rating span {
+  font-size: 13px;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+.hero-trust-divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(36, 20, 25, 0.16);
+}
+
+.hero-trust-text {
+  font-size: 13px;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+.hero-visual {
+  position: relative;
+}
+
+/* --- Hero image slot ---
+   Add a real image like:
+   <div className="hero-image-frame">
+     <img src="/images/hero-model.jpg" alt="Jawabu beauty model" />
+   </div>
+*/
+.hero-image-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 2px;
+  overflow: hidden;
+  background: #0c0b09;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(232, 195, 106, 0.38);
+}
+
+.hero-image-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+  padding: 28px 24px 48px;
+}
+
+.hero-image-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: radial-gradient(circle at 30% 20%, rgba(201, 168, 118, 0.18), transparent 60%),
+    linear-gradient(160deg, var(--blush), var(--cream));
+}
+
+.hero-image-frame:has(img) .hero-image-placeholder {
+  display: none;
+}
+
+.hero-placeholder-brand {
+  font-family: var(--font-display);
+  font-size: 42px;
+  font-style: italic;
+  color: var(--flame);
+}
+
+.hero-placeholder-subtitle {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+}
+
+.hero-floating-card {
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+  background: #262220;
+  border: 1px solid #c9a876;
+  border-radius: 2px;
+  padding: 22px 24px;
+  box-shadow: var(--shadow-lift);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 210px;
+}
+
+.floating-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--flame);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.hero-floating-card strong {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.hero-floating-card a {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.hero-floating-card a:hover {
+  color: var(--flame);
+}
+
+/* =====================================================
+   CATEGORIES
+===================================================== */
+
+.categories-section {
+  padding: 72px 0;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.categories-grid.sleek-categories {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+/* --- Category image slot ---
+   Add an image as a background layer:
+   <Link className="category-card">
+     <img src="/images/categories/skincare.jpg" alt="Skincare" />
+     ...content stays as-is...
+   </Link>
+*/
+.category-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 260px;
+  padding: 22px;
+  border-radius: 2px;
+  border: 1px solid #e9e1d6;
+  border-top: 2px solid #c9a876;
+  background: var(--blush);
+  text-decoration: none;
+  color: var(--ink);
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-soft);
+}
+
+.category-card img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+  transition: transform 0.4s ease;
+}
+
+.category-card:hover img {
+  transform: scale(1.05);
+}
+
+.category-card:has(img)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(38, 34, 32, 0) 40%, rgba(38, 34, 32, 0.72) 100%);
+  z-index: -1;
+}
+
+.category-card:has(img) h3,
+.category-card:has(img) p,
+.category-card:has(img) .category-number,
+.category-card:has(img) .category-card-top {
+  color: #fff;
+}
+
+.category-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--flame);
+}
+
+.category-number {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--flame);
+}
+
+.category-card h3 {
+  font-size: 22px;
+  margin: 10px 0 6px;
+}
+
+.category-card p {
+  font-size: 13px;
+}
+
+/* =====================================================
+   FEATURED PRODUCTS
+===================================================== */
+
+.featured-section {
+  padding: 72px 0;
+  background: var(--blush);
+}
+
+.bestsellers-section {
+  padding-top: 8px;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+}
+
+.product-card {
+  background: #12100c;
+  border-radius: 2px;
+  border: 1px solid rgba(232, 195, 106, 0.28);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lift);
+}
+
+/* --- Product image slot ---
+   Add a real image like:
+   <div className="product-image">
+     <img src="/images/products/glow-set.jpg" alt="Daily Glow Essentials" />
+     <button ...wishlist... />
+     <span className="product-badge">FEATURED</span>
+   </div>
+*/
+.product-image {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: var(--blush);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.product-image > span:first-child {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+}
+
+.product-image:has(img) > span:first-child {
+  display: none;
+}
+
+.product-wishlist {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(36, 20, 25, 0.12);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.product-wishlist:hover {
+  color: var(--flame);
+  transform: scale(1.08);
+}
+
+.product-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  background: var(--flame);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 5px 10px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  color: #262220;
+}
+
+.product-info {
+  padding: 18px;
+}
+
+.product-category {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--flame);
+  text-transform: uppercase;
+}
+
+.product-info h3 {
+  font-size: 17px;
+  margin: 8px 0 6px;
+}
+
+.product-description {
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.product-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.product-bottom strong {
+  font-family: var(--font-display);
+  font-size: 17px;
+  color: var(--ink);
+}
+
+.product-bottom a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.product-bottom a:hover {
+  color: var(--flame);
+}
+
+/* =====================================================
+   WHY JAWABU
+===================================================== */
+
+.why-jawabu-section {
+  padding: 88px 0;
+}
+
+.why-jawabu-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 40px;
+  margin-bottom: 48px;
+}
+
+.why-jawabu-heading > p {
+  max-width: 380px;
+  font-size: 15px;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.benefits-grid.sleek-benefits {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.benefit-card {
+  padding: 28px 22px;
+  border-radius: var(--radius-md);
+  background: var(--cream);
+  border: 1px solid rgba(36, 20, 25, 0.08);
+}
+
+.benefit-number {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 28px;
+  color: var(--flame);
+  margin-bottom: 14px;
+}
+
+.benefit-card h3 {
+  font-size: 17px;
+  margin-bottom: 8px;
+}
+
+.benefit-card p {
+  font-size: 13.5px;
+}
+
+/* =====================================================
+   BEAUTY SERVICES
+===================================================== */
+
+.beauty-services-section {
+  padding: 88px 0;
+  background: var(--blush);
+}
+
+.services-section-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  margin-bottom: 44px;
+  flex-wrap: wrap;
+}
+
+.services-header-side {
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.services-header-side p {
+  font-size: 14.5px;
+}
+
+.services-list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid rgba(36, 20, 25, 0.12);
+}
+
+.service-row {
+  display: grid;
+  grid-template-columns: 48px 1fr auto 24px;
+  align-items: center;
+  gap: 24px;
+  padding: 22px 8px;
+  border-bottom: 1px solid rgba(36, 20, 25, 0.12);
+  text-decoration: none;
+  color: var(--ink);
+  transition: background 0.2s ease;
+}
+
+.service-row:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.service-number {
+  font-family: var(--font-display);
+  font-size: 15px;
+  color: var(--flame);
+}
+
+.service-main h3 {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.service-main p {
+  font-size: 13.5px;
+}
+
+.service-price {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.service-arrow {
+  display: flex;
+  color: var(--ink-soft);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.service-row:hover .service-arrow {
+  color: var(--flame);
+  transform: translateX(3px);
+}
+
+.services-booking-cta {
+  margin-top: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 32px;
+  background: #fff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.services-booking-cta h3 {
+  font-size: 24px;
+}
+
+/* =====================================================
+   BRAND STORY
+===================================================== */
+
+.brand-story-section {
+  padding: 88px 0;
+}
+
+.brand-story-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 56px;
+  align-items: center;
+  margin-bottom: 64px;
+}
+
+/* --- Brand story image slot ---
+   Add a real image like:
+   <div className="brand-story-image">
+     <img src="/images/brand-story.jpg" alt="Jawabu founder / studio" />
+   </div>
+*/
+.brand-story-image {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: 2px;
+  overflow: hidden;
+  background: #262220;
+}
+
+.brand-story-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.brand-story-image-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #fff;
+  text-align: center;
+}
+
+.brand-story-image:has(img) .brand-story-image-content {
+  display: none;
+}
+
+.brand-story-image-content span {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-style: italic;
+}
+
+.brand-story-image-content p {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.brand-story-content h2 {
+  font-size: clamp(28px, 3.4vw, 38px);
+  margin-bottom: 18px;
+}
+
+.brand-story-lead {
+  font-size: 16px;
+  color: var(--ink);
+  font-weight: 500;
+  margin-bottom: 14px;
+}
+
+.brand-story-content > p {
+  font-size: 14.5px;
+  margin-bottom: 14px;
+}
+
+.brand-story-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-weight: 600;
+  color: var(--flame);
+  text-decoration: none;
+}
+
+.brand-story-link:hover {
+  gap: 12px;
+}
+
+.brand-philosophy {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding-top: 48px;
+  border-top: 1px solid rgba(36, 20, 25, 0.12);
+}
+
+.philosophy-item span {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--flame);
+  margin-bottom: 10px;
+}
+
+.philosophy-item strong {
+  display: block;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.philosophy-item p {
+  font-size: 13.5px;
+}
+
+/* =====================================================
+   NEWSLETTER
+===================================================== */
+
+.newsletter-section {
+  padding: 72px 0 96px;
+}
+
+.newsletter-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+  background: #262220;
+  border: 1px solid #c9a876;
+  border-radius: 2px;
+  padding: 52px;
+  color: #fafaf8;
+}
+
+.newsletter-content .section-eyebrow {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.newsletter-content h2 {
+  color: #fff;
+  font-size: clamp(26px, 3vw, 34px);
+  margin-bottom: 14px;
+}
+
+.newsletter-content h2 span {
+  color: #c9a876;
+}
+
+.newsletter-content p {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 14.5px;
+}
+
+.newsletter-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.newsletter-input-wrapper {
+  display: flex;
+  background: #fff;
+  border-radius: 2px;
+  padding: 6px;
+  gap: 6px;
+}
+
+.newsletter-input-wrapper input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 12px 16px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  background: transparent;
+  color: var(--ink);
+}
+
+.newsletter-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  border-radius: 2px;
+  padding: 12px 22px;
+  background: #c9a876;
+  color: #262220;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+}
+
+.newsletter-submit:hover {
+  background: #a88b58;
+  color: #fff;
+}
+
+.newsletter-form p {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.82);
+  padding-left: 10px;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1100px) {
+  .categories-grid.sleek-categories {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1024px) {
+  .hero-container {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-visual {
+    order: -1;
+  }
+
+  .categories-grid,
+  .products-grid,
+  .benefits-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .brand-story-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .brand-philosophy {
+    grid-template-columns: 1fr;
+  }
+
+  .newsletter-card {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 20px 0 36px;
+  }
+
+  .categories-grid,
+  .categories-grid.sleek-categories,
+  .products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .benefits-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .why-jawabu-heading,
+  .services-section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .service-row {
+    grid-template-columns: 32px 1fr;
+    row-gap: 6px;
+  }
+
+  .service-price,
+  .service-arrow {
+    grid-column: 2;
+  }
+
+  .services-booking-cta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .category-card,
+  .product-card,
+  .category-card img,
+  .service-arrow,
+  .btn-primary,
+  .brand-story-link {
+    transition: none !important;
+  }
+}

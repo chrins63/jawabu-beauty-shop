@@ -1,19 +1,28 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { dispatchSms } from '../lib/sms';
+import { dispatchEmail } from '../lib/email';
+import ProductOptionsEditor from '../components/ProductOptionsEditor';
+import {
+  emptyOptionRow,
+  saveProductOptions,
+} from '../lib/productOptions';
 import './AddProduct.css'
+
+const FALLBACK_CATEGORIES = [
+  'Skincare Products',
+  'Perfumes & Colognes',
+  'Body Mists',
+  'Handbags & Sling Bags',
+  'Gift Packages',
+];
 
 function AddProduct() {
   const navigate = useNavigate();
 
-  const categories = [
-    'Makeup',
-    'Skincare',
-    'Hair Care',
-    'Fragrance',
-    'Body Care',
-    'Accessories',
-  ];
+  const [categories, setCategories] = useState(FALLBACK_CATEGORIES);
+  const [categoryRows, setCategoryRows] = useState([]);
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -32,6 +41,9 @@ function AddProduct() {
     image_url: '',
   });
 
+  const [optionType, setOptionType] = useState('');
+  const [optionRows, setOptionRows] = useState([emptyOptionRow()]);
+
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -43,6 +55,26 @@ function AddProduct() {
     setError('');
     setSuccess('');
   };
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      const { data, error: loadError } = await supabase
+        .from('category')
+        .select('id, name')
+        .order('name', { ascending: true });
+
+      if (loadError || !data?.length) {
+        setCategoryRows([]);
+        setCategories(FALLBACK_CATEGORIES);
+        return;
+      }
+
+      setCategoryRows(data);
+      setCategories(data.map((item) => item.name));
+    };
+
+    loadCategories();
+  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -90,6 +122,14 @@ function AddProduct() {
       return;
     }
 
+    if (
+      optionType &&
+      !optionRows.some((row) => String(row.option_value || '').trim())
+    ) {
+      setError('Add at least one colour or size, or turn options off.');
+      return;
+    }
+
     setSaving(true);
 
     // =====================================================
@@ -129,6 +169,10 @@ function AddProduct() {
       category:
         form.category.trim() || null,
 
+      category_id:
+        categoryRows.find((item) => item.name === form.category.trim())
+          ?.id ?? null,
+
       image_url:
         form.image_url.trim() || null,
 
@@ -164,14 +208,33 @@ function AddProduct() {
       return;
     }
 
+    try {
+      await saveProductOptions(supabase, data.id, optionType, optionRows);
+    } catch (optionsError) {
+      console.error('Error saving product options:', optionsError);
+      setError(
+        optionsError.message ||
+          'Product was created, but colours/sizes could not be saved. Edit the product to finish.'
+      );
+      setSaving(false);
+      return;
+    }
+
     console.log(
       'Product created:',
       data
     );
 
     setSuccess(
-      'Product created successfully.'
+      'Product created. Opted-in customers will get a Sleek Sisters email and SMS.'
     );
+
+    dispatchSms(supabase, { action: 'flush' }).catch((smsError) => {
+      console.error('SMS dispatch after new product:', smsError);
+    });
+    dispatchEmail(supabase, { action: 'flush' }).catch((emailError) => {
+      console.error('Email dispatch after new product:', emailError);
+    });
 
     // =====================================================
     // RESET FORM
@@ -189,6 +252,8 @@ function AddProduct() {
       category: '',
       image_url: '',
     });
+    setOptionType('');
+    setOptionRows([emptyOptionRow()]);
 
     setSaving(false);
 
@@ -218,7 +283,7 @@ function AddProduct() {
 
           <p>
             Add a new product to the
-            Jawabu Beauty catalogue.
+            Sleek Sisters catalogue.
           </p>
 
         </div>
@@ -520,16 +585,23 @@ function AddProduct() {
                 Initial Stock
               </label>
 
-              <input
-                id="stock_quantity"
-                name="stock_quantity"
-                type="number"
-                min="0"
-                step="1"
-                value={form.stock_quantity}
-                onChange={handleChange}
-                placeholder="0"
-              />
+              {optionType ? (
+                <p className="form-field-note">
+                  Stock is set for each colour or size below. The product
+                  total updates automatically.
+                </p>
+              ) : (
+                <input
+                  id="stock_quantity"
+                  name="stock_quantity"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={form.stock_quantity}
+                  onChange={handleChange}
+                  placeholder="0"
+                />
+              )}
 
             </div>
 
@@ -559,6 +631,13 @@ function AddProduct() {
           </div>
 
         </section>
+
+        <ProductOptionsEditor
+          optionType={optionType}
+          rows={optionRows}
+          onTypeChange={setOptionType}
+          onRowsChange={setOptionRows}
+        />
 
         {/* =================================================
             IMAGE

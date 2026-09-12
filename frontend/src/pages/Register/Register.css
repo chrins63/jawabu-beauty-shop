@@ -1,18 +1,18 @@
 .jw-register-root {
-  --cream: #fffbf6;
-  --ink: #1c1714;
-  --ink-soft: rgba(28, 23, 20, 0.58);
-  --rose: #e92063;
-  --rose-deep: #b5134a;
+  --cream: #0B0C10;
+  --ink: #F9FAFB;
+  --ink-soft: rgba(249, 250, 251, 0.68);
+  --rose: #e8c36a;
+  --rose-deep: #d4af37;
 
   position: relative;
   min-height: 100vh;
   width: 100%;
   overflow: hidden;
 
-  font-family: "Inter", sans-serif;
+  font-family: Calibri, "Source Sans 3", "Segoe UI", sans-serif;
   color: var(--ink);
-  background: var(--ink);
+  background: #070707;
 }
 
 /* =========================
@@ -203,7 +203,7 @@
 .jw-register-wordmark {
   color: var(--cream);
 
-  font-family: "Fraunces", serif;
+  font-family: Cambria, "Cormorant Garamond", Georgia, serif;
 
   font-size: 22px;
 
@@ -270,7 +270,7 @@
 
   color: var(--cream);
 
-  font-family: "Fraunces", serif;
+  font-family: Cambria, "Cormorant Garamond", Georgia, serif;
 
   font-size: 30px;
 
@@ -280,7 +280,7 @@
 .jw-register-script {
   color: var(--rose);
 
-  font-family: "Pinyon Script", cursive;
+  font-family: Cambria, "Cormorant Garamond", Georgia, serif;
 
   font-size: 44px;
 
@@ -327,19 +327,19 @@
   border-radius: 20px;
 
   border: 1px solid
-    rgba(255, 255, 255, 0.65);
+    rgba(255, 255, 255, 0.35);
 
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.15);
 
   -webkit-backdrop-filter:
-    blur(22px) saturate(140%);
+    blur(35px) saturate(125%);
 
   backdrop-filter:
-    blur(22px) saturate(140%);
+    blur(35px) saturate(125%);
 
   box-shadow:
-    0 30px 70px
-    rgba(20, 10, 15, 0.35);
+    0 15px 35px
+    rgba(0, 0, 0, 0.2);
 
   opacity: 0;
 
@@ -382,7 +382,7 @@
 
   color: var(--ink);
 
-  font-family: "Fraunces", serif;
+  font-family: Cambria, "Cormorant Garamond", Georgia, serif;
 
   font-size: 32px;
 
@@ -500,11 +500,11 @@
   outline: none;
 
   background:
-    rgba(255, 255, 255, 0.75);
+    rgba(161, 137, 137, 0.75);
 
   color: var(--ink);
 
-  font-family: "Inter", sans-serif;
+  font-family: Calibri, "Source Sans 3", "Segoe UI", sans-serif;
 
   font-size: 14.5px;
 
@@ -517,7 +517,7 @@
 .jw-register-field input:focus {
   border-color: var(--rose);
 
-  background: #fff;
+  background: #ceb6b6;
 
   box-shadow:
     0 0 0 4px
@@ -613,7 +613,7 @@
 
   color: #fff;
 
-  font-family: "Inter", sans-serif;
+  font-family: Calibri, "Source Sans 3", "Segoe UI", sans-serif;
 
   font-size: 14.5px;
 

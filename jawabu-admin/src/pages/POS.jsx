@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { dispatchSms, subscribeToSms } from '../lib/sms';
+import { dispatchEmail, subscribeToEmail } from '../lib/email';
+import {
+  applyVariantToProduct,
+  posLineId,
+  selectableVariants,
+  variantDisplayLabel,
+} from '../lib/productOptions';
 import './pos.css';
 
 function POS() {
@@ -36,6 +44,7 @@ function POS() {
   const checkoutLockRef = useRef(false);
 
   const [checkoutError, setCheckoutError] = useState('');
+  const [variantPickerProduct, setVariantPickerProduct] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [completedOrderId, setCompletedOrderId] = useState(null);
 
@@ -66,7 +75,18 @@ function POS() {
         image_url,
         low_stock_threshold,
         category,
-        active
+        active,
+        product_variants (
+          id,
+          option_type,
+          option_value,
+          sku,
+          price,
+          stock_quantity,
+          image_url,
+          available,
+          sort_order
+        )
       `)
       .eq('active', true)
       .order('name', { ascending: true });
@@ -139,23 +159,40 @@ function POS() {
       return;
     }
 
-    const exactProduct = products.find((product) => {
-      const sku = (product.sku || '').trim().toLowerCase();
-      const barcode = (product.barcode || '')
-        .trim()
-        .toLowerCase();
+    let matchedProduct = null;
+    let matchedVariant = null;
 
-      return sku === code || barcode === code;
-    });
+    for (const product of products) {
+      const variant = selectableVariants(product).find((row) =>
+        (row.sku || '').trim().toLowerCase() === code
+      );
 
-    if (!exactProduct) {
+      if (variant) {
+        matchedProduct = product;
+        matchedVariant = variant;
+        break;
+      }
+    }
+
+    if (!matchedProduct) {
+      matchedProduct = products.find((product) => {
+        const sku = (product.sku || '').trim().toLowerCase();
+        const barcode = (product.barcode || '')
+          .trim()
+          .toLowerCase();
+
+        return sku === code || barcode === code;
+      });
+    }
+
+    if (!matchedProduct) {
       setCheckoutError(
         `No exact SKU or barcode match found for "${search.trim()}".`
       );
       return;
     }
 
-    addToCart(exactProduct);
+    addToCart(matchedProduct, matchedVariant);
 
     setSearch('');
     setCheckoutError('');
@@ -176,38 +213,56 @@ function POS() {
   // ADD TO CART
   // =========================================================
 
-  const addToCart = (product) => {
+  const addToCart = (product, variant = null) => {
     setCheckoutError('');
     setSuccessMessage('');
     setCompletedOrderId(null);
 
-    const availableStock = Number(
-      product.stock_quantity || 0
-    );
+    const options = selectableVariants(product);
 
-    if (availableStock <= 0) {
+    if (options.length && !variant) {
+      setVariantPickerProduct(product);
+      return;
+    }
+
+    if (variant && variant.available === false) {
       setCheckoutError(
-        `${product.name} is out of stock.`
+        `${product.name} (${variant.option_value}) is not available.`
       );
       return;
     }
 
+    const priced = applyVariantToProduct(product, variant);
+    const availableStock = Number(priced.stock_quantity || 0);
+    const label = variantDisplayLabel(variant);
+    const displayName = label ? `${product.name} (${label})` : product.name;
+    const lineId = posLineId(product.id, variant?.id);
+
+    if (availableStock <= 0) {
+      setCheckoutError(
+        `${displayName} is out of stock.`
+      );
+      return;
+    }
+
+    setVariantPickerProduct(null);
+
     setCart((currentCart) => {
       const existing = currentCart.find(
-        (item) => item.product.id === product.id
+        (item) => item.lineId === lineId
       );
 
       if (existing) {
         if (existing.quantity >= availableStock) {
           setCheckoutError(
-            `Only ${availableStock} units of ${product.name} are available.`
+            `Only ${availableStock} units of ${displayName} are available.`
           );
 
           return currentCart;
         }
 
         return currentCart.map((item) =>
-          item.product.id === product.id
+          item.lineId === lineId
             ? {
                 ...item,
                 quantity: item.quantity + 1,
@@ -219,7 +274,10 @@ function POS() {
       return [
         ...currentCart,
         {
-          product,
+          product: priced,
+          variant_id: variant?.id || null,
+          variant_label: label,
+          lineId,
           quantity: 1,
           discountPercent: 0,
         },
@@ -231,7 +289,7 @@ function POS() {
   // CHANGE QUANTITY
   // =========================================================
 
-  const changeQuantity = (productId, newQuantity) => {
+  const changeQuantity = (lineId, newQuantity) => {
     const amount = Number(newQuantity);
 
     if (!Number.isInteger(amount)) {
@@ -239,23 +297,26 @@ function POS() {
     }
 
     if (amount <= 0) {
-      removeFromCart(productId);
+      removeFromCart(lineId);
       return;
     }
 
     setCart((currentCart) =>
       currentCart.map((item) => {
-        if (item.product.id !== productId) {
+        if (item.lineId !== lineId) {
           return item;
         }
 
         const available = Number(
           item.product.stock_quantity || 0
         );
+        const displayName = item.variant_label
+          ? `${item.product.name} (${item.variant_label})`
+          : item.product.name;
 
         if (amount > available) {
           setCheckoutError(
-            `Only ${available} units of ${item.product.name} are available.`
+            `Only ${available} units of ${displayName} are available.`
           );
         } else {
           setCheckoutError('');
@@ -273,7 +334,7 @@ function POS() {
   // CHANGE DISCOUNT
   // =========================================================
 
-  const changeDiscount = (productId, discountValue) => {
+  const changeDiscount = (lineId, discountValue) => {
     let discount = Number(discountValue);
 
     if (Number.isNaN(discount)) {
@@ -287,7 +348,7 @@ function POS() {
 
     setCart((currentCart) =>
       currentCart.map((item) =>
-        item.product.id === productId
+        item.lineId === lineId
           ? {
               ...item,
               discountPercent: discount,
@@ -301,10 +362,10 @@ function POS() {
   // REMOVE FROM CART
   // =========================================================
 
-  const removeFromCart = (productId) => {
+  const removeFromCart = (lineId) => {
     setCart((currentCart) =>
       currentCart.filter(
-        (item) => item.product.id !== productId
+        (item) => item.lineId !== lineId
       )
     );
   };
@@ -581,6 +642,12 @@ function POS() {
         }
       }
 
+      if (paymentMethod === 'mpesa' && !transactionId.trim()) {
+        throw new Error(
+          'Enter the M-Pesa confirmation code from the customer before completing the sale.'
+        );
+      }
+
       // =====================================================
       // BUILD ORDER PAYLOAD
       // =====================================================
@@ -658,6 +725,9 @@ function POS() {
             quantity:
               item.quantity,
 
+            variant_id:
+              item.variant_id || null,
+
             price_at_purchase:
               Number(
                 discountedUnitPrice.toFixed(2)
@@ -715,6 +785,31 @@ function POS() {
         );
       }
 
+      if (customer.phone.trim()) {
+        await subscribeToSms({
+          supabase,
+          phone: customer.phone.trim(),
+          name: `${customer.first_name} ${customer.last_name}`.trim(),
+          source: 'pos',
+        });
+      }
+
+      if (customer.email.trim()) {
+        await subscribeToEmail({
+          supabase,
+          email: customer.email.trim(),
+          name: `${customer.first_name} ${customer.last_name}`.trim(),
+          source: 'pos',
+        });
+      }
+
+      dispatchSms(supabase, { action: 'flush' }).catch((smsError) => {
+        console.error('SMS dispatch after POS sale:', smsError);
+      });
+      dispatchEmail(supabase, { action: 'flush' }).catch((emailError) => {
+        console.error('Email dispatch after POS sale:', emailError);
+      });
+
       // =====================================================
       // SAVE RECEIPT DATA
       // =====================================================
@@ -728,7 +823,9 @@ function POS() {
 
         items:
           calculatedCart.map((item) => ({
-            name: item.product.name,
+            name: item.variant_label
+              ? `${item.product.name} (${item.variant_label})`
+              : item.product.name,
 
             quantity:
               item.quantity,
@@ -859,7 +956,7 @@ function POS() {
 
           <p>
             Create and process
-            Jawabu Beauty sales.
+            Sleek Sisters sales.
           </p>
         </div>
 
@@ -1061,6 +1158,10 @@ function POS() {
                     stock <=
                       lowStockThreshold;
 
+                  const options = selectableVariants(product);
+                  const optionKind =
+                    options[0]?.option_type === 'size' ? 'Sizes' : 'Colours';
+
                   return (
 
                     <button
@@ -1113,6 +1214,12 @@ function POS() {
                           {product.sku ||
                             'No SKU'}
                         </small>
+
+                        {options.length ? (
+                          <small>
+                            {optionKind}: choose on add
+                          </small>
+                        ) : null}
 
                         {product.category && (
                           <small>
@@ -1224,7 +1331,7 @@ function POS() {
                   <div
                     className="pos-cart-item"
                     key={
-                      item.product.id
+                      item.lineId || item.product.id
                     }
                   >
 
@@ -1257,6 +1364,10 @@ function POS() {
                         {item.product.name}
                       </strong>
 
+                      {item.variant_label ? (
+                        <small>{item.variant_label}</small>
+                      ) : null}
+
                       <small>
                         {formatCurrency(
                           item.price
@@ -1275,7 +1386,7 @@ function POS() {
                           }
                           onClick={() =>
                             changeQuantity(
-                              item.product.id,
+                              item.lineId,
                               item.quantity - 1
                             )
                           }
@@ -1298,7 +1409,7 @@ function POS() {
                           }
                           onChange={(event) =>
                             changeQuantity(
-                              item.product.id,
+                              item.lineId,
                               event.target.value
                             )
                           }
@@ -1317,7 +1428,7 @@ function POS() {
                           }
                           onClick={() =>
                             changeQuantity(
-                              item.product.id,
+                              item.lineId,
                               item.quantity + 1
                             )
                           }
@@ -1348,7 +1459,7 @@ function POS() {
                           }
                           onChange={(event) =>
                             changeDiscount(
-                              item.product.id,
+                              item.lineId,
                               event.target.value
                             )
                           }
@@ -1382,7 +1493,7 @@ function POS() {
                         }
                         onClick={() =>
                           removeFromCart(
-                            item.product.id
+                            item.lineId
                           )
                         }
                       >
@@ -1556,7 +1667,11 @@ function POS() {
 
                   <input
                     type="text"
-                    placeholder="Transaction ID (optional)"
+                    placeholder={
+                      paymentMethod === 'mpesa'
+                        ? 'M-Pesa confirmation code'
+                        : 'Transaction ID (optional)'
+                    }
                     value={
                       transactionId
                     }
@@ -1863,6 +1978,65 @@ function POS() {
 
       </div>
 
+      {variantPickerProduct && (
+        <div
+          className="pos-receipt-overlay"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              setVariantPickerProduct(null);
+            }
+          }}
+        >
+          <div className="pos-receipt-modal pos-variant-picker">
+            <div className="pos-receipt-actions">
+              <button
+                type="button"
+                className="pos-close-receipt"
+                onClick={() => setVariantPickerProduct(null)}
+              >
+                Close
+              </button>
+            </div>
+
+            <h3>{variantPickerProduct.name}</h3>
+            <p>
+              Choose the{' '}
+              {selectableVariants(variantPickerProduct)[0]?.option_type === 'size'
+                ? 'size'
+                : 'colour'}{' '}
+              that is in stock.
+            </p>
+
+            <div className="pos-variant-options">
+              {selectableVariants(variantPickerProduct).map((variant) => {
+                const stock = Number(variant.stock_quantity || 0);
+                const label = variantDisplayLabel(variant);
+                const price =
+                  variant.price == null || variant.price === ''
+                    ? Number(variantPickerProduct.price || 0)
+                    : Number(variant.price);
+
+                return (
+                  <button
+                    type="button"
+                    key={variant.id}
+                    className="pos-variant-option"
+                    disabled={stock <= 0}
+                    onClick={() => addToCart(variantPickerProduct, variant)}
+                  >
+                    <strong>{label}</strong>
+                    <span>{formatCurrency(price)}</span>
+                    <small>
+                      {stock <= 0 ? 'Out of stock' : `${stock} in stock`}
+                    </small>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* =====================================================
           RECEIPT MODAL
       ===================================================== */}
@@ -1907,7 +2081,7 @@ function POS() {
               <div className="receipt-header">
 
                 <h2>
-                  JAWABU BEAUTY
+                  SLEEK SISTERS
                 </h2>
 
                 <p>
@@ -2195,7 +2369,7 @@ function POS() {
 
                 <p>
                   Thank you for shopping
-                  with Jawabu Beauty.
+                  with Sleek Sisters.
                 </p>
 
                 <p>

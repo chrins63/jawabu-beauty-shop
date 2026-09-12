@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { supabase } from "../lib/supabase";
+import { supabase } from "../../lib/supabase";
 import "./Login.css";
 
 const VIDEO_SRC = "/assets/video/jawabu-hero-loop.mp4";
@@ -61,7 +61,7 @@ export default function ForgotPassword() {
 
       <div className="jw-nav">
         <Link to="/" className="jw-wordmark" style={{ textDecoration: "none" }}>
-          JAWABU
+          SLEEK
         </Link>
         <Link to="/login" className="jw-nav-tag">
           Back to sign in
@@ -76,7 +76,7 @@ export default function ForgotPassword() {
             <span className="jw-script"> password</span>
           </h1>
           <p className="jw-sub">
-            Enter the email on your Jawabu account and we will send a reset link.
+            Enter the email on your Sleek Sisters account and we will send a reset link.
           </p>
 
           {errorMessage && (

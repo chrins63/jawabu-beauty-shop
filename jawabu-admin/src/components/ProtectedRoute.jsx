@@ -1,5 +1,6 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { canAccessPath } from '../lib/access';
 
 const ProtectedRoute = ({ allowedRoles }) => {
   const {
@@ -7,6 +8,8 @@ const ProtectedRoute = ({ allowedRoles }) => {
     profile,
     isLoading,
   } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   // Still checking authentication/profile
   if (isLoading) {
@@ -64,9 +67,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
           </p>
 
           <button
-            onClick={() => {
-              window.location.href = '/login';
-            }}
+            onClick={() => navigate('/login', { replace: true })}
             style={{
               marginTop: '20px',
               padding: '12px 24px',
@@ -116,9 +117,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
           </p>
 
           <button
-            onClick={() => {
-              window.location.href = '/login';
-            }}
+            onClick={() => navigate('/login', { replace: true })}
             style={{
               marginTop: '20px',
               padding: '12px 24px',
@@ -141,65 +140,64 @@ const ProtectedRoute = ({ allowedRoles }) => {
   const permitted = (allowedRoles || []).map((role) =>
     String(role).toLowerCase()
   )
+  const roleAllowed =
+    permitted.length === 0 || permitted.includes(currentRole)
+  const pathAllowed = canAccessPath(currentRole, location.pathname)
 
-  if (
-    permitted.length > 0 &&
-    !permitted.includes(currentRole)
-  ) {
+  if (!roleAllowed || !pathAllowed) {
     return (
       <div
         style={{
-          minHeight: '100vh',
+          minHeight: '60vh',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#faf7f4',
           fontFamily: 'Arial, sans-serif',
         }}
       >
         <div
           style={{
-            background: '#fff',
-            padding: '50px',
-            borderRadius: '16px',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+            background: '#111111',
+            padding: '40px',
+            borderRadius: '4px',
+            border: '1px solid rgba(201, 168, 118, 0.35)',
             textAlign: 'center',
-            maxWidth: '500px',
+            maxWidth: '460px',
+            color: '#f5ead0',
           }}
         >
-          <h1 style={{ color: '#d62828' }}>
-            Unauthorized
+          <h1 style={{ color: '#c9a876', fontSize: '28px', marginTop: 0 }}>
+            Restricted
           </h1>
 
           <p>
-            Your role does not have permission to view this page.
+            Your role cannot open this page.
           </p>
 
           <p
             style={{
               marginTop: '15px',
               fontSize: '14px',
-              color: '#777',
+              color: '#c9a876',
             }}
           >
-            Current role: <strong>{profile.role}</strong>
+            Signed in as <strong>{profile.role}</strong>
           </p>
 
           <button
-            onClick={() => {
-              window.location.href = '/login';
-            }}
+            onClick={() => navigate('/', { replace: true })}
             style={{
               marginTop: '20px',
               padding: '12px 24px',
               border: 'none',
               borderRadius: '8px',
-              background: '#111',
-              color: '#fff',
+              background: '#c9a876',
+              color: '#0a0a0a',
               cursor: 'pointer',
+              fontWeight: 600,
             }}
           >
-            Back to Login
+            Back to Dashboard
           </button>
         </div>
       </div>

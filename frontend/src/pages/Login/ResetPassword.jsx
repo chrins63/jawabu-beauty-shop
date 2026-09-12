@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "../lib/supabase";
+import { supabase } from "../../lib/supabase";
 import "./Login.css";
 
 export default function ResetPassword() {
@@ -61,7 +61,7 @@ export default function ResetPassword() {
     <div className="jw-root -stage1 -stage2 -stage3">
       <div className="jw-nav">
         <Link to="/" className="jw-wordmark" style={{ textDecoration: "none" }}>
-          JAWABU
+          SLEEK
         </Link>
       </div>
 

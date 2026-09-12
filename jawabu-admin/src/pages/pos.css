@@ -32,7 +32,7 @@
 
 .pos-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(380px, 0.8fr);
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
   gap: 22px;
   align-items: start;
 }
@@ -353,6 +353,8 @@
   padding: 14px;
   font-weight: 700;
   cursor: pointer;
+  background: #c9a876;
+  color: #262220;
 }
 
 .pos-checkout-button:disabled {
@@ -609,13 +611,55 @@
 }
 
 .pos-print-button {
-  background: #222;
-  color: white;
+  background: #c9a876;
+  color: #262220;
 }
 
 .pos-close-receipt {
   background: #eee;
   color: #333;
+}
+
+.pos-variant-picker h3 {
+  margin: 0 0 8px;
+}
+
+.pos-variant-picker p {
+  margin: 0 0 16px;
+  color: #555;
+}
+
+.pos-variant-options {
+  display: grid;
+  gap: 10px;
+}
+
+.pos-variant-option {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 12px;
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+}
+
+.pos-variant-option:hover:not(:disabled) {
+  border-color: #c9a876;
+}
+
+.pos-variant-option:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pos-variant-option small {
+  width: 100%;
+  color: #6b7280;
 }
 
 

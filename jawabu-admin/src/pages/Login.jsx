@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { publicAsset } from "../lib/assets";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [method, setMethod] = useState("email");
+  const [identifier, setIdentifier] = useState("");
+  const [pin, setPin] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -16,20 +18,19 @@ export default function Login() {
     setError("");
 
     try {
-      const { data, error } = await login(email.trim(), password);
+      const { data, error } = await login(identifier.trim(), pin);
 
       if (error) {
         setError(error.message);
         return;
       }
 
-      if (!data?.user) {
+      if (!data?.user && !data?.session) {
         setError("Login failed. No user account was returned.");
         return;
       }
 
-      console.log("Successfully logged in:", data.user);
-      navigate("/"); // Redirect to dashboard
+      navigate("/");
     } catch (err) {
       console.error("Login error:", err);
       setError("Something went wrong while signing in.");
@@ -39,34 +40,70 @@ export default function Login() {
   };
 
   return (
-    <div style={styles.page}>
-      <div style={styles.loginCard}>
+    <div className="admin-login-page" style={styles.page}>
+      <div className="admin-login-card" style={styles.loginCard}>
         <div style={styles.brand}>
-          <h1 style={styles.brandTitle}>JAWABU BEAUTY</h1>
-          <div style={styles.brandLine}></div>
+          <img
+            src={publicAsset("images/brand/logo-mark.png")}
+            alt="Sleek Sisters"
+            style={styles.brandMark}
+          />
+          <h1 style={styles.brandTitle}>Sleek_Sisters</h1>
+          <p style={styles.brandTagline}>Grace in Every Detail</p>
         </div>
 
         <div style={styles.heading}>
           <h2 style={styles.headingTitle}>Admin Login</h2>
 
           <p style={styles.headingText}>
-            Sign in to access the Jawabu Beauty management system.
+            Sign in with your email or phone number and staff PIN.
+            {window.sleekDesktop
+              ? " This computer must be online to reach the live shop."
+              : ""}
           </p>
+          <p style={{ ...styles.headingText, marginTop: 10 }}>
+            If someone forgets it, the owner can reset it from Staff.
+          </p>
+        </div>
+
+        <div style={styles.methodRow}>
+          <button
+            type="button"
+            style={{
+              ...styles.methodButton,
+              ...(method === "email" ? styles.methodButtonActive : {}),
+            }}
+            onClick={() => setMethod("email")}
+          >
+            Email
+          </button>
+          <button
+            type="button"
+            style={{
+              ...styles.methodButton,
+              ...(method === "phone" ? styles.methodButtonActive : {}),
+            }}
+            onClick={() => setMethod("phone")}
+          >
+            Phone
+          </button>
         </div>
 
         <form onSubmit={handleLogin} style={styles.form}>
           <div style={styles.field}>
-            <label htmlFor="email" style={styles.label}>
-              Email Address
+            <label htmlFor="identifier" style={styles.label}>
+              {method === "phone" ? "Phone Number" : "Email Address"}
             </label>
 
             <input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
+              id="identifier"
+              type={method === "phone" ? "tel" : "email"}
+              placeholder={
+                method === "phone" ? "0712 345 678" : "Enter your email"
+              }
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              autoComplete={method === "phone" ? "tel" : "email"}
               required
               disabled={loading}
               style={styles.input}
@@ -74,16 +111,16 @@ export default function Login() {
           </div>
 
           <div style={styles.field}>
-            <label htmlFor="password" style={styles.label}>
-              Password
+            <label htmlFor="pin" style={styles.label}>
+              PIN or password
             </label>
 
             <input
-              id="password"
+              id="pin"
               type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Staff PIN or your password"
+              value={pin}
+              onChange={(e) => setPin(e.target.value)}
               autoComplete="current-password"
               required
               disabled={loading}
@@ -111,7 +148,7 @@ export default function Login() {
         </form>
 
         <div style={styles.footer}>
-          Jawabu Beauty Management System
+          Sleek Sisters Management System
         </div>
       </div>
     </div>
@@ -125,54 +162,81 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: "#f7f3ef",
+    background: "#0a0a0a",
     padding: "30px",
     boxSizing: "border-box",
   },
   loginCard: {
     width: "100%",
     maxWidth: "440px",
-    background: "#ffffff",
+    background: "#111111",
     padding: "45px",
-    borderRadius: "18px",
-    boxShadow: "0 15px 45px rgba(0, 0, 0, 0.08)",
+    borderRadius: "4px",
+    border: "1px solid rgba(201, 168, 118, 0.35)",
+    boxShadow: "0 15px 45px rgba(0, 0, 0, 0.35)",
     boxSizing: "border-box",
   },
   brand: {
     marginBottom: "35px",
+    textAlign: "center",
+  },
+  brandMark: {
+    width: "92px",
+    height: "92px",
+    objectFit: "contain",
+    margin: "0 auto 12px",
+    display: "block",
   },
   brandTitle: {
     margin: 0,
     fontSize: "28px",
     fontWeight: "700",
-    letterSpacing: "1px",
-    color: "#171717",
+    letterSpacing: "0.02em",
+    color: "#c9a876",
+    fontFamily: "Cambria, Georgia, serif",
   },
-  brandLine: {
-    width: "55px",
-    height: "3px",
-    background: "#e91e63",
-    marginTop: "10px",
-    borderRadius: "10px",
+  brandTagline: {
+    margin: "6px 0 0",
+    fontSize: "14px",
+    fontStyle: "italic",
+    color: "#e8d5a3",
   },
   heading: {
-    marginBottom: "30px",
+    marginBottom: "22px",
   },
   headingTitle: {
     margin: "0 0 10px",
     fontSize: "26px",
-    color: "#171717",
+    color: "#f5ead0",
   },
   headingText: {
     margin: 0,
     fontSize: "14px",
     lineHeight: "1.6",
-    color: "#777",
+    color: "#c9a876",
   },
   form: {
     display: "flex",
     flexDirection: "column",
     gap: "20px",
+  },
+  methodRow: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "8px",
+    marginBottom: "18px",
+  },
+  methodButton: {
+    border: "1px solid rgba(201, 168, 118, 0.35)",
+    background: "transparent",
+    color: "#c9a876",
+    padding: "10px 12px",
+    cursor: "pointer",
+    fontWeight: 600,
+  },
+  methodButtonActive: {
+    background: "#c9a876",
+    color: "#0a0a0a",
   },
   field: {
     display: "flex",
@@ -182,18 +246,18 @@ const styles = {
   label: {
     fontSize: "14px",
     fontWeight: "600",
-    color: "#333",
+    color: "#e8d5a3",
   },
   input: {
     width: "100%",
     padding: "14px 15px",
-    border: "1px solid #ddd",
-    borderRadius: "9px",
-    fontSize: "15px",
+    border: "1px solid rgba(201, 168, 118, 0.35)",
+    borderRadius: "2px",
+    fontSize: "16px",
     outline: "none",
     boxSizing: "border-box",
-    background: "#fff",
-    color: "#222",
+    background: "#0a0a0a",
+    color: "#f5ead0",
   },
   error: {
     display: "flex",
@@ -212,8 +276,8 @@ const styles = {
     padding: "15px",
     border: "none",
     borderRadius: "9px",
-    background: "#e91e63",
-    color: "#ffffff",
+    background: "#c9a876",
+    color: "#0a0a0a",
     fontSize: "15px",
     fontWeight: "600",
     cursor: "pointer",
@@ -225,9 +289,9 @@ const styles = {
   footer: {
     marginTop: "30px",
     paddingTop: "20px",
-    borderTop: "1px solid #eee",
+    borderTop: "1px solid rgba(201, 168, 118, 0.28)",
     textAlign: "center",
     fontSize: "12px",
-    color: "#999",
+    color: "#c9a876",
   },
 };

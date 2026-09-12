@@ -15,7 +15,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true,
-    storageKey: 'jawabu-admin-auth',
+    detectSessionInUrl: !window.sleekDesktop,
+    storageKey: 'sleek-admin-auth',
   },
 })

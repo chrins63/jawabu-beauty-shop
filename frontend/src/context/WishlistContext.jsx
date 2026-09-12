@@ -1,116 +1,68 @@
-/* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useEffect, useState } from 'react'
+import { toWishlistItem } from '../lib/storeProduct'
 
-export const WishlistContext = createContext(null)
+export const WishlistContext = createContext(null) // eslint-disable-line react-refresh/only-export-components
 
-const STORAGE_KEY = 'jawabu-wishlist'
-
+const STORAGE_KEY = 'sleek-wishlist'
 
 export const WishlistProvider = ({ children }) => {
-
   const [wishlistItems, setWishlistItems] = useState(() => {
-
     try {
+      const savedWishlist = localStorage.getItem(STORAGE_KEY)
 
-      const savedWishlist =
-        localStorage.getItem(STORAGE_KEY)
-
-      return savedWishlist
-        ? JSON.parse(savedWishlist)
-        : []
-
+      return savedWishlist ? JSON.parse(savedWishlist) : []
     } catch (error) {
-
-      console.error(
-        'Could not load wishlist:',
-        error
-      )
-
+      console.error('Could not load wishlist:', error)
       return []
-
     }
-
   })
 
-
-  // Save wishlist whenever it changes
   useEffect(() => {
-
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(wishlistItems)
-    )
-
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(wishlistItems)
+      )
+    } catch (error) {
+      console.error('Could not save wishlist:', error)
+    }
   }, [wishlistItems])
 
-
-  // Check if product is already saved
   const isInWishlist = (productId) => {
-
-    return wishlistItems.some(
-      (item) => item.id === productId
-    )
-
+    return wishlistItems.some((item) => item.id === productId)
   }
 
-
-  // Add / remove product
   const toggleWishlist = (product) => {
+    const item = toWishlistItem(product)
 
     setWishlistItems((currentItems) => {
-
       const exists = currentItems.some(
-        (item) => item.id === product.id
+        (current) => current.id === item.id
       )
 
-
-      // Remove if already saved
       if (exists) {
-
         return currentItems.filter(
-          (item) => item.id !== product.id
+          (current) => current.id !== item.id
         )
-
       }
 
-
-      // Add product
-      return [
-        ...currentItems,
-        product
-      ]
-
+      return [...currentItems, item]
     })
-
   }
 
-
-  // Remove one product
   const removeFromWishlist = (productId) => {
-
     setWishlistItems((currentItems) =>
-      currentItems.filter(
-        (item) => item.id !== productId
-      )
+      currentItems.filter((item) => item.id !== productId)
     )
-
   }
 
-
-  // Remove everything
   const clearWishlist = () => {
-
     setWishlistItems([])
-
   }
 
-
-  const wishlistCount =
-    wishlistItems.length
-
+  const wishlistCount = wishlistItems.length
 
   return (
-
     <WishlistContext.Provider
       value={{
         wishlistItems,
@@ -121,33 +73,7 @@ export const WishlistProvider = ({ children }) => {
         clearWishlist
       }}
     >
-
       {children}
-
     </WishlistContext.Provider>
-
   )
-
-}
-
-
-// IMPORTANT:
-// Shop.jsx and Wishlist.jsx can now import useWishlist
-export const useWishlist = () => {
-
-  const context =
-    useContext(WishlistContext)
-
-
-  if (!context) {
-
-    throw new Error(
-      'useWishlist must be used inside WishlistProvider'
-    )
-
-  }
-
-
-  return context
-
 }

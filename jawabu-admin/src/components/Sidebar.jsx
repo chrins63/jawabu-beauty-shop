@@ -1,8 +1,11 @@
 import { NavLink } from 'react-router-dom';
+import BrandLogo from './BrandLogo';
+import { useAuth } from '../context/AuthContext';
+import { navItemsForRole } from '../lib/access';
 
 /*
 =========================================================
-JAWABU BEAUTY ADMIN — SIDEBAR
+SLEEK SISTERS ADMIN — SIDEBAR
 =========================================================
 */
 
@@ -144,65 +147,9 @@ function Icon({ name, size = 20 }) {
   }
 }
 
-function Sidebar() {
-  const navigation = [
-    {
-      label: 'Dashboard',
-      path: '/',
-      icon: 'dashboard',
-    },
-    {
-      label: 'POS',
-      path: '/pos',
-      icon: 'pos',
-      highlight: true,
-    },
-    {
-      label: 'Orders',
-      path: '/orders',
-      icon: 'orders',
-    },
-    {
-      label: 'Products',
-      path: '/products',
-      icon: 'products',
-    },
-    {
-      label: 'Categories',
-      path: '/categories',
-      icon: 'categories',
-    },
-    {
-      label: 'Inventory',
-      path: '/inventory',
-      icon: 'inventory',
-    },
-    {
-      label: 'Customers',
-      path: '/customers',
-      icon: 'customers',
-    },
-    {
-      label: 'Payments',
-      path: '/payments',
-      icon: 'payments',
-    },
-    {
-      label: 'Staff',
-      path: '/staff',
-      icon: 'staff',
-    },
-    {
-      label: 'Reports',
-      path: '/reports',
-      icon: 'reports',
-    },
-    {
-      label: 'Settings',
-      path: '/settings',
-      icon: 'settings',
-    },
-  ];
+function Sidebar({ onNavigate }) {
+  const { profile } = useAuth();
+  const navigation = navItemsForRole(profile?.role);
 
   return (
     <aside className="sidebar">
@@ -211,9 +158,9 @@ function Sidebar() {
           LOGO
       ====================================================== */}
 
-      <div className="sidebar-logo">
-        <h2>JAWABU</h2>
-        <span>BEAUTY ADMIN</span>
+      <div className="sidebar-logo" onClick={() => onNavigate?.()}>
+        <BrandLogo />
+        <span>ADMIN</span>
       </div>
 
       {/* =====================================================
@@ -232,6 +179,7 @@ function Sidebar() {
                 isActive ? 'active' : ''
               } ${item.highlight ? 'pos-link' : ''}`
             }
+            onClick={() => onNavigate?.()}
           >
 
             <span className="sidebar-icon">

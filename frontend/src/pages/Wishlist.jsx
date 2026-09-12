@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
 import {
@@ -13,6 +13,7 @@ import { useWishlist } from '../context/useWishlist'
 import { useCart } from '../context/useCart'
 
 const Wishlist = () => {
+  const navigate = useNavigate()
   const {
     wishlistItems,
     removeFromWishlist
@@ -23,6 +24,11 @@ const Wishlist = () => {
   const [addedProductId, setAddedProductId] = useState(null)
 
   const handleAddToCart = (product) => {
+    if (product.hasOptions) {
+      navigate(`/product/${product.id}`)
+      return
+    }
+
     addToCart(product)
 
     setAddedProductId(product.id)
@@ -130,10 +136,16 @@ const Wishlist = () => {
 
                 <div className="wishlist-image">
 
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                  />
+                  <Link
+                    to={`/product/${product.id}`}
+                    className="product-image-link"
+                    aria-label={`View ${product.name}`}
+                  >
+                    <img
+                      src={product.image}
+                      alt=""
+                    />
+                  </Link>
 
                   <div className="wishlist-saved-badge">
                     <FiHeart />
@@ -152,7 +164,12 @@ const Wishlist = () => {
                   </span>
 
                   <h2>
-                    {product.name}
+                    <Link
+                      to={`/product/${product.id}`}
+                      className="shop-product-name-link"
+                    >
+                      {product.name}
+                    </Link>
                   </h2>
 
                   <p>
