@@ -567,9 +567,23 @@ textarea:focus {
   color: #f5ead0;
 }
 
+.track-items-title {
+  color: #fff8e7;
+}
+
 .track-items li {
   border-top-color: rgba(232, 195, 106, 0.18);
   color: #f5ead0;
+}
+
+.track-items img {
+  border-color: rgba(232, 195, 106, 0.28);
+  background: #16130f;
+}
+
+.track-items span,
+.track-items-empty {
+  color: #c9b896;
 }
 
 .cart-summary-divider,

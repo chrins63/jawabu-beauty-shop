@@ -449,6 +449,14 @@
     line-height: 1.15;
   }
 
+  .track-items li {
+    grid-template-columns: 64px minmax(0, 1fr);
+  }
+
+  .track-items li > strong:last-child {
+    grid-column: 2;
+  }
+
   .checkout-form textarea,
   .checkout-field input,
   .checkout-field select,

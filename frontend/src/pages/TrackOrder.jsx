@@ -3,6 +3,8 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { FiPackage, FiSearch } from 'react-icons/fi'
 
 import { formatKes, getRememberedOrders, trackGuestOrder } from '../lib/checkout'
+
+const PRODUCT_PLACEHOLDER = '/images/products/placeholder.svg'
 import { getStorefrontCommerce } from '../lib/storefront'
 import { BRAND } from '../lib/brand'
 import { whatsappHref } from '../lib/whatsapp'
@@ -175,16 +177,39 @@ const TrackOrder = () => {
                   </p>
                 )}
 
+              <h2 className="track-items-title">What you ordered</h2>
               <ul className="track-items">
-                {(order.items || []).map((item, index) => (
-                  <li key={`${item.name}-${index}`}>
-                    <span>
-                      {item.name} × {item.quantity}
-                    </span>
-                    <strong>{formatKes(item.price * item.quantity)}</strong>
+                {(order.items || []).length === 0 ? (
+                  <li className="track-items-empty">
+                    Products for this order are not listed yet.
                   </li>
-                ))}
+                ) : (
+                  (order.items || []).map((item, index) => (
+                    <li key={item.id || `${item.name}-${index}`}>
+                      <Link
+                        to={item.product_id ? `/product/${item.product_id}` : '/shop'}
+                      >
+                        <img
+                          src={item.image || PRODUCT_PLACEHOLDER}
+                          alt={item.name || 'Ordered product'}
+                        />
+                      </Link>
+                      <div>
+                        <strong>{item.name || 'Product'}</strong>
+                        {item.variant_label ? <span>{item.variant_label}</span> : null}
+                        <span>Qty {item.quantity}</span>
+                      </div>
+                      <strong>{formatKes(item.price * item.quantity)}</strong>
+                    </li>
+                  ))
+                )}
               </ul>
+
+              {Number(order.delivery_fee) > 0 && (
+                <p className="track-fee">
+                  Delivery <strong>{formatKes(order.delivery_fee)}</strong>
+                </p>
+              )}
 
               <p className="track-total">
                 Total <strong>{formatKes(order.total_amount)}</strong>

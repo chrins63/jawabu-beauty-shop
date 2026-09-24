@@ -8411,22 +8411,56 @@ button.checkout-payment-option.is-selected {
   margin-bottom: 12px;
 }
 
+.track-items-title {
+  margin: 18px 0 0;
+  font-size: 18px;
+}
+
 .track-items {
   list-style: none;
   padding: 0;
-  margin: 18px 0;
+  margin: 12px 0 18px;
+  display: grid;
+  gap: 12px;
 }
 
 .track-items li {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 10px 0;
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding-top: 12px;
   border-top: 1px solid #eee;
 }
 
+.track-items img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border: 1px solid #e1ddd8;
+  background: #f7f4ef;
+}
+
+.track-items strong {
+  display: block;
+}
+
+.track-items span {
+  display: block;
+  margin-top: 2px;
+  color: #6d675f;
+  font-size: 13px;
+}
+
+.track-items-empty {
+  display: block;
+  color: #6d675f;
+}
+
+.track-fee,
 .track-total {
   font-size: 16px;
+  margin: 0 0 8px;
 }
 
 .whatsapp-float {
