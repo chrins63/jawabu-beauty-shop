@@ -218,6 +218,110 @@
   color: #fff8e7;
 }
 
+.order-receipt-list {
+  display: grid;
+  gap: 18px;
+}
+
+.order-receipt {
+  background: #0c0b09;
+  border: 1px solid rgba(232, 195, 106, 0.28);
+  padding: 18px;
+}
+
+.order-receipt-head,
+.order-receipt-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.order-receipt-head h2 {
+  margin: 4px 0;
+  color: #fff8e7;
+  font-size: 22px;
+}
+
+.order-receipt-head p,
+.order-receipt-foot p {
+  margin: 0;
+  color: #c9b896;
+}
+
+.order-receipt-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.order-receipt-status span {
+  border: 1px solid rgba(232, 195, 106, 0.4);
+  color: #f3d98a;
+  padding: 4px 8px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.order-receipt-items {
+  list-style: none;
+  margin: 16px 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.order-receipt-items li {
+  display: grid;
+  grid-template-columns: 72px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid rgba(232, 195, 106, 0.16);
+}
+
+.order-receipt-items img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border: 1px solid rgba(232, 195, 106, 0.28);
+  background: #16130f;
+}
+
+.order-receipt-items strong {
+  display: block;
+  color: #fff8e7;
+}
+
+.order-receipt-items span {
+  display: block;
+  margin-top: 2px;
+  color: #c9b896;
+  font-size: 13px;
+}
+
+.order-receipt-empty {
+  display: block;
+  color: #c9b896;
+}
+
+.order-receipt-foot {
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.order-receipt-total {
+  margin-left: auto;
+  color: #fff8e7;
+}
+
+.order-receipt-total strong {
+  color: #f3d98a;
+  margin-left: 8px;
+}
+
 .account-profile-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -338,6 +442,19 @@
   .account-order-track {
     grid-column: 2;
     grid-row: 1;
+  }
+
+  .order-receipt-head,
+  .order-receipt-foot {
+    flex-direction: column;
+  }
+
+  .order-receipt-items li {
+    grid-template-columns: 64px 1fr;
+  }
+
+  .order-receipt-items li > strong:last-child {
+    grid-column: 2;
   }
 }
 

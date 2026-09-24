@@ -4,23 +4,10 @@ import { FiArrowLeft, FiShoppingBag } from 'react-icons/fi'
 
 import { supabase } from '../lib/supabase'
 import { getRememberedOrderIds } from '../lib/checkout'
+import { withOrderItems } from '../lib/customerOrders'
 import { useAuth } from '../context/AuthContext'
+import OrderReceipt from '../components/OrderReceipt'
 import './Account.css'
-
-function formatMoney(value) {
-  return `KSh ${Number(value || 0).toLocaleString()}`
-}
-
-function formatDate(value) {
-  if (!value) {
-    return ''
-  }
-
-  return new Date(value).toLocaleString('en-KE', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  })
-}
 
 export default function Orders() {
   const navigate = useNavigate()
@@ -96,7 +83,7 @@ export default function Orders() {
         return bDate - aDate
       })
 
-      setOrders(merged)
+      setOrders(await withOrderItems(merged))
       setLoading(false)
     }
 
@@ -164,28 +151,9 @@ export default function Orders() {
           )}
 
           {!loading && orders.length > 0 && (
-            <div className="account-orders-list">
+            <div className="order-receipt-list">
               {orders.map((order) => (
-                <article className="account-order-card" key={order.id}>
-                  <div>
-                    <span className="account-order-id">
-                      Order #{order.id}
-                    </span>
-                    <p className="account-order-meta">
-                      {formatDate(order.created_at || order.order_date)}
-                    </p>
-                  </div>
-
-                  <div className="account-order-status">
-                    {order.payment_status || 'payment pending'}
-                    {' · '}
-                    {order.status || 'pending'}
-                  </div>
-
-                  <strong>
-                    {formatMoney(order.total_amount ?? order.total)}
-                  </strong>
-                </article>
+                <OrderReceipt key={order.id} order={order} />
               ))}
             </div>
           )}

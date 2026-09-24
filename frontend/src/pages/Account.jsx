@@ -12,35 +12,14 @@ import {
 
 import { supabase } from '../lib/supabase'
 import { getRememberedOrderIds } from '../lib/checkout'
+import { withOrderItems } from '../lib/customerOrders'
 import { isValidKenyanPhone } from '../lib/phone'
 import { useAuth } from '../context/AuthContext'
 import { useWishlist } from '../context/useWishlist'
 import { BRAND } from '../lib/brand'
 import { whatsappHref, defaultWhatsAppText } from '../lib/whatsapp'
+import OrderReceipt from '../components/OrderReceipt'
 import './Account.css'
-
-function formatMoney(value) {
-  return `KSh ${Number(value || 0).toLocaleString('en-KE')}`
-}
-
-function formatDate(value) {
-  if (!value) return ''
-  return new Date(value).toLocaleString('en-KE', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  })
-}
-
-function statusLabel(value) {
-  const key = String(value || '').toLowerCase()
-  if (key === 'paid' || key === 'completed' || key === 'success') return 'Paid'
-  if (key === 'processing') return 'Being prepared'
-  if (key === 'shipped' || key === 'dispatched') return 'On the way'
-  if (key === 'delivered') return 'Delivered'
-  if (key === 'cancelled') return 'Cancelled'
-  if (key === 'pending') return 'Pending'
-  return value || 'Pending'
-}
 
 export default function Account() {
   const navigate = useNavigate()
@@ -123,7 +102,7 @@ export default function Account() {
         )
       })
 
-      setOrders(merged)
+      setOrders(await withOrderItems(merged.slice(0, 3)))
       setOrdersLoading(false)
     }
 
@@ -272,36 +251,10 @@ export default function Account() {
             )}
 
             {!ordersLoading && recentOrders.length > 0 && (
-              <div className="account-orders-list">
-                {recentOrders.map((order) => {
-                  const trackTo =
-                    order.order_number && order.phone
-                      ? `/track?order=${encodeURIComponent(order.order_number)}&phone=${encodeURIComponent(order.phone)}`
-                      : '/track'
-
-                  return (
-                    <article className="account-order-card" key={order.id}>
-                      <div>
-                        <span className="account-order-id">
-                          {order.order_number || `Order #${order.id}`}
-                        </span>
-                        <p className="account-order-meta">
-                          {formatDate(order.created_at || order.order_date)}
-                        </p>
-                      </div>
-                      <div className="account-order-status">
-                        {statusLabel(order.payment_status)} ·{' '}
-                        {statusLabel(order.status)}
-                      </div>
-                      <strong>
-                        {formatMoney(order.total_amount ?? order.total)}
-                      </strong>
-                      <Link to={trackTo} className="account-order-track">
-                        Track
-                      </Link>
-                    </article>
-                  )
-                })}
+              <div className="order-receipt-list">
+                {recentOrders.map((order) => (
+                  <OrderReceipt key={order.id} order={order} />
+                ))}
               </div>
             )}
           </section>
