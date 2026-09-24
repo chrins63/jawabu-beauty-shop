@@ -1,0 +1,13 @@
+---
+description: Push every project update to GitHub
+alwaysApply: true
+---
+
+# Push updates to GitHub
+
+After each update to this shop, commit the change and push it to `main` on https://github.com/chrins63/jawabu-beauty-shop.
+
+- Do this when the requested change is finished, including the files for that update.
+- Leave out secrets: `.env` files, keys, and credentials.
+- Do not force-push `main`.
+- If GitHub sign-in is missing, stop and ask the user to sign in before pushing.
