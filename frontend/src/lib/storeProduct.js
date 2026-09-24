@@ -29,7 +29,7 @@ export function normalizeStoreProduct(product, categoryLookup = {}) {
     image:
       product.image ||
       product.image_url ||
-      '/images/products/placeholder.jpg',
+      '/images/products/placeholder.svg',
     description:
       product.description ||
       'A beautiful addition to your everyday routine.',
@@ -63,13 +63,22 @@ export function toWishlistItem(product) {
   }
 }
 
+export function isInStock(product) {
+  const stock = Number(product?.stock_quantity)
+  return Number.isFinite(stock) && stock > 0
+}
+
 export function capQuantity(quantity, stockQuantity) {
   const next = Math.max(1, Math.floor(Number(quantity) || 1))
   const stock = Number(stockQuantity)
 
-  if (Number.isFinite(stock) && stock > 0) {
-    return Math.min(next, stock)
+  if (!Number.isFinite(stock)) {
+    return next
   }
 
-  return next
+  if (stock <= 0) {
+    return 0
+  }
+
+  return Math.min(next, stock)
 }

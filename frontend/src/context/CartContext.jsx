@@ -1,9 +1,46 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { capQuantity, normalizeStoreProduct } from '../lib/storeProduct'
 import { cartLineKey } from '../lib/productOptions'
+import { loadRemoteCart, saveRemoteCart } from '../lib/accountSync'
+import { useAuth } from './AuthContext'
 import { CartContext, STORAGE_KEY } from './cart-context.js'
 
+function mergeCart(localItems, remoteRows) {
+  const next = [...localItems]
+
+  for (const row of remoteRows) {
+    const normalized = normalizeStoreProduct(row.product)
+    const index = next.findIndex(
+      (item) => Number(item.id) === Number(normalized.id) && !item.variant_id
+    )
+    const remoteQty = capQuantity(row.quantity, normalized.stock_quantity)
+
+    if (index >= 0) {
+      const existing = next[index]
+      const quantity = capQuantity(
+        Math.max(Number(existing.quantity) || 0, Number(row.quantity) || 0),
+        normalized.stock_quantity
+      )
+      next[index] = {
+        ...existing,
+        stock_quantity: normalized.stock_quantity,
+        quantity: quantity > 0 ? quantity : existing.quantity,
+      }
+    } else if (remoteQty > 0) {
+      next.push({
+        ...normalized,
+        quantity: remoteQty,
+      })
+    }
+  }
+
+  return next
+}
+
 export const CartProvider = ({ children }) => {
+  const { user } = useAuth()
+  const skipSync = useRef(true)
+  const cartRef = useRef([])
   const [cartItems, setCartItems] = useState(() => {
     try {
       const savedCart = localStorage.getItem(STORAGE_KEY)
@@ -14,6 +51,8 @@ export const CartProvider = ({ children }) => {
       return []
     }
   })
+
+  cartRef.current = cartItems
 
   useEffect(() => {
     try {
@@ -26,10 +65,59 @@ export const CartProvider = ({ children }) => {
     }
   }, [cartItems])
 
+  useEffect(() => {
+    let cancelled = false
+    skipSync.current = true
+
+    async function hydrate() {
+      if (!user?.id) {
+        skipSync.current = false
+        return
+      }
+
+      const remote = await loadRemoteCart(user.id)
+      if (cancelled) {
+        return
+      }
+
+      const merged = mergeCart(cartRef.current, remote)
+      setCartItems(merged)
+      await saveRemoteCart(user.id, merged)
+      if (!cancelled) {
+        skipSync.current = false
+      }
+    }
+
+    hydrate()
+
+    return () => {
+      cancelled = true
+    }
+  }, [user?.id])
+
+  useEffect(() => {
+    if (skipSync.current || !user?.id) {
+      return undefined
+    }
+
+    const handle = setTimeout(() => {
+      saveRemoteCart(user.id, cartItems)
+    }, 400)
+
+    return () => clearTimeout(handle)
+  }, [cartItems, user?.id])
+
   const addToCart = (product, quantity = 1) => {
+    const normalized = normalizeStoreProduct(product)
+    const nextQuantity = capQuantity(quantity, normalized.stock_quantity)
+
+    if (nextQuantity <= 0) {
+      return false
+    }
+
     const incoming = {
-      ...normalizeStoreProduct(product),
-      quantity: capQuantity(quantity, product.stock_quantity),
+      ...normalized,
+      quantity: nextQuantity,
     }
 
     const incomingKey = cartLineKey(incoming)
@@ -45,7 +133,9 @@ export const CartProvider = ({ children }) => {
             return item
           }
 
-          const stock = incoming.stock_quantity || item.stock_quantity
+          const stock = Number.isFinite(Number(incoming.stock_quantity))
+            ? incoming.stock_quantity
+            : item.stock_quantity
 
           return {
             ...item,
@@ -60,6 +150,8 @@ export const CartProvider = ({ children }) => {
 
       return [...currentItems, incoming]
     })
+
+    return true
   }
 
   const removeFromCart = (lineKey) => {
@@ -77,12 +169,18 @@ export const CartProvider = ({ children }) => {
           return item
         }
 
+        const nextQuantity = capQuantity(
+          item.quantity + 1,
+          item.stock_quantity
+        )
+
+        if (nextQuantity <= 0) {
+          return item
+        }
+
         return {
           ...item,
-          quantity: capQuantity(
-            item.quantity + 1,
-            item.stock_quantity
-          ),
+          quantity: nextQuantity,
         }
       })
     )

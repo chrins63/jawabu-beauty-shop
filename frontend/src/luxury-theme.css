@@ -731,7 +731,8 @@ textarea:focus {
   color: #f5ead0;
 }
 
-.checkout-delivery-card.is-selected {
+.checkout-delivery-card.is-selected,
+.checkout-payment-option.is-selected {
   border-color: #f3d98a;
   box-shadow: 0 0 0 1px #e8c36a;
 }

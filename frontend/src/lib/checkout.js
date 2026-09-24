@@ -14,6 +14,7 @@ export async function createCheckoutOrder({
   giftMessage,
   lat,
   lng,
+  paymentMethod = 'M-Pesa',
 }) {
   return supabase.rpc('create_checkout_order_with_map', {
     p_first_name: firstName,
@@ -23,7 +24,7 @@ export async function createCheckoutOrder({
     p_delivery_option_id: Number(deliveryOptionId),
     p_delivery_address: address || '',
     p_city: city || '',
-    p_payment_method: 'M-Pesa',
+    p_payment_method: paymentMethod || 'M-Pesa',
     p_items: items,
     p_gift_message: giftMessage || null,
     p_delivery_lat: lat == null ? null : Number(lat),

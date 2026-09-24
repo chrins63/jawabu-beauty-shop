@@ -101,6 +101,24 @@ function Icon({ name, size = 20 }) {
         </svg>
       );
 
+    case 'inbox':
+      return (
+        <svg {...commonProps}>
+          <path d="M4 6h16v12H4z" />
+          <path d="m4 7 8 6 8-6" />
+        </svg>
+      );
+
+    case 'services':
+      return (
+        <svg {...commonProps}>
+          <rect x="4" y="5" width="16" height="15" rx="2" />
+          <path d="M8 3v4" />
+          <path d="M16 3v4" />
+          <path d="M4 9h16" />
+        </svg>
+      );
+
     case 'payments':
       return (
         <svg {...commonProps}>

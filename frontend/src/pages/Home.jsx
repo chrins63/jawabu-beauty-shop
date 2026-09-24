@@ -52,40 +52,77 @@ const Home = () => {
   const { isInWishlist, toggleWishlist } = useWishlist()
   const [newArrivals, setNewArrivals] = useState([])
   const [bestsellers, setBestsellers] = useState([])
+  const [arrivalsError, setArrivalsError] = useState('')
+  const [bestsellersError, setBestsellersError] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [newsletterStatus, setNewsletterStatus] = useState('')
 
   useEffect(() => {
+    let cancelled = false
+
     const loadHomeProducts = async () => {
-      const [{ data: categoryData }, { data: newest }, { data: popular }] =
-        await Promise.all([
-          supabase.from('category').select('id, name'),
-          supabase
-            .from('products')
-            .select('id, name, price, image_url, sku, category, category_id, stock_quantity, created_at')
-            .eq('active', true)
-            .order('created_at', { ascending: false })
-            .order('id', { ascending: false })
-            .limit(8),
-          supabase.rpc('list_bestselling_products', { p_limit: 8 }),
-        ])
+      try {
+        const [categoryResult, newestResult, popularResult] =
+          await Promise.all([
+            supabase.from('category').select('id, name'),
+            supabase
+              .from('products')
+              .select('id, name, price, image_url, sku, category, category_id, stock_quantity, created_at')
+              .eq('active', true)
+              .order('created_at', { ascending: false })
+              .order('id', { ascending: false })
+              .limit(8),
+            supabase.rpc('list_bestselling_products', { p_limit: 8 }),
+          ])
 
-      const categoryLookup = buildCategoryLookup(categoryData)
+        if (cancelled) {
+          return
+        }
 
-      setNewArrivals(
-        (newest || []).map((item) =>
-          normalizeStoreProduct(item, categoryLookup)
-        )
-      )
-      setBestsellers(
-        (popular || []).map((item) =>
-          normalizeStoreProduct(item, categoryLookup)
-        )
-      )
+        const categoryLookup = buildCategoryLookup(categoryResult.data)
+
+        if (newestResult.error) {
+          console.error('Could not load new arrivals:', newestResult.error)
+          setArrivalsError('We could not load new products right now.')
+          setNewArrivals([])
+        } else {
+          setArrivalsError('')
+          setNewArrivals(
+            (newestResult.data || []).map((item) =>
+              normalizeStoreProduct(item, categoryLookup)
+            )
+          )
+        }
+
+        if (popularResult.error) {
+          console.error('Could not load bestsellers:', popularResult.error)
+          setBestsellersError('We could not load bestsellers right now.')
+          setBestsellers([])
+        } else {
+          setBestsellersError('')
+          setBestsellers(
+            (popularResult.data || []).map((item) =>
+              normalizeStoreProduct(item, categoryLookup)
+            )
+          )
+        }
+      } catch (error) {
+        console.error('Could not load home products:', error)
+        if (!cancelled) {
+          setArrivalsError('We could not load new products right now.')
+          setBestsellersError('We could not load bestsellers right now.')
+          setNewArrivals([])
+          setBestsellers([])
+        }
+      }
     }
 
     loadHomeProducts()
+
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const handleNewsletter = async (event) => {
@@ -278,12 +315,16 @@ const Home = () => {
             </Link>
           </div>
 
-          <HomeProductGrid
-            products={newArrivals}
-            badge="NEW"
-            isInWishlist={isInWishlist}
-            toggleWishlist={toggleWishlist}
-          />
+          {arrivalsError ? (
+            <p>{arrivalsError}</p>
+          ) : (
+            <HomeProductGrid
+              products={newArrivals}
+              badge="NEW"
+              isInWishlist={isInWishlist}
+              toggleWishlist={toggleWishlist}
+            />
+          )}
         </div>
       </section>
 
@@ -304,12 +345,16 @@ const Home = () => {
             </Link>
           </div>
 
-          <HomeProductGrid
-            products={bestsellers}
-            badge="POPULAR"
-            isInWishlist={isInWishlist}
-            toggleWishlist={toggleWishlist}
-          />
+          {bestsellersError ? (
+            <p>{bestsellersError}</p>
+          ) : (
+            <HomeProductGrid
+              products={bestsellers}
+              badge="POPULAR"
+              isInWishlist={isInWishlist}
+              toggleWishlist={toggleWishlist}
+            />
+          )}
         </div>
       </section>
 

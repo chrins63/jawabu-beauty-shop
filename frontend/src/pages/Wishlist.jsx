@@ -11,6 +11,7 @@ import {
 
 import { useWishlist } from '../context/useWishlist'
 import { useCart } from '../context/useCart'
+import { isInStock } from '../lib/storeProduct'
 
 const Wishlist = () => {
   const navigate = useNavigate()
@@ -29,7 +30,9 @@ const Wishlist = () => {
       return
     }
 
-    addToCart(product)
+    if (!isInStock(product) || !addToCart(product)) {
+      return
+    }
 
     setAddedProductId(product.id)
 
@@ -192,12 +195,15 @@ const Wishlist = () => {
                           ? 'btn btn-primary wishlist-add-btn added'
                           : 'btn btn-primary wishlist-add-btn'
                       }
+                      disabled={!product.hasOptions && !isInStock(product)}
                       onClick={() =>
                         handleAddToCart(product)
                       }
                     >
 
-                      {addedProductId === product.id ? (
+                      {!product.hasOptions && !isInStock(product) ? (
+                        <>Sold out</>
+                      ) : addedProductId === product.id ? (
                         <>
                           <FiCheck />
                           Added to Bag

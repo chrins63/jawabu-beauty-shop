@@ -29,6 +29,8 @@ export const NAV_ITEMS = [
   { label: 'Categories', path: '/categories', icon: 'categories', roles: CATALOGUE_ROLES },
   { label: 'Inventory', path: '/inventory', icon: 'inventory', roles: CATALOGUE_ROLES },
   { label: 'Customers', path: '/customers', icon: 'customers', roles: ALL_STAFF_ROLES },
+  { label: 'Inbox', path: '/inbox', icon: 'inbox', roles: ALL_STAFF_ROLES },
+  { label: 'Services', path: '/services', icon: 'services', roles: CATALOGUE_ROLES },
   { label: 'Payments', path: '/payments', icon: 'payments', roles: OWNER_ROLES },
   { label: 'Staff', path: '/staff', icon: 'staff', roles: OWNER_ROLES },
   { label: 'Reports', path: '/reports', icon: 'reports', roles: CATALOGUE_ROLES },

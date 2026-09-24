@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1000" viewBox="0 0 800 1000" role="img" aria-label="Product photo coming soon">
+  <rect width="800" height="1000" fill="#f6f1ea"/>
+  <rect x="48" y="48" width="704" height="904" fill="none" stroke="#c9a876" stroke-width="2"/>
+  <text x="400" y="470" text-anchor="middle" fill="#2b1d22" font-family="Georgia, serif" font-size="42">Sleek Sisters</text>
+  <text x="400" y="530" text-anchor="middle" fill="#8a7350" font-family="Georgia, serif" font-size="22">Photo coming soon</text>
+</svg>

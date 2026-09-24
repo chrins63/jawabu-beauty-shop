@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
 import { supabase } from '../lib/supabase'
 import { categorySlug, slugMatchesCategory } from '../lib/brand'
-import { buildCategoryLookup, normalizeStoreProduct } from '../lib/storeProduct'
+import { buildCategoryLookup, isInStock, normalizeStoreProduct } from '../lib/storeProduct'
 import { useCart } from '../context/useCart'
 import { useWishlist } from '../context/useWishlist'
 import {
@@ -221,7 +221,9 @@ const Shop = () => {
       return
     }
 
-    addToCart(product)
+    if (!isInStock(product) || !addToCart(product)) {
+      return
+    }
 
     setAddedProductId(
       product.id
@@ -794,9 +796,12 @@ const Shop = () => {
                                   ? 'add-to-bag added'
                                   : 'add-to-bag'
                               }
+                              disabled={!product.hasOptions && !isInStock(product)}
                               aria-label={
                                 product.hasOptions
                                   ? `Choose ${product.name}`
+                                  : !isInStock(product)
+                                    ? `${product.name} is sold out`
                                   : addedProductId ===
                                     product.id
                                     ? `${product.name} added to bag`
@@ -809,7 +814,9 @@ const Shop = () => {
                               }
                             >
 
-                              {product.hasOptions ? (
+                              {!product.hasOptions && !isInStock(product) ? (
+                                <span>Sold out</span>
+                              ) : product.hasOptions ? (
 
                                 <>
 

@@ -52,9 +52,20 @@ const getProducts = async (req, res) => {
 
     const category = req.query.category || ''
 
-    const sort = req.query.sort || 'created_at'
+    const allowedSorts = new Set([
+      'created_at',
+      'name',
+      'price',
+      'stock_quantity',
+      'id',
+    ])
 
-    const order = req.query.order || 'desc'
+    const requestedSort = String(req.query.sort || 'created_at')
+    const sort = allowedSorts.has(requestedSort) ? requestedSort : 'created_at'
+
+    const order = String(req.query.order || 'desc').toLowerCase() === 'asc'
+      ? 'asc'
+      : 'desc'
 
     let query = db('products')
 

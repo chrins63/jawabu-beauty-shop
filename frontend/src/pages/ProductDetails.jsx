@@ -28,6 +28,7 @@ import { useWishlist } from '../context/useWishlist'
 import { BRAND } from '../lib/brand'
 import { getStorefrontCommerce } from '../lib/storefront'
 import { whatsappHref } from '../lib/whatsapp'
+import ProductReviews from '../components/ProductReviews'
 
 const ProductDetails = () => {
   const { id } = useParams()
@@ -707,6 +708,7 @@ const ProductDetails = () => {
 
       </section>
 
+      {product?.id ? <ProductReviews productId={product.id} /> : null}
 
       {/* =====================================================
           SIMILAR PRODUCTS

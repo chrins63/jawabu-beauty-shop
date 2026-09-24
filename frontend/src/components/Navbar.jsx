@@ -28,6 +28,7 @@ import "./Navbar.css";
 const NAV_LINKS = [
   { to: "/", label: "Home" },
   { to: "/shop", label: "Shop" },
+  { to: "/services", label: "Services" },
   { to: "/track", label: "Track" },
   { to: "/about", label: "About" },
   { to: "/contact", label: "Contact" }

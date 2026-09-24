@@ -75,6 +75,7 @@ const Footer = () => {
           <div className="footer-column">
             <h3>Shop</h3>
             <Link to="/shop">All Products</Link>
+            <Link to="/services">Services</Link>
             <Link to="/track">Track order</Link>
             {HOME_CATEGORIES.map((category) => (
               <Link

@@ -112,6 +112,7 @@ const Checkout = () => {
   const [formError, setFormError] = useState('')
   const [payMessage, setPayMessage] = useState('')
   const [stkBusy, setStkBusy] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState('M-Pesa')
 
   const deliveryOptions = commerce?.delivery_options || []
   const selectedOption = deliveryOptions.find(
@@ -122,6 +123,63 @@ const Checkout = () => {
   const orderTotal = Number(cartTotal) + deliveryFee
   const whatsappNumber = commerce?.whatsapp_number || BRAND.phone
   const mpesa = commerce?.mpesa || {}
+  const payments = commerce?.payments || { cash: true, card: true, bank: true }
+
+  const paymentChoices = useMemo(() => {
+    const choices = []
+
+    if (mpesa.enabled !== false) {
+      choices.push({
+        id: 'M-Pesa',
+        title: 'Lipa Na M-Pesa',
+        detail: mpesa.stk_ready
+          ? 'A prompt will be sent to your phone after you place the order.'
+          : 'You will receive till or paybill details after placing the order.',
+      })
+    }
+
+    if (payments.cash !== false) {
+      choices.push({
+        id: 'Cash',
+        title: needsAddress ? 'Pay on delivery' : 'Pay when you collect',
+        detail: needsAddress
+          ? 'Pay cash when the order arrives.'
+          : 'Pay cash at the collection point. No M-Pesa needed.',
+      })
+    }
+
+    if (payments.card) {
+      choices.push({
+        id: 'Card',
+        title: 'Card',
+        detail: 'We will contact you to take the card payment.',
+      })
+    }
+
+    if (payments.bank) {
+      choices.push({
+        id: 'Bank transfer',
+        title: 'Bank transfer',
+        detail: 'We will send the bank details after you place the order.',
+      })
+    }
+
+    if (!choices.length) {
+      choices.push({
+        id: 'M-Pesa',
+        title: 'Lipa Na M-Pesa',
+        detail: 'You will receive payment details after placing the order.',
+      })
+    }
+
+    return choices
+  }, [mpesa.enabled, mpesa.stk_ready, payments.cash, payments.card, payments.bank, needsAddress])
+
+  useEffect(() => {
+    if (!paymentChoices.some((choice) => choice.id === paymentMethod)) {
+      setPaymentMethod(paymentChoices[0].id)
+    }
+  }, [paymentChoices, paymentMethod])
 
   useEffect(() => {
     getStorefrontCommerce().then((data) => {
@@ -272,7 +330,7 @@ const Checkout = () => {
     }
 
     const payPhone = formData.mpesaPhone.trim() || formData.phone
-    if (!isValidKenyanPhone(payPhone)) {
+    if (paymentMethod === 'M-Pesa' && !isValidKenyanPhone(payPhone)) {
       setFormError('Enter a valid M-Pesa number.')
       return
     }
@@ -315,6 +373,7 @@ const Checkout = () => {
         giftMessage: formData.giftMessage.trim(),
         lat: formData.lat,
         lng: formData.lng,
+        paymentMethod,
       })
 
       if (error) {
@@ -331,6 +390,7 @@ const Checkout = () => {
         payment_status: data?.payment_status || 'pending',
         phone: formData.phone.trim(),
         mpesaPhone: payPhone,
+        payment_method: paymentMethod,
       }
 
       setOrderData(placed)
@@ -361,12 +421,22 @@ const Checkout = () => {
       clearCart()
       setOrderPlaced(true)
 
-      if (mpesa.stk_ready) {
+      if (paymentMethod === 'M-Pesa' && mpesa.stk_ready) {
         await startStk(orderId, formData.phone.trim(), payPhone)
-      } else {
+      } else if (paymentMethod === 'M-Pesa') {
         setPayMessage(
           'Your order is saved. Complete Lipa Na M-Pesa using the details below.'
         )
+      } else if (paymentMethod === 'Cash') {
+        setPayMessage(
+          needsAddress
+            ? 'Your order is saved. Pay cash when it arrives.'
+            : 'Your order is saved. Pay cash when you collect it.'
+        )
+      } else if (paymentMethod === 'Card') {
+        setPayMessage('Your order is saved. We will contact you to take the card payment.')
+      } else {
+        setPayMessage('Your order is saved. We will send bank details to confirm payment.')
       }
     } catch (error) {
       console.error('CHECKOUT UNEXPECTED ERROR:', error)
@@ -417,7 +487,13 @@ const Checkout = () => {
             <p>
               {paid
                 ? `Thank you, ${formData.firstName}. We will prepare your order shortly.`
-                : `Thank you, ${formData.firstName}. Complete M-Pesa to confirm your order.`}
+                : orderData?.payment_method === 'Cash'
+                  ? `Thank you, ${formData.firstName}. Pay cash when you receive the order.`
+                  : orderData?.payment_method === 'Card'
+                    ? `Thank you, ${formData.firstName}. We will contact you to take the card payment.`
+                    : orderData?.payment_method === 'Bank transfer'
+                      ? `Thank you, ${formData.firstName}. We will send bank details to confirm payment.`
+                      : `Thank you, ${formData.firstName}. Complete M-Pesa to confirm your order.`}
             </p>
 
             {orderData?.order_number && (
@@ -433,7 +509,7 @@ const Checkout = () => {
 
             {payMessage && <p className="checkout-pay-status">{payMessage}</p>}
 
-            {!paid && (
+            {!paid && orderData?.payment_method === 'M-Pesa' && (
               <>
                 {mpesa.stk_ready && (
                   <button
@@ -492,7 +568,7 @@ const Checkout = () => {
             <span className="section-eyebrow">CHECKOUT</span>
             <h1>Complete Your Order</h1>
             <p>
-              Choose delivery, pay with M-Pesa, and we will pack your Sleek Sisters
+              Choose how you receive it and how you pay, and we will pack your Sleek Sisters
               order with care.
             </p>
           </div>
@@ -666,33 +742,43 @@ const Checkout = () => {
 
               <div className="checkout-form-section">
                 <span className="checkout-form-label">03 — PAYMENT</span>
-                <h2>M-Pesa</h2>
+                <h2>How would you like to pay?</h2>
 
-                <div className="checkout-payment-option">
-                  <div className="checkout-payment-icon">M</div>
-                  <div>
-                    <strong>Lipa Na M-Pesa</strong>
-                    <p>
-                      {mpesa.stk_ready
-                        ? 'A prompt will be sent to your phone after you place the order.'
-                        : 'You will receive till or paybill details after placing the order.'}
-                    </p>
-                  </div>
-                  <FiCheck />
-                </div>
-
-                <div className="checkout-field">
-                  <label htmlFor="mpesaPhone">M-Pesa number</label>
-                  <input
-                    id="mpesaPhone"
-                    name="mpesaPhone"
-                    type="tel"
-                    placeholder="Same as your phone, or another Safaricom number"
-                    value={formData.mpesaPhone}
-                    onChange={handleChange}
+                {paymentChoices.map((choice) => (
+                  <button
+                    key={choice.id}
+                    type="button"
+                    className={`checkout-payment-option${
+                      paymentMethod === choice.id ? ' is-selected' : ''
+                    }`}
+                    onClick={() => setPaymentMethod(choice.id)}
                     disabled={isSubmitting}
-                  />
-                </div>
+                  >
+                    <div className="checkout-payment-icon">
+                      {choice.id === 'M-Pesa' ? 'M' : choice.id === 'Cash' ? 'C' : choice.id === 'Card' ? 'K' : 'B'}
+                    </div>
+                    <div>
+                      <strong>{choice.title}</strong>
+                      <p>{choice.detail}</p>
+                    </div>
+                    {paymentMethod === choice.id ? <FiCheck /> : <span />}
+                  </button>
+                ))}
+
+                {paymentMethod === 'M-Pesa' ? (
+                  <div className="checkout-field">
+                    <label htmlFor="mpesaPhone">M-Pesa number</label>
+                    <input
+                      id="mpesaPhone"
+                      name="mpesaPhone"
+                      type="tel"
+                      placeholder="Same as your phone, or another Safaricom number"
+                      value={formData.mpesaPhone}
+                      onChange={handleChange}
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                ) : null}
 
                 <label className="checkout-sms-optin">
                   <input

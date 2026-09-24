@@ -21,6 +21,8 @@ import POS from './pages/POS';
 import Reports from './pages/Reports';
 import Payments from './pages/Payments.jsx';
 import Customers from './pages/Customers';
+import Inbox from './pages/Inbox';
+import ServicesAdmin from './pages/Services';
 import Settings from './pages/Settings';
 import Categories from './pages/Categories';
 import Staff from './pages/Staff';
@@ -124,6 +126,14 @@ function App() {
   path="/customers"
   element={<Customers />}
 />
+            <Route
+              path="/inbox"
+              element={<Inbox />}
+            />
+            <Route
+              path="/services"
+              element={<ServicesAdmin />}
+            />
             <Route
               path="/settings"
               element={<Settings />}

@@ -12,6 +12,11 @@ const FALLBACK = {
     account_name: BRAND.name,
     stk_ready: false,
   },
+  payments: {
+    cash: true,
+    card: true,
+    bank: true,
+  },
   delivery_options: [],
 }
 

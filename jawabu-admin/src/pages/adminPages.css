@@ -138,6 +138,28 @@
   color: #fff;
 }
 
+.admin-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.admin-tab {
+  border: 1px solid #e9e1d6;
+  background: #fff;
+  border-radius: 999px;
+  padding: 8px 14px;
+  cursor: pointer;
+  color: #262220;
+}
+
+.admin-tab.is-active {
+  background: #262220;
+  color: #fff;
+  border-color: #262220;
+}
+
 .admin-page-message {
   padding: 14px 16px;
   border-radius: 12px;

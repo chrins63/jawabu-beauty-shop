@@ -1,8 +1,7 @@
 import {
   BrowserRouter,
   Routes,
-  Route,
-  Navigate
+  Route
 } from "react-router-dom";
 
 import MainLayout from "./layouts/MainLayout";
@@ -10,6 +9,7 @@ import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/Home";
 import Shop from "./pages/Shop";
 import ProductDetails from "./pages/ProductDetails";
+import Services from "./pages/Services";
 import Account from "./pages/Account";
 import Orders from "./pages/Orders";
 import About from "./pages/About";
@@ -102,7 +102,7 @@ function App() {
                 {/* SERVICES */}
                 <Route
                   path="/services"
-                  element={<Navigate to="/shop" replace />}
+                  element={<Services />}
                 />
 
                 {/* ABOUT */}
