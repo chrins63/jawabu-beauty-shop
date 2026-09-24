@@ -14,6 +14,7 @@ import {
   extractOrderId,
   formatKes,
   getCheckoutPaymentStatus,
+  notifyOrderPlaced,
   rememberLocalOrder,
   requestMpesaStk,
 } from '../lib/checkout'
@@ -421,22 +422,43 @@ const Checkout = () => {
       clearCart()
       setOrderPlaced(true)
 
+      const notice = await notifyOrderPlaced({
+        orderId,
+        phone: formData.phone.trim(),
+      })
+      const sentBy = [
+        notice.emailSent ? 'email' : '',
+        notice.smsSent ? 'text' : '',
+      ].filter(Boolean)
+      const sentLine = sentBy.length
+        ? ` We sent a confirmation by ${sentBy.join(' and ')}.`
+        : ''
+
       if (paymentMethod === 'M-Pesa' && mpesa.stk_ready) {
         await startStk(orderId, formData.phone.trim(), payPhone)
+        if (sentLine) {
+          setPayMessage((current) => `${current || ''}${sentLine}`.trim())
+        }
       } else if (paymentMethod === 'M-Pesa') {
         setPayMessage(
-          'Your order is saved. Complete Lipa Na M-Pesa using the details below.'
+          `Your order is saved. Complete Lipa Na M-Pesa using the details below.${sentLine}`
         )
       } else if (paymentMethod === 'Cash') {
         setPayMessage(
-          needsAddress
-            ? 'Your order is saved. Pay cash when it arrives.'
-            : 'Your order is saved. Pay cash when you collect it.'
+          `${
+            needsAddress
+              ? 'Your order is saved. Pay cash when it arrives.'
+              : 'Your order is saved. Pay cash when you collect it.'
+          }${sentLine}`
         )
       } else if (paymentMethod === 'Card') {
-        setPayMessage('Your order is saved. We will contact you to take the card payment.')
+        setPayMessage(
+          `Your order is saved. We will contact you to take the card payment.${sentLine}`
+        )
       } else {
-        setPayMessage('Your order is saved. We will send bank details to confirm payment.')
+        setPayMessage(
+          `Your order is saved. We will send bank details to confirm payment.${sentLine}`
+        )
       }
     } catch (error) {
       console.error('CHECKOUT UNEXPECTED ERROR:', error)

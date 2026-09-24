@@ -68,6 +68,24 @@ export async function getCheckoutPaymentStatus(orderId, phone) {
   })
 }
 
+export async function notifyOrderPlaced({ orderId, phone }) {
+  const { data, error } = await supabase.functions.invoke('order-confirmation', {
+    body: {
+      order_id: Number(orderId),
+      phone,
+    },
+  })
+
+  if (error || data?.ok === false) {
+    return { emailSent: false, smsSent: false }
+  }
+
+  return {
+    emailSent: Boolean(data?.email_sent),
+    smsSent: Boolean(data?.sms_sent),
+  }
+}
+
 export async function trackGuestOrder(orderNumber, phone) {
   return supabase.rpc('track_guest_order', {
     p_order_number: orderNumber,
