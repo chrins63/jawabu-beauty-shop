@@ -567,23 +567,9 @@ textarea:focus {
   color: #f5ead0;
 }
 
-.track-items-title {
-  color: #fff8e7;
-}
-
 .track-items li {
   border-top-color: rgba(232, 195, 106, 0.18);
   color: #f5ead0;
-}
-
-.track-items img {
-  border-color: rgba(232, 195, 106, 0.28);
-  background: #16130f;
-}
-
-.track-items span,
-.track-items-empty {
-  color: #c9b896;
 }
 
 .cart-summary-divider,
@@ -745,8 +731,7 @@ textarea:focus {
   color: #f5ead0;
 }
 
-.checkout-delivery-card.is-selected,
-.checkout-payment-option.is-selected {
+.checkout-delivery-card.is-selected {
   border-color: #f3d98a;
   box-shadow: 0 0 0 1px #e8c36a;
 }
@@ -1013,4 +998,120 @@ textarea:focus {
 .account-panel-link,
 .account-footer-copy a {
   color: #f3d98a;
+}
+
+.order-receipt {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  background: #0c0b09;
+  border: 1px solid rgba(232, 195, 106, 0.22);
+  color: #f5ead0;
+}
+
+.order-receipt-head,
+.order-receipt-foot,
+.order-receipt-items li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.order-receipt h2,
+.order-receipt p,
+.order-receipt li {
+  color: #f5ead0;
+}
+
+.order-receipt-head p,
+.order-receipt-status,
+.order-receipt-items span {
+  color: #c9b896;
+  font-size: 13px;
+}
+
+.order-receipt-status {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+}
+
+.order-receipt-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.order-receipt-items li {
+  align-items: center;
+}
+
+.order-receipt-items a {
+  flex: 0 0 64px;
+}
+
+.order-receipt-items img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  display: block;
+  background: #161410;
+}
+
+.order-receipt-items div {
+  flex: 1;
+  display: grid;
+  gap: 2px;
+}
+
+.order-receipt-foot {
+  align-items: center;
+  border-top: 1px solid rgba(232, 195, 106, 0.22);
+  padding-top: 12px;
+}
+
+.order-receipt-total strong,
+.order-receipt-items strong {
+  color: #f3d98a;
+}
+
+.customer-reviews {
+  padding: 72px 0;
+  background: #0c0b09;
+  color: #f5ead0;
+}
+
+.customer-reviews h2,
+.customer-reviews p,
+.customer-reviews li {
+  color: #f5ead0;
+}
+
+.customer-reviews .section-eyebrow,
+.product-reviews-empty,
+.product-reviews-list span {
+  color: #c9b896;
+}
+
+.product-reviews-list {
+  list-style: none;
+  margin: 24px 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.product-reviews-list li {
+  display: grid;
+  gap: 6px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(232, 195, 106, 0.22);
+}
+
+.product-reviews-form {
+  max-width: 560px;
+  margin-top: 24px;
 }

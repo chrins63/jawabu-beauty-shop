@@ -1,46 +1,41 @@
 import { useEffect, useRef, useState } from 'react'
+import { loadRemoteCart, saveRemoteCart } from '../lib/accountSync'
 import { capQuantity, normalizeStoreProduct } from '../lib/storeProduct'
 import { cartLineKey } from '../lib/productOptions'
-import { loadRemoteCart, saveRemoteCart } from '../lib/accountSync'
 import { useAuth } from './AuthContext'
 import { CartContext, STORAGE_KEY } from './cart-context.js'
 
-function mergeCart(localItems, remoteRows) {
-  const next = [...localItems]
+function mergeCartLines(localItems, remoteItems) {
+  const merged = new Map()
 
-  for (const row of remoteRows) {
-    const normalized = normalizeStoreProduct(row.product)
-    const index = next.findIndex(
-      (item) => Number(item.id) === Number(normalized.id) && !item.variant_id
-    )
-    const remoteQty = capQuantity(row.quantity, normalized.stock_quantity)
-
-    if (index >= 0) {
-      const existing = next[index]
-      const quantity = capQuantity(
-        Math.max(Number(existing.quantity) || 0, Number(row.quantity) || 0),
-        normalized.stock_quantity
-      )
-      next[index] = {
-        ...existing,
-        stock_quantity: normalized.stock_quantity,
-        quantity: quantity > 0 ? quantity : existing.quantity,
-      }
-    } else if (remoteQty > 0) {
-      next.push({
-        ...normalized,
-        quantity: remoteQty,
-      })
+  for (const item of [...remoteItems, ...localItems]) {
+    const key = cartLineKey(item)
+    const existing = merged.get(key)
+    if (!existing) {
+      merged.set(key, item)
+      continue
     }
+
+    merged.set(key, {
+      ...existing,
+      ...item,
+      quantity: Math.max(
+        Number(existing.quantity) || 0,
+        Number(item.quantity) || 0
+      ),
+    })
   }
 
-  return next
+  return [...merged.values()]
 }
 
 export const CartProvider = ({ children }) => {
-  const { user } = useAuth()
-  const skipSync = useRef(true)
+  const { user, loading: authLoading } = useAuth()
+  const [remoteReady, setRemoteReady] = useState(false)
   const cartRef = useRef([])
+  const previousUserId = useRef(null)
+  const seenAuth = useRef(false)
+
   const [cartItems, setCartItems] = useState(() => {
     try {
       const savedCart = localStorage.getItem(STORAGE_KEY)
@@ -51,8 +46,6 @@ export const CartProvider = ({ children }) => {
       return []
     }
   })
-
-  cartRef.current = cartItems
 
   useEffect(() => {
     try {
@@ -65,58 +58,65 @@ export const CartProvider = ({ children }) => {
     }
   }, [cartItems])
 
+  cartRef.current = cartItems
+
   useEffect(() => {
+    if (authLoading) {
+      return undefined
+    }
+
     let cancelled = false
-    skipSync.current = true
+    const previous = seenAuth.current ? previousUserId.current : null
+    seenAuth.current = true
+    const switching = Boolean(previous && user?.id && previous !== user.id)
+    previousUserId.current = user?.id || null
 
     async function hydrate() {
-      if (!user?.id) {
-        skipSync.current = false
+      if (!user) {
+        if (!cancelled) {
+          setRemoteReady(true)
+        }
         return
       }
 
       const remote = await loadRemoteCart(user.id)
-      if (cancelled) {
+      if (cancelled || remote == null) {
         return
       }
 
-      const merged = mergeCart(cartRef.current, remote)
-      setCartItems(merged)
-      await saveRemoteCart(user.id, merged)
-      if (!cancelled) {
-        skipSync.current = false
-      }
+      const local = switching ? [] : cartRef.current
+      setCartItems(mergeCartLines(local, remote))
+      setRemoteReady(true)
     }
 
+    setRemoteReady(false)
     hydrate()
 
     return () => {
       cancelled = true
     }
-  }, [user?.id])
+  }, [authLoading, user])
 
   useEffect(() => {
-    if (skipSync.current || !user?.id) {
+    if (!user || !remoteReady) {
       return undefined
     }
 
-    const handle = setTimeout(() => {
+    const handle = window.setTimeout(() => {
       saveRemoteCart(user.id, cartItems)
-    }, 400)
+    }, 500)
 
-    return () => clearTimeout(handle)
-  }, [cartItems, user?.id])
+    return () => window.clearTimeout(handle)
+  }, [cartItems, remoteReady, user])
 
   const addToCart = (product, quantity = 1) => {
-    const normalized = normalizeStoreProduct(product)
-    const nextQuantity = capQuantity(quantity, normalized.stock_quantity)
-
-    if (nextQuantity <= 0) {
+    const nextQuantity = capQuantity(quantity, product.stock_quantity)
+    if (nextQuantity < 1) {
       return false
     }
 
     const incoming = {
-      ...normalized,
+      ...normalizeStoreProduct(product),
       quantity: nextQuantity,
     }
 
@@ -169,18 +169,14 @@ export const CartProvider = ({ children }) => {
           return item
         }
 
-        const nextQuantity = capQuantity(
-          item.quantity + 1,
-          item.stock_quantity
-        )
-
-        if (nextQuantity <= 0) {
+        const next = capQuantity(item.quantity + 1, item.stock_quantity)
+        if (next < 1) {
           return item
         }
 
         return {
           ...item,
-          quantity: nextQuantity,
+          quantity: next,
         }
       })
     )

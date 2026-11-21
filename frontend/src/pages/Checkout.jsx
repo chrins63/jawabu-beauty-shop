@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   FiArrowLeft,
@@ -114,6 +114,8 @@ const Checkout = () => {
   const [payMessage, setPayMessage] = useState('')
   const [stkBusy, setStkBusy] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState('M-Pesa')
+  const [commerceReady, setCommerceReady] = useState(false)
+  const confirmedPayment = useRef(false)
 
   const deliveryOptions = commerce?.delivery_options || []
   const selectedOption = deliveryOptions.find(
@@ -185,6 +187,7 @@ const Checkout = () => {
   useEffect(() => {
     getStorefrontCommerce().then((data) => {
       setCommerce(data)
+      setCommerceReady(true)
       setFormData((current) => {
         if (current.deliveryOptionId || !data.delivery_options?.length) {
           return current
@@ -419,13 +422,22 @@ const Checkout = () => {
         })
       }
 
-      clearCart()
+      const holdBag =
+        paymentMethod === 'M-Pesa' &&
+        String(placed.payment_status || '').toLowerCase() !== 'paid'
+
+      if (!holdBag) {
+        clearCart()
+      }
+
       setOrderPlaced(true)
 
-      const notice = await notifyOrderPlaced({
-        orderId,
-        phone: formData.phone.trim(),
-      })
+      const notice = holdBag
+        ? { emailSent: false, smsSent: false }
+        : await notifyOrderPlaced({
+            orderId,
+            phone: formData.phone.trim(),
+          })
       const sentBy = [
         notice.emailSent ? 'email' : '',
         notice.smsSent ? 'text' : '',
@@ -436,12 +448,16 @@ const Checkout = () => {
 
       if (paymentMethod === 'M-Pesa' && mpesa.stk_ready) {
         await startStk(orderId, formData.phone.trim(), payPhone)
-        if (sentLine) {
+        if (holdBag) {
+          setPayMessage((current) =>
+            `${current || ''} Your bag stays until the payment goes through.`.trim()
+          )
+        } else if (sentLine) {
           setPayMessage((current) => `${current || ''}${sentLine}`.trim())
         }
       } else if (paymentMethod === 'M-Pesa') {
         setPayMessage(
-          `Your order is saved. Complete Lipa Na M-Pesa using the details below.${sentLine}`
+          `Your order is saved. Complete Lipa Na M-Pesa using the details below. Your bag stays until the payment goes through.${sentLine}`
         )
       } else if (paymentMethod === 'Cash') {
         setPayMessage(
@@ -469,6 +485,34 @@ const Checkout = () => {
   }
 
   const paid = String(orderData?.payment_status || '').toLowerCase() === 'paid'
+  const deliveryMissing = commerceReady && deliveryOptions.length === 0
+
+  useEffect(() => {
+    if (
+      !paid ||
+      orderData?.payment_method !== 'M-Pesa' ||
+      !orderData?.order_id ||
+      !orderData?.phone ||
+      confirmedPayment.current
+    ) {
+      return
+    }
+
+    confirmedPayment.current = true
+    clearCart()
+    notifyOrderPlaced({
+      orderId: orderData.order_id,
+      phone: orderData.phone,
+    }).then((notice) => {
+      const sentBy = [
+        notice.emailSent ? 'email' : '',
+        notice.smsSent ? 'text' : '',
+      ].filter(Boolean)
+      if (sentBy.length) {
+        setPayMessage(`Payment received. We sent a confirmation by ${sentBy.join(' and ')}.`)
+      }
+    })
+  }, [clearCart, orderData?.order_id, orderData?.payment_method, orderData?.phone, paid])
 
   const pickupCopy = useMemo(() => {
     if (!selectedOption || selectedOption.requires_address) {
@@ -667,6 +711,17 @@ const Checkout = () => {
                 <span className="checkout-form-label">02 — DELIVERY</span>
                 <h2>How should we send it?</h2>
 
+                {!commerceReady && (
+                  <p className="checkout-pickup-note">Loading delivery options…</p>
+                )}
+
+                {deliveryMissing && (
+                  <p className="checkout-form-error">
+                    Delivery options are not set up yet. Ask the shop to add them
+                    in Admin, then refresh this page.
+                  </p>
+                )}
+
                 <div className="checkout-delivery-grid">
                   {deliveryOptions.map((option) => {
                     const selected =
@@ -820,7 +875,7 @@ const Checkout = () => {
               <button
                 type="submit"
                 className="btn btn-primary checkout-submit"
-                disabled={isSubmitting || !selectedOption}
+                disabled={isSubmitting || !selectedOption || deliveryMissing}
               >
                 {isSubmitting
                   ? 'Placing order…'

@@ -21,6 +21,7 @@ const ProductReviews = ({ productId }) => {
   const [comment, setComment] = useState('')
   const [status, setStatus] = useState('')
   const [saving, setSaving] = useState(false)
+  const [loadError, setLoadError] = useState('')
 
   useEffect(() => {
     let cancelled = false
@@ -32,10 +33,16 @@ const ProductReviews = ({ productId }) => {
         .eq('product_id', Number(productId))
         .order('created_at', { ascending: false })
 
-      if (cancelled || error) {
+      if (cancelled) {
         return
       }
 
+      if (error) {
+        setLoadError('Reviews could not be loaded.')
+        return
+      }
+
+      setLoadError('')
       setReviews(data || [])
       const mine = (data || []).find((row) => row.auth_user_id === user?.id)
       if (mine) {
@@ -89,10 +96,11 @@ const ProductReviews = ({ productId }) => {
   }
 
   return (
-    <section className="product-reviews">
+    <section className="customer-reviews">
       <div className="container">
         <span className="section-eyebrow">REVIEWS</span>
         <h2>What customers say</h2>
+        {loadError ? <p className="product-reviews-empty">{loadError}</p> : null}
 
         {reviews.length === 0 ? (
           <p className="product-reviews-empty">No reviews yet. Be the first.</p>

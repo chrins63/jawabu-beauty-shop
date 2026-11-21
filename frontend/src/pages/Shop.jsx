@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
 import { supabase } from '../lib/supabase'
 import { categorySlug, slugMatchesCategory } from '../lib/brand'
-import { buildCategoryLookup, isInStock, normalizeStoreProduct } from '../lib/storeProduct'
+import { buildCategoryLookup, normalizeStoreProduct } from '../lib/storeProduct'
 import { useCart } from '../context/useCart'
 import { useWishlist } from '../context/useWishlist'
 import {
@@ -221,7 +221,11 @@ const Shop = () => {
       return
     }
 
-    if (!isInStock(product) || !addToCart(product)) {
+    if (Number(product.stock_quantity) <= 0) {
+      return
+    }
+
+    if (!addToCart(product)) {
       return
     }
 
@@ -796,12 +800,13 @@ const Shop = () => {
                                   ? 'add-to-bag added'
                                   : 'add-to-bag'
                               }
-                              disabled={!product.hasOptions && !isInStock(product)}
+                              disabled={
+                                !product.hasOptions &&
+                                Number(product.stock_quantity) <= 0
+                              }
                               aria-label={
                                 product.hasOptions
                                   ? `Choose ${product.name}`
-                                  : !isInStock(product)
-                                    ? `${product.name} is sold out`
                                   : addedProductId ===
                                     product.id
                                     ? `${product.name} added to bag`
@@ -814,7 +819,8 @@ const Shop = () => {
                               }
                             >
 
-                              {!product.hasOptions && !isInStock(product) ? (
+                              {!product.hasOptions &&
+                              Number(product.stock_quantity) <= 0 ? (
                                 <span>Sold out</span>
                               ) : product.hasOptions ? (
 

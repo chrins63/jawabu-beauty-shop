@@ -185,8 +185,7 @@ const Cart = () => {
                             increaseQuantity(item.cartKey || `${item.id}:${item.variant_id || 0}`)
                           }
                           disabled={
-                            Number(item.stock_quantity) > 0 &&
-                            item.quantity >= item.stock_quantity
+                            Number(item.stock_quantity) <= item.quantity
                           }
                           aria-label={`Increase quantity of ${item.name}`}
                         >

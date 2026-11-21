@@ -23,8 +23,20 @@ function statusLabel(value) {
   return value || 'Pending'
 }
 
-export default function OrderReceipt({ order }) {
-  const items = order.items || []
+function lineView(item) {
+  return {
+    id: item.id,
+    productId: item.productId ?? item.product_id,
+    name: item.name || 'Product',
+    image: item.image || '/images/products/placeholder.svg',
+    quantity: Number(item.quantity) || 1,
+    price: Number(item.price ?? item.price_at_purchase) || 0,
+    variantLabel: item.variantLabel || item.variant_label || '',
+  }
+}
+
+export default function OrderReceipt({ order, children }) {
+  const items = (order.items || []).map(lineView)
   const trackTo =
     order.order_number && order.phone
       ? `/track?order=${encodeURIComponent(order.order_number)}&phone=${encodeURIComponent(order.phone)}`
@@ -63,6 +75,8 @@ export default function OrderReceipt({ order }) {
           ))
         )}
       </ul>
+
+      {children}
 
       <footer className="order-receipt-foot">
         {Number(order.delivery_fee) > 0 ? (

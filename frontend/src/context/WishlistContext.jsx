@@ -1,16 +1,27 @@
 import { createContext, useEffect, useRef, useState } from 'react'
-import { toWishlistItem } from '../lib/storeProduct'
 import { loadRemoteWishlist, saveRemoteWishlist } from '../lib/accountSync'
+import { toWishlistItem } from '../lib/storeProduct'
 import { useAuth } from './AuthContext'
+
+function mergeWishlist(localItems, remoteItems) {
+  const merged = new Map()
+  for (const item of [...remoteItems, ...localItems]) {
+    merged.set(item.id, item)
+  }
+  return [...merged.values()]
+}
 
 export const WishlistContext = createContext(null) // eslint-disable-line react-refresh/only-export-components
 
 const STORAGE_KEY = 'sleek-wishlist'
 
 export const WishlistProvider = ({ children }) => {
-  const { user } = useAuth()
-  const skipSync = useRef(true)
+  const { user, loading: authLoading } = useAuth()
+  const [remoteReady, setRemoteReady] = useState(false)
   const wishlistRef = useRef([])
+  const previousUserId = useRef(null)
+  const seenAuth = useRef(false)
+
   const [wishlistItems, setWishlistItems] = useState(() => {
     try {
       const savedWishlist = localStorage.getItem(STORAGE_KEY)
@@ -21,8 +32,6 @@ export const WishlistProvider = ({ children }) => {
       return []
     }
   })
-
-  wishlistRef.current = wishlistItems
 
   useEffect(() => {
     try {
@@ -35,54 +44,57 @@ export const WishlistProvider = ({ children }) => {
     }
   }, [wishlistItems])
 
+  wishlistRef.current = wishlistItems
+
   useEffect(() => {
-    let cancelled = false
-    skipSync.current = true
-
-    async function hydrate() {
-      if (!user?.id) {
-        skipSync.current = false
-        return
-      }
-
-      const remote = await loadRemoteWishlist(user.id)
-      if (cancelled) {
-        return
-      }
-
-      const merged = [...wishlistRef.current]
-      for (const product of remote) {
-        const item = toWishlistItem(product)
-        if (!merged.some((current) => Number(current.id) === Number(item.id))) {
-          merged.push(item)
-        }
-      }
-
-      setWishlistItems(merged)
-      await saveRemoteWishlist(user.id, merged)
-      if (!cancelled) {
-        skipSync.current = false
-      }
+    if (authLoading) {
+      return undefined
     }
 
+    let cancelled = false
+    const previous = seenAuth.current ? previousUserId.current : null
+    seenAuth.current = true
+    const switching = Boolean(previous && user?.id && previous !== user.id)
+    previousUserId.current = user?.id || null
+
+    async function hydrate() {
+      if (!user) {
+        if (!cancelled) {
+          setRemoteReady(true)
+        }
+        return
+      }
+
+      const remoteProducts = await loadRemoteWishlist(user.id)
+      if (cancelled || remoteProducts == null) {
+        return
+      }
+
+      const remote = remoteProducts.map((product) => toWishlistItem(product))
+      const local = switching ? [] : wishlistRef.current
+      setWishlistItems(mergeWishlist(local, remote))
+      setRemoteReady(true)
+    }
+
+    setRemoteReady(false)
     hydrate()
 
     return () => {
       cancelled = true
     }
-  }, [user?.id])
+  }, [authLoading, user])
 
   useEffect(() => {
-    if (skipSync.current || !user?.id) {
+    if (!user || !remoteReady) {
       return undefined
     }
 
-    const handle = setTimeout(() => {
+    const handle = window.setTimeout(() => {
       saveRemoteWishlist(user.id, wishlistItems)
-    }, 400)
+    }, 500)
 
-    return () => clearTimeout(handle)
-  }, [wishlistItems, user?.id])
+    return () => window.clearTimeout(handle)
+  }, [remoteReady, user, wishlistItems])
 
   const isInWishlist = (productId) => {
     return wishlistItems.some((item) => item.id === productId)

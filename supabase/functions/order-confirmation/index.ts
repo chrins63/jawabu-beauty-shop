@@ -28,7 +28,7 @@ Deno.serve(async (req: Request) => {
     const { data: order, error } = await admin
       .from("orders")
       .select(
-        "id, order_number, first_name, last_name, email, phone, total_amount, payment_method, delivery_option_id, city",
+        "id, order_number, first_name, last_name, email, phone, total_amount, payment_method, payment_status, delivery_option_id, city",
       )
       .eq("id", orderId)
       .maybeSingle();
@@ -61,7 +61,7 @@ Deno.serve(async (req: Request) => {
     const emailSent = order.email
       ? await sendConfirmationEmail(admin, order.id, order.email, summary)
       : false;
-    const smsSent = await sendConfirmationSms(admin, order.id, order.phone, summary);
+    const smsSent = await sendPaymentThanks(admin, order.id, order.phone);
 
     return json({ ok: true, email_sent: emailSent, sms_sent: smsSent });
   } catch (error) {
@@ -159,43 +159,29 @@ async function sendConfirmationEmail(
   }
 }
 
-async function sendConfirmationSms(
+async function sendPaymentThanks(
   admin: ReturnType<typeof createClient>,
   orderId: number,
   phone: string,
-  summary: OrderSummary,
 ) {
-  const message = confirmationSms(summary);
   const { data: existing } = await admin
     .from("sms_outbox")
-    .select("id, status")
-    .eq("kind", "order_confirmation")
+    .select("id, status, message, phone")
+    .eq("kind", "payment_thanks")
     .eq("related_order_id", orderId)
     .maybeSingle();
 
-  if (existing?.status === "sent") {
+  if (!existing) {
+    return false;
+  }
+
+  if (existing.status === "sent") {
     return true;
   }
 
-  let rowId = existing?.id;
-  if (!rowId) {
-    const { data: inserted, error } = await admin
-      .from("sms_outbox")
-      .insert({
-        phone,
-        message,
-        kind: "order_confirmation",
-        status: "queued",
-        related_order_id: orderId,
-      })
-      .select("id")
-      .single();
-
-    if (error || !inserted) {
-      return false;
-    }
-    rowId = inserted.id;
-  }
+  const rowId = existing.id;
+  const message = existing.message;
+  phone = existing.phone || phone;
 
   const { data: secrets } = await admin.rpc("get_sms_provider_secrets");
   const username = String(secrets?.username || "").trim();
@@ -279,15 +265,11 @@ function confirmationHtml(summary: OrderSummary) {
 </div>`;
 }
 
-function confirmationSms(summary: OrderSummary) {
-  return `Sleek Sisters: order ${summary.orderNumber} received. Total ${summary.total}. ${summary.deliveryName}. Payment: ${summary.paymentMethod}.`;
-}
-
 function paymentNote(method: string) {
   if (method === "Cash") return "Pay cash when you receive the order.";
   if (method === "Card") return "We will contact you to take the card payment.";
   if (method === "Bank transfer") return "We will send bank details to confirm payment.";
-  return "Complete M-Pesa to confirm the order.";
+  return "M-Pesa payment received.";
 }
 
 async function loadMailConfig(admin: ReturnType<typeof createClient>) {

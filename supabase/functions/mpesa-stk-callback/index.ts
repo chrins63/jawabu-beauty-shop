@@ -31,7 +31,7 @@ Deno.serve(async (req: Request) => {
     const receipt = findMeta(metadataItems, "MpesaReceiptNumber");
     const amount = parseAmount(findMeta(metadataItems, "Amount"));
 
-    await admin.rpc("complete_mpesa_stk", {
+    const completed = await admin.rpc("complete_mpesa_stk", {
       p_checkout_request_id: String(callback.CheckoutRequestID || ""),
       p_merchant_request_id: String(callback.MerchantRequestID || ""),
       p_result_code: Number(callback.ResultCode ?? -1),
@@ -40,6 +40,26 @@ Deno.serve(async (req: Request) => {
       p_payload: payload,
       p_amount: amount,
     });
+
+    const paidNow = completed.data?.paid === true && completed.data?.already_paid !== true;
+    const orderId = Number(completed.data?.order_id);
+    if (paidNow && orderId) {
+      const { data: order } = await admin
+        .from("orders")
+        .select("phone")
+        .eq("id", orderId)
+        .maybeSingle();
+      if (order?.phone) {
+        await fetch(`${supabaseUrl}/functions/v1/order-confirmation`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${serviceKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ order_id: orderId, phone: order.phone }),
+        }).catch(() => null);
+      }
+    }
 
     return new Response(JSON.stringify({ ResultCode: 0, ResultDesc: "Accepted" }), {
       status: 200,

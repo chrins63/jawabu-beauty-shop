@@ -60,6 +60,22 @@ function Icon({ name, size = 20 }) {
         </svg>
       );
 
+    case 'inbox':
+      return (
+        <svg {...commonProps}>
+          <path d="M4 6h16v12H4z" />
+          <path d="m4 7 8 6 8-6" />
+        </svg>
+      );
+
+    case 'services':
+      return (
+        <svg {...commonProps}>
+          <circle cx="12" cy="12" r="8" />
+          <path d="M12 8v4l3 2" />
+        </svg>
+      );
+
     case 'products':
       return (
         <svg {...commonProps}>
@@ -98,24 +114,6 @@ function Icon({ name, size = 20 }) {
           <circle cx="9.5" cy="7" r="3.5" />
           <path d="M17 11a3.5 3.5 0 1 0-1.2-6.8" />
           <path d="M21 20v-1.5a4 4 0 0 0-3-3.87" />
-        </svg>
-      );
-
-    case 'inbox':
-      return (
-        <svg {...commonProps}>
-          <path d="M4 6h16v12H4z" />
-          <path d="m4 7 8 6 8-6" />
-        </svg>
-      );
-
-    case 'services':
-      return (
-        <svg {...commonProps}>
-          <rect x="4" y="5" width="16" height="15" rx="2" />
-          <path d="M8 3v4" />
-          <path d="M16 3v4" />
-          <path d="M4 9h16" />
         </svg>
       );
 
