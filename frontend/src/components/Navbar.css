@@ -3,14 +3,14 @@
    ========================================================= */
 
 :root {
-  --jwb-ink: #f5ead0;
-  --jwb-ink-soft: #f3d98a;
+  --jwb-ink: #f7f1de;
+  --jwb-ink-soft: #f2d16b;
   --jwb-cream: #000000;
-  --jwb-cream-soft: #111111;
-  --jwb-blush: rgba(232, 195, 106, 0.16);
-  --jwb-accent: #e8c36a;
-  --jwb-accent-deep: #f3d98a;
-  --jwb-border: rgba(232, 195, 106, 0.45);
+  --jwb-cream-soft: #0a0a0a;
+  --jwb-blush: rgba(212, 175, 55, 0.18);
+  --jwb-accent: #d4af37;
+  --jwb-accent-deep: #f2d16b;
+  --jwb-border: rgba(212, 175, 55, 0.8);
   --jwb-glass: #000000;
   --jwb-glass-strong: #000000;
   --jwb-mirror-line: rgba(243, 217, 138, 0.85);
@@ -34,10 +34,10 @@
   padding-top: env(safe-area-inset-top, 0px);
 
   background: #000000;
-  border-bottom: 3px solid #e8c36a;
-  border-top: 3px solid #e8c36a;
+  border-bottom: 4px solid #d4af37;
+  border-top: 4px solid #d4af37;
   box-shadow:
-    0 1px 0 #f3d98a,
+    0 1px 0 #f2d16b,
     0 14px 36px rgba(0, 0, 0, 0.55);
 
   transition:
@@ -72,9 +72,9 @@
 .navbar--scrolled {
   background: #000000;
   box-shadow:
-    0 1px 0 #f3d98a,
+    0 1px 0 #f2d16b,
     0 18px 40px rgba(0, 0, 0, 0.75);
-  border-bottom-color: #e8c36a;
+  border-bottom-color: #d4af37;
 }
 
 .navbar-container {
@@ -125,7 +125,7 @@
   font-size: 20px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: #f3d98a;
+  color: #f2d16b;
   line-height: 1.1;
   white-space: nowrap;
   text-shadow: 0 0 18px rgba(232, 195, 106, 0.35);
@@ -182,7 +182,7 @@
   height: 3px;
   border-radius: 2px;
 
-  background: #e8c36a;
+  background: #d4af37;
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.25s ease;
@@ -198,7 +198,7 @@
 }
 
 .navbar-link.is-active {
-  color: #f3d98a;
+  color: #f2d16b;
   font-weight: 600;
 }
 

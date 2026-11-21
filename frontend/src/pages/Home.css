@@ -26,12 +26,12 @@
 ===================================================== */
 
 :root {
-  --flame: #e8c36a;
-  --flame-dark: #d4af37;
-  --cream: #070707;
-  --blush: #14110c;
-  --ink: #f5ead0;
-  --ink-soft: #c9b896;
+  --flame: #d4af37;
+  --flame-dark: #a67c1a;
+  --cream: #000000;
+  --blush: #0a0a0a;
+  --ink: #f7f1de;
+  --ink-soft: #e0c98a;
   --font-display: Cambria, "Cormorant Garamond", Georgia, serif;
   --font-body: Calibri, "Source Sans 3", "Segoe UI", sans-serif;
   --radius-lg: 8px;
@@ -248,9 +248,9 @@
   aspect-ratio: 4 / 5;
   border-radius: 2px;
   overflow: hidden;
-  background: #0c0b09;
+  background: #000000;
   box-shadow: var(--shadow-soft);
-  border: 1px solid rgba(232, 195, 106, 0.38);
+  border: 2px solid #d4af37;
 }
 
 .hero-image-frame img {
@@ -296,8 +296,8 @@
   position: absolute;
   bottom: 18px;
   left: 18px;
-  background: #262220;
-  border: 1px solid #c9a876;
+  background: #000000;
+  border: 2px solid #d4af37;
   border-radius: 2px;
   padding: 22px 24px;
   box-shadow: var(--shadow-lift);
@@ -371,8 +371,8 @@
   min-height: 260px;
   padding: 22px;
   border-radius: 2px;
-  border: 1px solid #e9e1d6;
-  border-top: 2px solid #c9a876;
+  border: 2px solid rgba(212, 175, 55, 0.7);
+  border-top: 3px solid #d4af37;
   background: var(--blush);
   text-decoration: none;
   color: var(--ink);
@@ -460,7 +460,8 @@
 }
 
 .product-card {
-  background: #12100c;
+  background: #050505;
+  border: 2px solid rgba(212, 175, 55, 0.75);
   border-radius: 2px;
   border: 1px solid rgba(232, 195, 106, 0.28);
   overflow: hidden;
@@ -517,8 +518,9 @@
   height: 34px;
   border: none;
   border-radius: 50%;
-  background: #fff;
+  background: #000;
   color: var(--ink);
+  border: 2px solid #d4af37;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -545,7 +547,7 @@
   padding: 5px 10px;
   border-radius: 2px;
   text-transform: uppercase;
-  color: #262220;
+  color: #000;
 }
 
 .product-info {
@@ -741,7 +743,8 @@
   gap: 24px;
   flex-wrap: wrap;
   padding: 32px;
-  background: #fff;
+  background: #0a0a0a;
+  border: 2px solid #d4af37;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
 }
@@ -777,7 +780,7 @@
   aspect-ratio: 4 / 5;
   border-radius: 2px;
   overflow: hidden;
-  background: #262220;
+  background: #000000;
 }
 
 .brand-story-image img {
@@ -886,11 +889,11 @@
   grid-template-columns: 1fr 1fr;
   gap: 40px;
   align-items: center;
-  background: #262220;
-  border: 1px solid #c9a876;
+  background: #000000;
+  border: 3px solid #d4af37;
   border-radius: 2px;
   padding: 52px;
-  color: #fafaf8;
+  color: #f7f1de;
 }
 
 .newsletter-content .section-eyebrow {
@@ -904,7 +907,7 @@
 }
 
 .newsletter-content h2 span {
-  color: #c9a876;
+  color: #d4af37;
 }
 
 .newsletter-content p {
@@ -920,7 +923,8 @@
 
 .newsletter-input-wrapper {
   display: flex;
-  background: #fff;
+  background: #111111;
+  border: 2px solid #d4af37;
   border-radius: 2px;
   padding: 6px;
   gap: 6px;
@@ -944,8 +948,8 @@
   border: none;
   border-radius: 2px;
   padding: 12px 22px;
-  background: #c9a876;
-  color: #262220;
+  background: #d4af37;
+  color: #000;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -954,8 +958,8 @@
 }
 
 .newsletter-submit:hover {
-  background: #a88b58;
-  color: #fff;
+  background: #a67c1a;
+  color: #000;
 }
 
 .newsletter-form p {
