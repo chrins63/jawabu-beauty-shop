@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  FiHeart,
-  FiLogOut,
-  FiMail,
-  FiMapPin,
-  FiPackage,
-  FiShoppingBag,
-  FiUser,
-} from 'react-icons/fi'
+  LuHeart,
+  LuHouse,
+  LuLogOut,
+  LuMail,
+  LuMapPin,
+  LuPackage,
+  LuPhone,
+  LuShoppingBag,
+  LuUser,
+} from 'react-icons/lu'
 
 import { supabase } from '../lib/supabase'
 import { getRememberedOrderIds } from '../lib/checkout'
@@ -188,181 +190,200 @@ export default function Account() {
 
       <section className="account-content">
         <div className="account-container">
-          <div className="account-shortcuts">
-            <Link to="/orders" className="account-shortcut">
-              <FiPackage />
-              <strong>My orders</strong>
-              <span>
-                {ordersLoading
-                  ? 'Loading...'
-                  : orders.length
-                    ? `${orders.length} on file`
-                    : 'No orders yet'}
-              </span>
-            </Link>
-            <Link to="/track" className="account-shortcut">
-              <FiMapPin />
-              <strong>Track order</strong>
-              <span>Find a delivery with your order number</span>
-            </Link>
-            <Link to="/wishlist" className="account-shortcut">
-              <FiHeart />
-              <strong>Wishlist</strong>
-              <span>
-                {wishlistCount
-                  ? `${wishlistCount} saved`
-                  : 'Save products for later'}
-              </span>
-            </Link>
-            <Link to="/shop" className="account-shortcut">
-              <FiShoppingBag />
-              <strong>Shop again</strong>
-              <span>Browse the collection</span>
-            </Link>
-          </div>
-
-          <section className="account-panel">
-            <div className="account-panel-heading">
-              <div>
-                <span className="account-eyebrow">Recent orders</span>
-                <h2>What you bought</h2>
-              </div>
-              <Link to="/orders" className="account-panel-link">
-                View all orders
-              </Link>
-            </div>
-
-            {ordersLoading && (
-              <div className="account-loader">Fetching orders...</div>
-            )}
-
-            {!ordersLoading && recentOrders.length === 0 && (
-              <div className="account-empty">
-                <FiShoppingBag />
-                <h3>No orders yet</h3>
-                <p>
-                  When you check out with this email, your purchases will show
-                  up here.
-                </p>
-                <Link to="/shop" className="btn btn-primary">
-                  Shop products
+          <div className="account-layout">
+            <section className="account-panel account-orders-panel">
+              <div className="account-panel-heading">
+                <div>
+                  <span className="account-eyebrow">Recent orders</span>
+                  <h2>What you bought</h2>
+                </div>
+                <Link to="/orders" className="account-panel-link">
+                  View all
                 </Link>
               </div>
-            )}
 
-            {!ordersLoading && recentOrders.length > 0 && (
-              <div className="order-receipt-list">
-                {recentOrders.map((order) => (
-                  <OrderReceipt key={order.id} order={order} />
-                ))}
-              </div>
-            )}
-          </section>
-
-          <section className="account-panel">
-            <div className="account-panel-heading">
-              <div>
-                <span className="account-eyebrow">Profile</span>
-                <h2>Your details</h2>
-              </div>
-            </div>
-
-            <form className="account-profile-form" onSubmit={handleSaveProfile}>
-              <div className="account-profile-grid">
-                <label className="account-field">
-                  <span>
-                    <FiUser /> Name
-                  </span>
-                  <input
-                    type="text"
-                    value={fullName}
-                    onChange={(event) => setFullName(event.target.value)}
-                    autoComplete="name"
-                    required
-                  />
-                </label>
-
-                <label className="account-field">
-                  <span>
-                    <FiMail /> Email
-                  </span>
-                  <input type="email" value={user.email || ''} disabled />
-                </label>
-
-                <label className="account-field">
-                  <span>Phone</span>
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(event) => setPhone(event.target.value)}
-                    placeholder="0712 345 678"
-                    autoComplete="tel"
-                  />
-                </label>
-
-                <label className="account-field">
-                  <span>City / Town</span>
-                  <input
-                    type="text"
-                    value={city}
-                    onChange={(event) => setCity(event.target.value)}
-                    placeholder="Nairobi"
-                    autoComplete="address-level2"
-                  />
-                </label>
-
-                <label className="account-field account-field-wide">
-                  <span>Delivery address</span>
-                  <textarea
-                    rows={3}
-                    value={address}
-                    onChange={(event) => setAddress(event.target.value)}
-                    placeholder="Estate, street, building, landmark"
-                    autoComplete="street-address"
-                  />
-                </label>
-              </div>
-
-              {saveError && <p className="account-form-error">{saveError}</p>}
-              {saveMessage && (
-                <p className="account-form-success">{saveMessage}</p>
+              {ordersLoading && (
+                <div className="account-loader">Fetching orders...</div>
               )}
 
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={saving}
-              >
-                {saving ? 'Saving...' : 'Save details'}
-              </button>
-            </form>
-          </section>
+              {!ordersLoading && recentOrders.length === 0 && (
+                <div className="account-empty">
+                  <span className="account-shortcut-icon">
+                    <LuShoppingBag />
+                  </span>
+                  <h3>No orders yet</h3>
+                  <p>
+                    When you check out with this email, your purchases will show
+                    up here.
+                  </p>
+                  <Link to="/shop" className="btn btn-primary">
+                    Shop products
+                  </Link>
+                </div>
+              )}
 
-          <div className="account-footer">
-            <div className="account-footer-copy">
-              <span>{BRAND.name.toUpperCase()}</span>
-              <p>
-                Need a hand?{' '}
-                <a
-                  href={whatsappHref(BRAND.phone, defaultWhatsAppText())}
-                  target="_blank"
-                  rel="noreferrer"
+              {!ordersLoading && recentOrders.length > 0 && (
+                <div className="order-receipt-list">
+                  {recentOrders.map((order) => (
+                    <OrderReceipt key={order.id} order={order} />
+                  ))}
+                </div>
+              )}
+            </section>
+
+            <aside className="account-side-column">
+              <div className="account-shortcuts">
+                <Link to="/orders" className="account-shortcut">
+                  <span className="account-shortcut-icon">
+                    <LuPackage />
+                  </span>
+                  <strong>My orders</strong>
+                  <span>
+                    {ordersLoading
+                      ? 'Loading...'
+                      : orders.length
+                        ? `${orders.length} on file`
+                        : 'No orders yet'}
+                  </span>
+                </Link>
+                <Link to="/track" className="account-shortcut">
+                  <span className="account-shortcut-icon">
+                    <LuMapPin />
+                  </span>
+                  <strong>Track order</strong>
+                  <span>Find a delivery</span>
+                </Link>
+                <Link to="/wishlist" className="account-shortcut">
+                  <span className="account-shortcut-icon">
+                    <LuHeart />
+                  </span>
+                  <strong>Wishlist</strong>
+                  <span>
+                    {wishlistCount
+                      ? `${wishlistCount} saved`
+                      : 'Nothing saved yet'}
+                  </span>
+                </Link>
+                <Link to="/shop" className="account-shortcut">
+                  <span className="account-shortcut-icon">
+                    <LuShoppingBag />
+                  </span>
+                  <strong>Shop again</strong>
+                  <span>Browse the collection</span>
+                </Link>
+              </div>
+
+              <section className="account-panel">
+                <div className="account-panel-heading">
+                  <div>
+                    <span className="account-eyebrow">Profile</span>
+                    <h2>Your details</h2>
+                  </div>
+                </div>
+
+                <form className="account-profile-form" onSubmit={handleSaveProfile}>
+                  <div className="account-profile-grid">
+                    <label className="account-field account-field-wide">
+                      <span>
+                        <LuUser /> Name
+                      </span>
+                      <input
+                        type="text"
+                        value={fullName}
+                        onChange={(event) => setFullName(event.target.value)}
+                        autoComplete="name"
+                        required
+                      />
+                    </label>
+
+                    <label className="account-field account-field-wide">
+                      <span>
+                        <LuMail /> Email
+                      </span>
+                      <input type="email" value={user.email || ''} disabled />
+                    </label>
+
+                    <label className="account-field account-field-wide">
+                      <span>
+                        <LuPhone /> Phone
+                      </span>
+                      <input
+                        type="tel"
+                        value={phone}
+                        onChange={(event) => setPhone(event.target.value)}
+                        placeholder="0712 345 678"
+                        autoComplete="tel"
+                      />
+                    </label>
+
+                    <label className="account-field account-field-wide">
+                      <span>
+                        <LuMapPin /> City / Town
+                      </span>
+                      <input
+                        type="text"
+                        value={city}
+                        onChange={(event) => setCity(event.target.value)}
+                        placeholder="Nairobi"
+                        autoComplete="address-level2"
+                      />
+                    </label>
+
+                    <label className="account-field account-field-wide">
+                      <span>
+                        <LuHouse /> Delivery address
+                      </span>
+                      <textarea
+                        rows={3}
+                        value={address}
+                        onChange={(event) => setAddress(event.target.value)}
+                        placeholder="Estate, street, building, landmark"
+                        autoComplete="street-address"
+                      />
+                    </label>
+                  </div>
+
+                  {saveError && <p className="account-form-error">{saveError}</p>}
+                  {saveMessage && (
+                    <p className="account-form-success">{saveMessage}</p>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={saving}
+                  >
+                    {saving ? 'Saving...' : 'Save details'}
+                  </button>
+                </form>
+              </section>
+
+              <div className="account-footer">
+                <div className="account-footer-copy">
+                  <span>{BRAND.name.toUpperCase()}</span>
+                  <p>
+                    Need a hand?{' '}
+                    <a
+                      href={whatsappHref(BRAND.phone, defaultWhatsAppText())}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      WhatsApp us
+                    </a>
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  className="account-signout"
+                  onClick={handleSignOut}
+                  disabled={signingOut}
                 >
-                  WhatsApp us
-                </a>{' '}
-                or <Link to="/contact">send a message</Link>.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              className="account-signout"
-              onClick={handleSignOut}
-              disabled={signingOut}
-            >
-              <FiLogOut />
-              <span>{signingOut ? 'Signing out...' : 'Sign out'}</span>
-            </button>
+                  <LuLogOut />
+                  <span>{signingOut ? 'Signing out...' : 'Sign out'}</span>
+                </button>
+              </div>
+            </aside>
           </div>
         </div>
       </section>

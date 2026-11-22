@@ -2,18 +2,23 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import {
+  FiArrowRight,
   FiHeart,
   FiShoppingBag,
-  FiUser,
   FiSearch,
   FiMenu,
   FiX,
-  FiLogOut,
   FiChevronDown,
-  FiArrowRight,
-  FiPackage,
-  FiMapPin
 } from "react-icons/fi";
+import {
+  LuHeart,
+  LuLogIn,
+  LuLogOut,
+  LuMapPin,
+  LuPackage,
+  LuUser,
+  LuUserPlus,
+} from "react-icons/lu";
 
 import { supabase } from "../lib/supabase";
 import { useCart } from "../context/useCart";
@@ -467,7 +472,7 @@ const Navbar = () => {
                 aria-expanded={accountOpen}
                 onClick={() => setAccountOpen((current) => !current)}
               >
-                <FiUser />
+                <LuUser />
                 <span>{user ? displayName : "Account"}</span>
                 <FiChevronDown
                   className={`navbar-account-chevron${
@@ -486,13 +491,20 @@ const Navbar = () => {
                   {user ? (
                     <>
                       <div className="navbar-account-header">
-                        <span className="navbar-account-name">
-                          {displayName}
+                        <span className="navbar-account-mark" aria-hidden="true">
+                          <LuUser />
                         </span>
-                        <span className="navbar-account-email">
-                          {user.email}
+                        <span className="navbar-account-identity">
+                          <span className="navbar-account-name">
+                            {displayName}
+                          </span>
+                          <span className="navbar-account-email">
+                            {user.email}
+                          </span>
                         </span>
                       </div>
+
+                      <p className="navbar-account-label">Your account</p>
 
                       <Link
                         to="/account"
@@ -500,7 +512,9 @@ const Navbar = () => {
                         role="menuitem"
                         onClick={() => setAccountOpen(false)}
                       >
-                        <FiUser />
+                        <span className="navbar-account-icon" aria-hidden="true">
+                          <LuUser />
+                        </span>
                         <span>My Account</span>
                       </Link>
 
@@ -510,7 +524,9 @@ const Navbar = () => {
                         role="menuitem"
                         onClick={() => setAccountOpen(false)}
                       >
-                        <FiPackage />
+                        <span className="navbar-account-icon" aria-hidden="true">
+                          <LuPackage />
+                        </span>
                         <span>My Orders</span>
                       </Link>
 
@@ -520,7 +536,9 @@ const Navbar = () => {
                         role="menuitem"
                         onClick={() => setAccountOpen(false)}
                       >
-                        <FiMapPin />
+                        <span className="navbar-account-icon" aria-hidden="true">
+                          <LuMapPin />
+                        </span>
                         <span>Track order</span>
                       </Link>
 
@@ -530,7 +548,9 @@ const Navbar = () => {
                         role="menuitem"
                         onClick={() => setAccountOpen(false)}
                       >
-                        <FiHeart />
+                        <span className="navbar-account-icon" aria-hidden="true">
+                          <LuHeart />
+                        </span>
                         <span>Wishlist</span>
                         {wishlistCount > 0 && (
                           <span className="navbar-account-link-count">
@@ -547,20 +567,29 @@ const Navbar = () => {
                         role="menuitem"
                         onClick={handleSignOut}
                       >
-                        <FiLogOut />
+                        <span className="navbar-account-icon" aria-hidden="true">
+                          <LuLogOut />
+                        </span>
                         <span>Sign out</span>
                       </button>
                     </>
                   ) : (
                     <>
                       <div className="navbar-account-header">
-                        <span className="navbar-account-name">
-                          Welcome to Sleek Sisters
+                        <span className="navbar-account-mark" aria-hidden="true">
+                          <LuUser />
                         </span>
-                        <span className="navbar-account-email">
-                          Sign in to your account
+                        <span className="navbar-account-identity">
+                          <span className="navbar-account-name">
+                            Welcome
+                          </span>
+                          <span className="navbar-account-email">
+                            Sign in to Sleek Sisters
+                          </span>
                         </span>
                       </div>
+
+                      <p className="navbar-account-label">Account</p>
 
                       <Link
                         to="/login"
@@ -568,7 +597,9 @@ const Navbar = () => {
                         role="menuitem"
                         onClick={() => setAccountOpen(false)}
                       >
-                        <FiUser />
+                        <span className="navbar-account-icon" aria-hidden="true">
+                          <LuLogIn />
+                        </span>
                         <span>Sign in</span>
                       </Link>
 
@@ -578,9 +609,15 @@ const Navbar = () => {
                         role="menuitem"
                         onClick={() => setAccountOpen(false)}
                       >
-                        <FiArrowRight />
+                        <span className="navbar-account-icon" aria-hidden="true">
+                          <LuUserPlus />
+                        </span>
                         <span>Create account</span>
                       </Link>
+
+                      <div className="navbar-account-divider" />
+
+                      <p className="navbar-account-label">Orders</p>
 
                       <Link
                         to="/track"
@@ -588,7 +625,9 @@ const Navbar = () => {
                         role="menuitem"
                         onClick={() => setAccountOpen(false)}
                       >
-                        <FiMapPin />
+                        <span className="navbar-account-icon" aria-hidden="true">
+                          <LuMapPin />
+                        </span>
                         <span>Track order</span>
                       </Link>
                     </>
@@ -704,28 +743,28 @@ const Navbar = () => {
               className="navbar-mobile-link"
               onClick={() => setMobileOpen(false)}
             >
-              My Account
+              <LuUser /> My Account
             </Link>
             <Link
               to="/orders"
               className="navbar-mobile-link"
               onClick={() => setMobileOpen(false)}
             >
-              My Orders
+              <LuPackage /> My Orders
             </Link>
             <Link
               to="/track"
               className="navbar-mobile-link"
               onClick={() => setMobileOpen(false)}
             >
-              Track order
+              <LuMapPin /> Track order
             </Link>
             <Link
               to="/wishlist"
               className="navbar-mobile-link"
               onClick={() => setMobileOpen(false)}
             >
-              Wishlist
+              <LuHeart /> Wishlist
             </Link>
 
             <button
@@ -733,7 +772,7 @@ const Navbar = () => {
               className="navbar-mobile-signout"
               onClick={handleSignOut}
             >
-              <FiLogOut />
+              <LuLogOut />
               Sign out
             </button>
           </>
@@ -744,7 +783,7 @@ const Navbar = () => {
               className="navbar-mobile-link"
               onClick={() => setMobileOpen(false)}
             >
-              Sign in
+              <LuLogIn /> Sign in
             </Link>
 
             <Link
@@ -752,14 +791,14 @@ const Navbar = () => {
               className="navbar-mobile-link"
               onClick={() => setMobileOpen(false)}
             >
-              Create account
+              <LuUserPlus /> Create account
             </Link>
             <Link
               to="/track"
               className="navbar-mobile-link"
               onClick={() => setMobileOpen(false)}
             >
-              Track order
+              <LuMapPin /> Track order
             </Link>
           </>
         )}

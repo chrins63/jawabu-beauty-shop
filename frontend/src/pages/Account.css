@@ -73,11 +73,46 @@
   padding: 36px 0 80px;
 }
 
+.account-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.9fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.account-side-column {
+  display: grid;
+  gap: 16px;
+}
+
+.account-side-column .account-panel,
+.account-orders-panel {
+  margin-bottom: 0;
+}
+
 .account-shortcuts {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-  margin-bottom: 36px;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.account-shortcut-icon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  background: #000000;
+  border: 1px solid #d4af37;
+  color: #f2d16b;
+}
+
+.account-shortcut-icon svg,
+.account-field span svg,
+.account-signout svg {
+  width: 16px;
+  height: 16px;
+  color: #f2d16b;
 }
 
 .account-shortcut {
@@ -95,9 +130,9 @@
 }
 
 .account-shortcut svg {
-  width: 20px;
-  height: 20px;
-  color: #e8c36a;
+  width: 16px;
+  height: 16px;
+  color: #f2d16b;
 }
 
 .account-shortcut strong {
@@ -426,8 +461,10 @@
 }
 
 @media (max-width: 900px) {
-  .account-shortcuts {
-    grid-template-columns: 1fr 1fr;
+  .account-layout,
+  .account-shortcuts,
+  .account-profile-grid {
+    grid-template-columns: 1fr;
   }
 
   .account-order-card {
@@ -461,14 +498,6 @@
 @media (max-width: 640px) {
   .account-hero {
     padding-top: 28px;
-  }
-
-  .account-shortcuts {
-    grid-template-columns: 1fr;
-  }
-
-  .account-profile-grid {
-    grid-template-columns: 1fr;
   }
 
   .account-panel {
