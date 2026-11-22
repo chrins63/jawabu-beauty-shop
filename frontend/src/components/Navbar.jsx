@@ -52,6 +52,7 @@ const Navbar = () => {
   const [accountOpen, setAccountOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -105,21 +106,50 @@ const Navbar = () => {
   }, []);
 
   /* =====================================================
-     NAVBAR SCROLL EFFECT (mirror intensifies on scroll)
+     HIDE ON SCROLL DOWN, RETURN ON SCROLL UP
   ===================================================== */
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+    let lastY = window.scrollY;
+    let frame = 0;
+
+    const update = () => {
+      const y = window.scrollY;
+      const delta = y - lastY;
+
+      setScrolled(y > 20);
+
+      if (mobileOpen || y < 72) {
+        setHidden(false);
+      } else if (delta > 8) {
+        setHidden(true);
+        setAccountOpen(false);
+        setSearchOpen(false);
+      } else if (delta < -8) {
+        setHidden(false);
+      }
+
+      lastY = y;
+      frame = 0;
     };
 
-    handleScroll();
+    const handleScroll = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(update);
+    };
+
+    update();
     window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      if (frame) window.cancelAnimationFrame(frame);
     };
-  }, []);
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    setHidden(false);
+  }, [location.pathname]);
 
   /* =====================================================
      CLOSE ACCOUNT DROPDOWN OUTSIDE
@@ -308,7 +338,7 @@ const Navbar = () => {
       ===================================================== */}
 
       <header
-        className={`navbar${scrolled ? " navbar--scrolled" : ""}`}
+        className={`navbar${scrolled ? " navbar--scrolled" : ""}${hidden ? " navbar--hidden" : ""}`}
       >
         <div className="navbar-container">
           {/* =================================================
