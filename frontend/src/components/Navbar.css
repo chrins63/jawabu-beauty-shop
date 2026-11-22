@@ -534,17 +534,17 @@
   flex-direction: row;
   align-items: center;
   gap: 12px;
-  padding: 4px 4px 12px;
+  padding: 0 0 12px;
   margin-bottom: 2px;
   border-bottom: 1px solid rgba(212, 175, 55, 0.45);
 }
 
 .navbar-account-mark {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
   display: grid;
   place-items: center;
-  flex-shrink: 0;
   background: #000000;
   border: 1px solid #d4af37;
   color: #f2d16b;
@@ -579,7 +579,7 @@
 }
 
 .navbar-account-label {
-  margin: 8px 4px 2px;
+  margin: 10px 0 2px;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.22em;
@@ -589,14 +589,18 @@
 
 /* DROPDOWN LINKS */
 
-.navbar-account-dropdown .navbar-account-link,
-.navbar-account-dropdown .navbar-signout {
+.navbar-actions .navbar-account-dropdown .navbar-account-link,
+.navbar-actions .navbar-account-dropdown .navbar-signout {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 12px;
 
   width: 100%;
-  padding: 6px;
+  height: auto;
+  min-height: 44px;
+  padding: 4px 0;
+  box-sizing: border-box;
   border-radius: 2px;
 
   color: #f7f1de;
@@ -606,19 +610,22 @@
   font-family: Calibri, "Source Sans 3", "Segoe UI", sans-serif;
   font-size: 14px;
   font-weight: 600;
+  line-height: 1;
   text-align: left;
   text-decoration: none;
+  white-space: nowrap;
 
   cursor: pointer;
+  transform: none;
   transition: background 0.18s ease, color 0.18s ease;
 }
 
 .navbar-account-icon {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
   display: grid;
   place-items: center;
-  flex-shrink: 0;
   background: #050505;
   border: 1px solid rgba(212, 175, 55, 0.75);
   color: #f2d16b;
@@ -634,10 +641,14 @@
   flex-shrink: 0;
 }
 
-.navbar-account-dropdown .navbar-account-link:hover,
-.navbar-account-dropdown .navbar-account-link:focus-visible {
+.navbar-actions .navbar-account-dropdown .navbar-account-link:hover,
+.navbar-actions .navbar-account-dropdown .navbar-account-link:focus-visible,
+.navbar-actions .navbar-account-dropdown .navbar-signout:hover,
+.navbar-actions .navbar-account-dropdown .navbar-signout:focus-visible {
   background: rgba(212, 175, 55, 0.12);
   color: #f2d16b;
+  padding: 4px 0;
+  transform: none;
   outline: none;
 }
 
@@ -675,9 +686,8 @@
 
 .navbar-account-dropdown .navbar-signout:hover,
 .navbar-account-dropdown .navbar-signout:focus-visible {
-  background: rgba(201, 168, 118, 0.16);
-  color: #c9a876;
-  padding-left: 14px;
+  background: rgba(212, 175, 55, 0.12);
+  color: #f2d16b;
   outline: none;
 }
 

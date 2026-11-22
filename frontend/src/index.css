@@ -3114,6 +3114,12 @@ section {
     height: 20px;
   }
 
+  .navbar-actions .navbar-account-dropdown a,
+  .navbar-actions .navbar-account-dropdown button {
+    width: 100%;
+    height: auto;
+  }
+
   .navbar-actions svg {
     width: 18px;
     height: 18px;
