@@ -1,0 +1,4 @@
+{
+  "name": "ChrisTech",
+  "description": "Self-hosted website monitoring and support ticketing suite with a React dashboard backed by a Flask API, public status page, multi-channel alerts, SSL radar, maintenance windows, and SLA reports."
+}
