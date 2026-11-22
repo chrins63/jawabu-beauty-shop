@@ -27,6 +27,7 @@ import BrandLogo from "./BrandLogo";
 import { BRAND } from "../lib/brand";
 import { getStorefrontCommerce } from "../lib/storefront";
 import { whatsappHref, defaultWhatsAppText } from "../lib/whatsapp";
+import { FaWhatsapp } from "react-icons/fa";
 
 import "./Navbar.css";
 
@@ -309,9 +310,6 @@ const Navbar = () => {
       <header
         className={`navbar${scrolled ? " navbar--scrolled" : ""}`}
       >
-        {/* mirror sheen layer, purely decorative */}
-        <div className="navbar-sheen" aria-hidden="true" />
-
         <div className="navbar-container">
           {/* =================================================
               MOBILE MENU BUTTON
@@ -417,9 +415,7 @@ const Navbar = () => {
               target="_blank"
               rel="noreferrer"
             >
-              <span className="navbar-whatsapp-glyph" aria-hidden="true">
-                WA
-              </span>
+              <FaWhatsapp />
             </a>
 
             {/* WISHLIST */}

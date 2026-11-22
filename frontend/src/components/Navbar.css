@@ -34,59 +34,24 @@
   padding-top: env(safe-area-inset-top, 0px);
 
   background: #000000;
-  border-bottom: 4px solid #d4af37;
-  border-top: 4px solid #d4af37;
-  box-shadow:
-    0 1px 0 #f2d16b,
-    0 14px 36px rgba(0, 0, 0, 0.55);
-
-  transition:
-    background 0.35s ease,
-    box-shadow 0.35s ease,
-    border-color 0.35s ease;
-}
-
-/* the "mirror" reflection: a thin bright line along the top edge
-   plus a soft vertical fade, like light catching polished glass */
-
-.navbar-sheen {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-
-  background:
-    linear-gradient(
-      180deg,
-      var(--jwb-mirror-line) 0%,
-      rgba(255, 255, 255, 0) 2px
-    ),
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.35) 0%,
-      rgba(255, 255, 255, 0) 60%
-    );
-
-  opacity: 0.8;
+  border-bottom: 2px solid #d4af37;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
 }
 
 .navbar--scrolled {
-  background: #000000;
-  box-shadow:
-    0 1px 0 #f2d16b,
-    0 18px 40px rgba(0, 0, 0, 0.75);
-  border-bottom-color: #d4af37;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
 }
 
 .navbar-container {
-  max-width: 1320px;
+  max-width: 1360px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 28px;
 
-  height: 84px;
+  height: 76px;
 
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 28px;
 
   position: relative;
 }
@@ -106,8 +71,8 @@
 }
 
 .brand-logo-mark {
-  width: 58px;
-  height: 58px;
+  width: 46px;
+  height: 46px;
   object-fit: contain;
   display: block;
   flex-shrink: 0;
@@ -122,13 +87,12 @@
 
 .brand-logo-name {
   font-family: Cambria, "Cormorant Garamond", Georgia, serif;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
   color: #f2d16b;
-  line-height: 1.1;
+  line-height: 1;
   white-space: nowrap;
-  text-shadow: 0 0 18px rgba(232, 195, 106, 0.35);
 }
 
 .brand-logo-tagline {
@@ -153,57 +117,56 @@
 .navbar-links {
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin-left: 12px;
+  justify-content: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
 }
 
 .navbar-link {
   position: relative;
 
-  padding: 9px 14px;
-  border-radius: 2px;
+  padding: 10px 12px;
+  border-radius: 0;
 
-  color: #f5ead0;
+  color: #f7f1de;
   font-family: Calibri, "Source Sans 3", "Segoe UI", sans-serif;
-  font-size: 13.5px;
-  font-weight: 500;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 
   text-decoration: none;
 
-  transition: color 0.2s ease, background 0.2s ease;
+  transition: color 0.2s ease;
 }
 
 .navbar-link::after {
   content: "";
   position: absolute;
-  left: 14px;
-  right: 14px;
-  bottom: 3px;
-  height: 3px;
-  border-radius: 2px;
+  left: 12px;
+  right: 12px;
+  bottom: 4px;
+  height: 2px;
 
   background: #d4af37;
   transform: scaleX(0);
-  transform-origin: left;
+  transform-origin: center;
   transition: transform 0.25s ease;
 }
 
 .navbar-link:hover {
-  color: #e8d5a3;
-  background: rgba(201, 168, 118, 0.12);
+  color: #f2d16b;
+  background: transparent;
 }
 
-.navbar-link:hover::after {
+.navbar-link:hover::after,
+.navbar-link.is-active::after {
   transform: scaleX(1);
 }
 
 .navbar-link.is-active {
   color: #f2d16b;
-  font-weight: 600;
-}
-
-.navbar-link.is-active::after {
-  transform: scaleX(1);
 }
 
 /* =========================================================
@@ -227,29 +190,25 @@
 .navbar-menu-btn {
   position: relative;
 
-  width: 40px;
-  height: 40px;
-  flex: 0 0 40px;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  border: 1px solid transparent;
-  border-radius: 50%;
-  background: transparent;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-radius: 2px;
+  background: #000000;
 
-  color: var(--jwb-ink);
+  color: #f2d16b;
   font-size: 18px;
 
   text-decoration: none;
   cursor: pointer;
 
-  transition:
-    background 0.25s ease,
-    border-color 0.25s ease,
-    color 0.25s ease,
-    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .navbar-actions .navbar-icon-btn svg,
@@ -264,10 +223,10 @@
 
 .navbar-actions .navbar-icon-btn:hover,
 .navbar-menu-btn:hover {
-  background: var(--jwb-blush);
-  border-color: rgba(201, 168, 118, 0.18);
-  color: var(--jwb-accent-deep);
-  transform: translateY(-2px);
+  background: rgba(212, 175, 55, 0.14);
+  border-color: #d4af37;
+  color: #fff6d8;
+  transform: none;
 }
 
 .navbar-actions .navbar-icon-btn:hover svg {
@@ -345,11 +304,8 @@
   padding: 8px 10px;
   box-sizing: border-box;
 
-  background: rgba(10, 10, 10, 0.96);
-  backdrop-filter: blur(16px) saturate(160%);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
-
-  border: 1px solid rgba(201, 168, 118, 0.35);
+  background: #000000;
+  border: 2px solid #d4af37;
   border-radius: 2px;
 
   box-shadow:
@@ -422,33 +378,29 @@
 }
 
 .navbar-account-wrapper .navbar-account {
-  height: 40px;
-  min-width: 88px;
+  height: 36px;
+  min-width: 0;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: 8px;
 
-  padding: 0 14px;
+  padding: 0 12px;
 
-  border: 1px solid transparent;
-  border-radius: 999px;
-  background: transparent;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-radius: 2px;
+  background: #000000;
 
-  color: var(--jwb-ink);
+  color: #f2d16b;
   font-family: Calibri, "Source Sans 3", Arial, sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 
   white-space: nowrap;
   cursor: pointer;
-
-  transition:
-    background 0.25s ease,
-    border-color 0.25s ease,
-    color 0.25s ease;
 }
 
 .navbar-account-wrapper .navbar-account svg {
@@ -470,9 +422,9 @@
 }
 
 .navbar-account-wrapper .navbar-account:hover {
-  background: rgba(201, 168, 118, 0.14);
-  border-color: #c9a876;
-  color: #e8d5a3;
+  background: rgba(212, 175, 55, 0.14);
+  border-color: #d4af37;
+  color: #fff6d8;
 }
 
 /* =========================================================
@@ -728,12 +680,9 @@
   padding: calc(24px + env(safe-area-inset-top, 0px)) 18px 24px;
   box-sizing: border-box;
 
-  background: #0a0a0a;
-  backdrop-filter: blur(22px) saturate(170%);
-  -webkit-backdrop-filter: blur(22px) saturate(170%);
-
-  border-right: 1px solid rgba(201, 168, 118, 0.28);
-  box-shadow: 24px 0 60px -24px rgba(43, 29, 34, 0.4);
+  background: #000000;
+  border-right: 2px solid #d4af37;
+  box-shadow: 24px 0 60px rgba(0, 0, 0, 0.55);
 
   transform: translateX(-100%);
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -751,9 +700,9 @@
   padding: 10px 14px;
   margin-bottom: 10px;
 
-  border: 1px solid var(--jwb-border);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid #d4af37;
+  border-radius: 2px;
+  background: #000000;
 }
 
 .navbar-mobile-search svg {

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { BRAND } from '../lib/brand'
 
 export default function BrandLogo({
   to = '/',
@@ -16,7 +17,7 @@ export default function BrandLogo({
         <span className="visually-hidden">Sleek Sisters</span>
       ) : (
         <span className="brand-logo-copy">
-          <span className="brand-logo-name">Sleek_Sisters</span>
+          <span className="brand-logo-name">{BRAND.name}</span>
           <span className="brand-logo-tagline">Grace in Every Detail</span>
         </span>
       )}
